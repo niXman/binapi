@@ -57,7 +57,7 @@ int main() {
         ,"443"
         ,pk
         ,sk
-        ,10000
+        ,10000 // recvWindow
     );
 
     auto account = api.account_info();
@@ -92,7 +92,7 @@ int main() {
         ,"443"
         ,pk
         ,sk
-        ,10000
+        ,10000 // recvWindow
     );
 
     api.account_info([](const char *fl, int ec, std::string errmsg, binapi::rest::account_info_t res) {
