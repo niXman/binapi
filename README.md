@@ -37,3 +37,5 @@ This implementation has been developed as a consequence of the lack of suitable 
 
 # Implementation details
 The project is written using C++14 and [boost](https://www.boost.org/) (at least version 1.70). [boost.beast](https://www.boost.org/doc/libs/1_73_0/libs/beast/index.html) is used to interact with the network.
+
+# 
