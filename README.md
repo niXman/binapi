@@ -1,5 +1,5 @@
 # binapi
-Binance API implemented in C++
+Binance API implemented in C++ for both synchronous and asynchronous way.
 
 # Motivation
 This implementation has been developed as a consequence of the lack of suitable alternatives as part of my multiuser trading platform project.
@@ -38,4 +38,38 @@ This implementation has been developed as a consequence of the lack of suitable 
 # Implementation details
 The project is written using C++14 and [boost](https://www.boost.org/) (at least version 1.70). [boost.beast](https://www.boost.org/doc/libs/1_73_0/libs/beast/index.html) is used to interact with the network.
 
-# 
+# Synchronous example
+```cpp
+#include "binapi/api.hpp"
+
+#include <boost/asio/io_context.hpp>
+
+#include <iostream>
+
+int main() {
+    const std::string pk = "...";
+    const std::string sk = "...";
+
+    boost::asio::io_context ioctx;
+    binapi::rest::api api(
+        ioctx
+        ,"api.binance.com"
+        ,"443"
+        ,pk
+        ,sk
+        ,10000
+    );
+
+    auto account = api.account_info();
+    if ( !account ) {
+        std::cerr << "account info error: " << account.errmsg << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    std::cout << "account info: " << account.v << std::endl << std::endl;
+
+    return EXIT_SUCCESS;
+}
+
+```
+
