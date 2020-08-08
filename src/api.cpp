@@ -11,6 +11,7 @@
 
 #include <binapi/api.hpp>
 #include <binapi/invoker.hpp>
+#include <binapi/picohash.h>
 
 #include <boost/preprocessor.hpp>
 #include <boost/callable_traits.hpp>
@@ -28,10 +29,6 @@
 #include <queue>
 #include <type_traits>
 #include <iostream>
-
-// TODO: re-do without using openssl
-#include <openssl/hmac.h>
-#include <openssl/sha.h>
 
 namespace binapi {
 namespace rest {
@@ -110,21 +107,13 @@ std::string b2a_hex(const std::uint8_t *p, std::size_t n) {
 }
 
 std::string hmac_sha256(const char *key, std::size_t klen, const char *data, std::size_t dlen) {
-    std::uint8_t digest[EVP_MAX_MD_SIZE];
-    std::uint32_t dilen{};
+    picohash_ctx_t ctx;
+    std::uint8_t digest[PICOHASH_SHA256_DIGEST_LENGTH];
+    picohash_init_hmac(&ctx, picohash_init_sha256, key, klen);
+    picohash_update(&ctx, data, dlen);
+    picohash_final(&ctx, digest);
 
-    auto p = ::HMAC(
-         ::EVP_sha256()
-        ,key
-        ,klen
-        ,(std::uint8_t *)data
-        ,dlen
-        ,digest
-        ,&dilen
-    );
-    assert(p);
-
-    return b2a_hex(digest, dilen);
+    return b2a_hex(digest, sizeof(digest));
 }
 
 /*************************************************************************************************/
