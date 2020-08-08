@@ -66,28 +66,6 @@ struct api {
     result<server_time_t>
     server_time(server_time_cb cb = {});
 
-    // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker
-    using price_cb = std::function<bool(const char *fl, int ec, std::string errmsg, prices_t::price_t res)>;
-    result<prices_t::price_t>
-    price(const std::string &symbol, price_cb cb = {}) { return price(symbol.c_str(), std::move(cb)); }
-    result<prices_t::price_t>
-    price(const char *symbol, price_cb cb = {});
-
-    using prices_cb = std::function<bool(const char *fl, int ec, std::string errmsg, prices_t res)>;
-    result<prices_t>
-    prices(prices_cb cb = {});
-
-    // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics
-    using _24hrs_ticker_cb = std::function<bool(const char *fl, int ec, std::string errmsg, _24hrs_tickers_t::_24hrs_ticker_t res)>;
-    result<_24hrs_tickers_t::_24hrs_ticker_t>
-    _24hrs_ticker(const std::string &symbol, _24hrs_ticker_cb cb = {}) { return _24hrs_ticker(symbol.c_str(), std::move(cb)); }
-    result<_24hrs_tickers_t::_24hrs_ticker_t>
-    _24hrs_ticker(const char *symbol, _24hrs_ticker_cb cb = {});
-
-    using _24hrs_tickers_cb = std::function<bool(const char *fl, int ec, std::string errmsg, _24hrs_tickers_t res)>;
-    result<_24hrs_tickers_t>
-    _24hrs_tickers(_24hrs_tickers_cb cb = {});
-
     // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#exchange-information
     using exchange_info_cb = std::function<bool(const char *fl, int ec, std::string errmsg, exchange_info_t res)>;
     result<exchange_info_t>
@@ -112,6 +90,28 @@ struct api {
     trades(const std::string &symbol, std::size_t limit, trades_cb cb = {}) { return trades(symbol.c_str(), limit, std::move(cb)); }
     result<trades_t>
     trades(const char *symbol, std::size_t limit, trades_cb cb = {});
+
+    // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker
+    using price_cb = std::function<bool(const char *fl, int ec, std::string errmsg, prices_t::price_t res)>;
+    result<prices_t::price_t>
+    price(const std::string &symbol, price_cb cb = {}) { return price(symbol.c_str(), std::move(cb)); }
+    result<prices_t::price_t>
+    price(const char *symbol, price_cb cb = {});
+
+    using prices_cb = std::function<bool(const char *fl, int ec, std::string errmsg, prices_t res)>;
+    result<prices_t>
+    prices(prices_cb cb = {});
+
+    // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics
+    using _24hrs_ticker_cb = std::function<bool(const char *fl, int ec, std::string errmsg, _24hrs_tickers_t::_24hrs_ticker_t res)>;
+    result<_24hrs_tickers_t::_24hrs_ticker_t>
+    _24hrs_ticker(const std::string &symbol, _24hrs_ticker_cb cb = {}) { return _24hrs_ticker(symbol.c_str(), std::move(cb)); }
+    result<_24hrs_tickers_t::_24hrs_ticker_t>
+    _24hrs_ticker(const char *symbol, _24hrs_ticker_cb cb = {});
+
+    using _24hrs_tickers_cb = std::function<bool(const char *fl, int ec, std::string errmsg, _24hrs_tickers_t res)>;
+    result<_24hrs_tickers_t>
+    _24hrs_tickers(_24hrs_tickers_cb cb = {});
 
     // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list
     using agg_trade_cb = std::function<bool(const char *fl, int ec, std::string errmsg, agg_trades_t::agg_trade_t res)>;
