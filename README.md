@@ -73,3 +73,41 @@ int main() {
 
 ```
 
+# Asynchronous example
+```cpp
+#include "binapi/api.hpp"
+
+#include <boost/asio/io_context.hpp>
+
+#include <iostream>
+
+int main() {
+    const std::string pk = "...";
+    const std::string sk = "...";
+
+    boost::asio::io_context ioctx;
+    binapi::rest::api api(
+        ioctx
+        ,"api.binance.com"
+        ,"443"
+        ,pk
+        ,sk
+        ,10000
+    );
+
+    api.account_info([](const char *fl, int ec, std::string errmsg, binapi::rest::account_info_t res) {
+        if ( ec ) {
+            std::cerr << "account info error: fl=" << fl << ", ec=" << ec << ", emsg=" << errmsg << std::endl;
+            return false;
+        }
+
+        std::cout << "account info: " << res << std::endl;
+
+        return true;
+    });
+
+    ioctx.run();
+
+    return EXIT_SUCCESS;
+}
+```
