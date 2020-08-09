@@ -31,7 +31,6 @@ set(BINAPI_HEADERS
     binapi/io_state.hpp
     binapi/message.hpp
     binapi/pairslist.hpp
-    binapi/picohash.h
     binapi/reports.hpp
     binapi/tools.hpp
     binapi/types.hpp
