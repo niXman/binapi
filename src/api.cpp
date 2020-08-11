@@ -29,7 +29,6 @@
 #include <type_traits>
 #include <iostream>
 
-// TODO: re-do without using openssl
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
 
@@ -158,11 +157,12 @@ struct api::impl {
 
     template<
          typename CB
-        ,typename R = typename std::tuple_element<3, typename boost::callable_traits::args<CB>::type>::type
+        ,typename Args = typename boost::callable_traits::args<CB>::type
+        ,typename R = typename std::tuple_element<3, Args>::type
     >
     api::result<R>
     post(bool _signed, const char *target, const char *action, const std::initializer_list<kv_type> &map, CB cb) {
-        static_assert(std::tuple_size<typename boost::callable_traits::args<CB>::type>::value == 4, "");
+        static_assert(std::tuple_size<Args>::value == 4, "");
 
         api::result<R> res{};
 
@@ -624,13 +624,13 @@ api::~api()
 /*************************************************************************************************/
 
 api::result<ping_t> api::ping(ping_cb cb) {
-    return pimpl->post(false, "/api/v1/ping", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/ping", "GET", {}, std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<server_time_t> api::server_time(server_time_cb cb) {
-    return pimpl->post(false, "/api/v1/time", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/time", "GET", {}, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -654,17 +654,17 @@ api::result<_24hrs_tickers_t::_24hrs_ticker_t> api::_24hrs_ticker(const char *sy
         {"symbol", symbol}
     };
 
-    return pimpl->post(false, "/api/v1/ticker/24hr", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/ticker/24hr", "GET", map, std::move(cb));
 }
 
 api::result<_24hrs_tickers_t> api::_24hrs_tickers(api::_24hrs_tickers_cb cb) {
-    return pimpl->post(false, "/api/v1/ticker/24hr", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/ticker/24hr", "GET", {}, std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<exchange_info_t> api::exchange_info(exchange_info_cb cb) {
-    return pimpl->post(false, "/api/v1/exchangeInfo", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/exchangeInfo", "GET", {}, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -675,7 +675,7 @@ api::result<depths_t> api::depths(const char *symbol, std::size_t limit, depths_
         ,{"limit", limit}
     };
 
-    return pimpl->post(false, "/api/v1/depth", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/depth", "GET", map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -686,7 +686,7 @@ api::result<trades_t::trade_t> api::trade(const char *symbol, trade_cb cb) {
         ,{"limit", 1u}
     };
 
-    return pimpl->post(false, "/api/v1/trades", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/trades", "GET", map, std::move(cb));
 }
 
 api::result<trades_t> api::trades(const char *symbol, std::size_t limit, trades_cb cb) {
@@ -695,7 +695,7 @@ api::result<trades_t> api::trades(const char *symbol, std::size_t limit, trades_
         ,{"limit", limit}
     };
 
-    return pimpl->post(false, "/api/v1/trades", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/trades", "GET", map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -706,7 +706,7 @@ api::result<agg_trades_t::agg_trade_t> api::agg_trade(const char *symbol, agg_tr
         ,{"limit", 1u}
     };
 
-    return pimpl->post(false, "/api/v1/aggTrades", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/aggTrades", "GET", map, std::move(cb));
 }
 
 api::result<agg_trades_t> api::agg_trades(const char *symbol, std::size_t limit, agg_trades_cb cb) {
@@ -715,7 +715,7 @@ api::result<agg_trades_t> api::agg_trades(const char *symbol, std::size_t limit,
         ,{"limit", limit}
     };
 
-    return pimpl->post(false, "/api/v1/aggTrades", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/aggTrades", "GET", map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -727,7 +727,7 @@ api::result<klines_t> api::klines(const char *symbol, const char *interval, std:
         ,{"interval", interval}
     };
 
-    return pimpl->post(false, "/api/v1/klines", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/klines", "GET", map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -939,7 +939,7 @@ api::result<my_trades_info_t> api::my_trades(
 /*************************************************************************************************/
 
 api::result<start_user_data_stream_t> api::start_user_data_stream(start_user_data_stream_cb cb) {
-    return pimpl->post(false, "/api/v1/userDataStream", "POST", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/userDataStream", "POST", {}, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -949,7 +949,7 @@ api::result<ping_user_data_stream_t> api::ping_user_data_stream(const char *list
         {"listenKey", listen_key}
     };
 
-    return pimpl->post(false, "/api/v1/userDataStream", "PUT", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/userDataStream", "PUT", map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -959,7 +959,7 @@ api::result<close_user_data_stream_t> api::close_user_data_stream(const char *li
         {"listenKey", listen_key}
     };
 
-    return pimpl->post(false, "/api/v1/userDataStream", "DELETE", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/userDataStream", "DELETE", map, std::move(cb));
 }
 
 /*************************************************************************************************/
