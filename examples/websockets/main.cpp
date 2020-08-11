@@ -38,43 +38,38 @@ int main(int argc, char **argv) {
         ,"9443"
     };
 
-    auto res = api.start_user_data_stream(
-        [&ws](const char *fl, int ec, std::string emsg, auto res) {
+    auto res = api.start_user_data_stream();
+    if ( !res ) {
+        std::cerr << "start user data stream error: " << res.errmsg << std::endl;
+
+        return EXIT_FAILURE;
+    }
+
+    std::cout << "listen key: " << res.v << std::endl;
+
+    ws.subscribe_depth("BTCUSDT",
+        [](const char *fl, int ec, std::string emsg, auto depths) {
             if ( ec ) {
-                std::cerr << "start user data stream error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+                std::cerr << "subscribe depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
 
                 return false;
             }
 
-            std::cout << "listen key: " << res << std::endl;
+            std::cout << "depths: " << depths << std::endl;
 
-            ws.subscribe_depth("BTCUSDT",
-                [](const char *fl, int ec, std::string emsg, auto depths) {
-                    if ( ec ) {
-                        std::cerr << "subscribe depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+            return true;
+        }
+    );
 
-                        return false;
-                    }
+    ws.subscribe_trade("BTCUSDT",
+        [](const char *fl, int ec, std::string emsg, auto trades) {
+            if ( ec ) {
+                std::cerr << "subscribe trades error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
 
-                    std::cout << "depths: " << depths << std::endl;
+                return false;
+            }
 
-                    return true;
-                }
-            );
-
-            ws.subscribe_trade("BTCUSDT",
-                [](const char *fl, int ec, std::string emsg, auto trades) {
-                    if ( ec ) {
-                        std::cerr << "subscribe trades error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
-
-                        return false;
-                    }
-
-                    std::cout << "trades: " << trades << std::endl;
-
-                    return true;
-                }
-            );
+            std::cout << "trades: " << trades << std::endl;
 
             return true;
         }
