@@ -217,6 +217,8 @@ struct api::impl {
         }
 
         if ( _signed ) {
+            assert(!m_pk.empty() && !m_sk.empty());
+
             if ( !data.empty() ) {
                 data += "&";
             }
@@ -425,14 +427,10 @@ struct api::impl {
 
         // Look up the domain name
         m_resolver.async_resolve(
-            m_host,
-            m_port,
-            std::bind(
-                &impl::on_resolve,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2
-            )
+             m_host
+            ,m_port
+            ,[this](const boost::system::error_code &ec, boost::asio::ip::tcp::resolver::results_type res)
+             { on_resolve(ec, std::move(res)); }
         );
     }
     void on_resolve(boost::system::error_code ec, boost::asio::ip::tcp::resolver::results_type results) {
