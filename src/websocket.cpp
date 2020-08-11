@@ -180,10 +180,10 @@ void websocket::stop() { return pimpl->stop(); }
 /*************************************************************************************************/
 
 struct websockets_pool::impl {
-    impl(boost::asio::io_context &ioctx, const std::string &host, const std::string &port, on_message_received_cb cb)
+    impl(boost::asio::io_context &ioctx, std::string host, std::string port, on_message_received_cb cb)
         :m_ioctx{ioctx}
-        ,m_host{host}
-        ,m_port{port}
+        ,m_host{std::move(host)}
+        ,m_port{std::move(port)}
         ,m_on_message{std::move(cb)}
         ,m_map{}
     {}
@@ -261,11 +261,11 @@ struct websockets_pool::impl {
 
 websockets_pool::websockets_pool(
      boost::asio::io_context &ioctx
-    ,const std::string &host
-    ,const std::string &port
+    ,std::string host
+    ,std::string port
     ,on_message_received_cb cb
 )
-    :pimpl{std::make_unique<impl>(ioctx, host, port, std::move(cb))}
+    :pimpl{std::make_unique<impl>(ioctx, std::move(host), std::move(port), std::move(cb))}
 {}
 
 websockets_pool::~websockets_pool()

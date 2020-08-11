@@ -68,8 +68,8 @@ struct websockets_pool {
 
     websockets_pool(
          boost::asio::io_context &ioctx
-        ,const std::string &host
-        ,const std::string &port
+        ,std::string host
+        ,std::string port
         ,on_message_received_cb cb = {}
     );
     ~websockets_pool();
