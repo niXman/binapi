@@ -5,35 +5,34 @@ Binance API implemented in C++ for both synchronous and asynchronous way.
 This implementation has been developed as a consequence of the lack of suitable alternatives as part of my multiuser trading platform project.
 
 # REST API
-- ping
-- time
-- exchange info
-- account info
-- depth
-- trades
-- agg trades
-- 24hr ticker
-- price
-- order put
-- order query
-- order test put
-- order test query
-- order cancel
-- open orders query
-- all orders query
-- my trades
-- user-data-stream new
-- user-data-stream ping
-- user-data-stream close
+- [Test connectivity](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#test-connectivity) -> `api::ping()`
+- [Check server time](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#check-server-time) -> `api::time()`
+- [Exchange information](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#exchange-information) -> `api::exchange_info()`
+- [Account information](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-information-user_data) -> `api::account_info()`
+- [Order book](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#order-book) -> `api::depth()`
+- [Recent trades list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#recent-trades-list) -> `api::trades()`
+- [Aggregate trades list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list) -> `api::agg_trades()`
+- [24hr ticker price change statistics](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics) -> `api::_24hrs_ticker()`
+- [Symbol price ticker](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker) -> `api::price()`
+- [New order](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#new-order--trade) -> `api::new_order()`
+- [Query order](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#query-order-user_data) -> `api::order_info()`
+- [Test new order](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#test-new-order-trade) -> `api::new_test_order()`
+- [Cancel order](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#cancel-order-trade) -> `api::cancel_order()`
+- [Current open orders](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#current-open-orders-user_data) -> `api::open_orders()`
+- [All orders](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#all-orders-user_data) -> `api::all_orders()`
+- [Account trade list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-trade-list-user_data) -> `api::my_trades()`
+- [Start user data stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#start-user-data-stream-user_stream) -> `api::start_user_data_stream()`
+- [Keepalive user data stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#keepalive-user-data-stream-user_stream) -> `api::ping_user_data_stream()`
+- [Close user data stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#close-user-data-stream-user_stream) -> `api::close_user_data_stream()`
 
 # WebSocket API
-- depth
-- klines
-- trades
-- agg trades
-- ticker
-- all market tickers
-- userdata
+- [Partial Book Depth Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams) -> `websockets_pool::subscribe_depth()`, `websockets_pool::unsubscribe_depth()`
+- [Kline/Candlestick Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams) -> `websockets_pool::subscribe_klines()`, `websockets_pool::unsubscribe_klines()`
+- [Trade Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#trade-streams) -> `websockets_pool::subscribe_trade()`, `websockets_pool::subscribe_trade()`
+- [Aggregate Trade Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams) -> `websockets_pool::subscribe_agg_trade()`, `websockets_pool::unsubscribe_agg_trade()`
+- [Individual Symbol Ticker Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams) -> `websockets_pool::subscribe_market()`, `websockets_pool::unsubscribe_market()`
+- [All Market Tickers Stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream) -> `websockets_pool::subscribe_markets()`, `websockets_pool::unsubscribe_markets()`
+- [User Data Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/user-data-stream.md) -> `websockets_pool::subscribe_userdata()`, `websockets_pool::unsubscribe_userdata()`
 
 # Implementation details
 The project is written using C++14 and [boost](https://www.boost.org/) (at least version 1.70). [boost.beast](https://www.boost.org/doc/libs/1_73_0/libs/beast/index.html) is used to interact with the network.

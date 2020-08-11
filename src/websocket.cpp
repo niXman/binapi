@@ -276,7 +276,7 @@ websockets_pool::~websockets_pool()
 websockets_pool::handle websockets_pool::subscribe_depth(const char *pair, on_depth_received_cd cb)
 { return pimpl->start_channel(pair, "depth", std::move(cb)); }
 
-void websockets_pool::unsubscribe_depth(const handle h) { return pimpl->stop_channel(h); }
+void websockets_pool::unsubscribe_depth(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
@@ -314,33 +314,33 @@ websockets_pool::handle websockets_pool::subscribe_klines(const char *pair, cons
     return pimpl->start_channel(pair, p, std::move(cb));
 }
 
-void websockets_pool::unsubscribe_klines(const handle h) { return pimpl->stop_channel(h); }
+void websockets_pool::unsubscribe_klines(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
 websockets_pool::handle websockets_pool::subscribe_trade(const char *pair, on_trade_received_cd cb)
 { return pimpl->start_channel(pair, "trade", std::move(cb)); }
 
-void websockets_pool::unsubscribe_trade(const handle h) { return pimpl->stop_channel(h); }
+void websockets_pool::unsubscribe_trade(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
 websockets_pool::handle websockets_pool::subscribe_agg_trade(const char *pair, on_agg_trade_received_cd cb)
 { return pimpl->start_channel(pair, "aggTrade", std::move(cb)); }
 
-void websockets_pool::unsubscribe_agg_trade(const handle h) { return pimpl->stop_channel(h); }
+void websockets_pool::unsubscribe_agg_trade(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
 websockets_pool::handle websockets_pool::subscribe_market(const char *pair, on_market_received_cd cb)
 { return pimpl->start_channel(pair, "ticker", std::move(cb)); }
 
-void websockets_pool::unsubscribe_market(const handle h) { return pimpl->stop_channel(h); }
+void websockets_pool::unsubscribe_market(handle h) { return pimpl->stop_channel(h); }
 
 websockets_pool::handle websockets_pool::subscribe_markets(on_markets_received_cd cb)
 { return pimpl->start_channel("!ticker", "arr", std::move(cb)); }
 
-void websockets_pool::unsubscribe_markets(const handle h) { return pimpl->stop_channel(h); }
+void websockets_pool::unsubscribe_markets(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
@@ -365,7 +365,7 @@ websockets_pool::handle websockets_pool::subscribe_userdata(const char *lkey, on
     return pimpl->start_channel(nullptr, lkey, std::move(cb));
 }
 
-void websockets_pool::unsubscribe_userdata(const handle h) { return pimpl->stop_channel(h); }
+void websockets_pool::unsubscribe_userdata(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
