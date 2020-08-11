@@ -111,6 +111,8 @@ int main() {
 }
 ```
 
+# WebSocket example (will write later...)
+
 # Tools (will write later...)
 - filters
 - report generators
