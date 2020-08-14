@@ -16,36 +16,14 @@
 
 #include <iostream>
 
-int main(int argc, char **argv) {
-    assert(argc == 3);
-
+int main() {
     boost::asio::io_context ioctx;
-    std::string pk = argv[1];
-    std::string sk = argv[2];
-
-    binapi::rest::api api{
-        ioctx
-        ,"api.binance.com"
-        ,"443"
-        ,std::move(pk)
-        ,std::move(sk)
-        ,10000 // recvWindow
-    };
 
     binapi::ws::websockets_pool ws{
          ioctx
         ,"stream.binance.com"
         ,"9443"
     };
-
-    auto res = api.start_user_data_stream();
-    if ( !res ) {
-        std::cerr << "start user data stream error: " << res.errmsg << std::endl;
-
-        return EXIT_FAILURE;
-    }
-
-    std::cout << "listen key: " << res.v << std::endl;
 
     ws.subscribe_depth("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto depths) {

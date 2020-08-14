@@ -17,10 +17,10 @@
 
 int main(int argc, char **argv) {
     assert(argc == 3);
-
-    boost::asio::io_context ioctx;
     std::string pk = argv[1];
     std::string sk = argv[2];
+
+    boost::asio::io_context ioctx;
 
     binapi::rest::api api{
         ioctx
