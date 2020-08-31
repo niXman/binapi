@@ -866,7 +866,7 @@ api::result<new_order_resp_type> api::new_test_order(
         ,{"newOrderRespType", responce_type}
     };
 
-    return pimpl->post(true, "/api/v3/order/test", boost::beast::http::verb::get, map, std::move(cb));
+    return pimpl->post(true, "/api/v3/order/test", boost::beast::http::verb::post, map, std::move(cb));
 }
 
 /*************************************************************************************************/
