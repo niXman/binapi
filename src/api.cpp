@@ -161,7 +161,7 @@ struct api::impl {
         ,typename R = typename std::tuple_element<3, Args>::type
     >
     api::result<R>
-    post(bool _signed, const char *target, const char *action, const std::initializer_list<kv_type> &map, CB cb) {
+    post(bool _signed, const char *target, boost::beast::http::verb action, const std::initializer_list<kv_type> &map, CB cb) {
         static_assert(std::tuple_size<Args>::value == 4, "");
 
         api::result<R> res{};
@@ -241,8 +241,8 @@ struct api::impl {
         }
 
         auto get_delete =
-            std::strcmp(action, "GET") == 0 ||
-            std::strcmp(action, "DELETE") == 0
+            action == boost::beast::http::verb::get ||
+            action == boost::beast::http::verb::delete_
         ;
         if ( get_delete && !data.empty() ) {
             starget += "?";
@@ -287,7 +287,7 @@ struct api::impl {
     }
 
     api::result<std::string>
-    sync_post(const char *target, const char *action, std::string data) {
+    sync_post(const char *target, boost::beast::http::verb action, std::string data) {
         api::result<std::string> res{};
 
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_stream(m_ioctx, m_ssl_ctx);
@@ -328,25 +328,12 @@ struct api::impl {
         boost::beast::http::request<boost::beast::http::string_body> req;
         req.target(target);
         req.version(11);
-        if ( 0 == std::strcmp(action, "GET") ) {
-            req.method(boost::beast::http::verb::get);
-        } else if ( 0 == std::strcmp(action, "POST") ) {
-            req.method(boost::beast::http::verb::post);
+
+        req.method(action);
+        if ( action != boost::beast::http::verb::get ) {
             auto body_size = data.size();
             req.body() = std::move(data);
-            req.set(boost::beast::http::field::content_length, body_size);
-        } else if ( 0 == std::strcmp(action, "PUT") ) {
-            req.method(boost::beast::http::verb::put);
-            auto body_size = data.size();
-            req.body() = std::move(data);
-            req.set(boost::beast::http::field::content_length, body_size);
-        } else if ( 0 == std::strcmp(action, "DELETE") ) {
-            req.method(boost::beast::http::verb::delete_);
-            auto body_size = data.size();
-            req.body() = std::move(data);
-            req.set(boost::beast::http::field::content_length, body_size);
-        } else {
-            assert(!"unreachable");
+            req.set(boost::beast::http::field::content_length, std::to_string(body_size));
         }
 
         req.insert("X-MBX-APIKEY", m_pk);
@@ -392,29 +379,17 @@ struct api::impl {
         m_write_in_process = true;
 
         auto &front = m_async_requests.front();
-        std::string action = std::move(front.action);
+        auto action = front.action;
         std::string data = std::move(front.data);
         std::string target = front.target;
         //std::cout << "async_post(): target=" << target << std::endl;
 
-        // Set up an HTTP GET request message
         m_req.version(11);
-        if ( action == "GET" ) {
-            m_req.method(boost::beast::http::verb::get);
-        } else if ( action == "POST" ) {
-            m_req.method(boost::beast::http::verb::post);
+        m_req.method(action);
+        if ( action != boost::beast::http::verb::get ) {
             auto body_size = data.size();
             m_req.body() = std::move(data);
-            m_req.set(boost::beast::http::field::content_length, body_size);
-        } else if ( action == "PUT" ) {
-            m_req.method(boost::beast::http::verb::put);
-            auto body_size = data.size();
-            m_req.body() = std::move(data);
-            m_req.set(boost::beast::http::field::content_length, body_size);
-        } else if ( action == "DELETE" ) {
-            m_req.method(boost::beast::http::verb::delete_);
-        } else {
-            assert(!"unreachable");
+            m_req.set(boost::beast::http::field::content_length, std::to_string(body_size));
         }
 
         m_req.target(target);
@@ -582,7 +557,7 @@ struct api::impl {
     bool m_write_in_process;
     struct async_req_item {
         std::string target;
-        std::string action;
+        boost::beast::http::verb action;
         std::string data;
         detail::invoker_ptr invoker;
     };
@@ -622,13 +597,13 @@ api::~api()
 /*************************************************************************************************/
 
 api::result<ping_t> api::ping(ping_cb cb) {
-    return pimpl->post(false, "/api/v3/ping", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/ping", boost::beast::http::verb::get, {}, std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<server_time_t> api::server_time(server_time_cb cb) {
-    return pimpl->post(false, "/api/v3/time", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/time", boost::beast::http::verb::get, {}, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -638,11 +613,11 @@ api::result<prices_t::price_t> api::price(const char *symbol, price_cb cb) {
         {"symbol", symbol}
     };
 
-    return pimpl->post(false, "/api/v3/ticker/price", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/ticker/price", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 api::result<prices_t> api::prices(prices_cb cb) {
-    return pimpl->post(false, "/api/v3/ticker/price", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/ticker/price", boost::beast::http::verb::get, {}, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -652,17 +627,17 @@ api::result<_24hrs_tickers_t::_24hrs_ticker_t> api::_24hrs_ticker(const char *sy
         {"symbol", symbol}
     };
 
-    return pimpl->post(false, "/api/v3/ticker/24hr", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/ticker/24hr", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 api::result<_24hrs_tickers_t> api::_24hrs_tickers(api::_24hrs_tickers_cb cb) {
-    return pimpl->post(false, "/api/v3/ticker/24hr", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/ticker/24hr", boost::beast::http::verb::get, {}, std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<exchange_info_t> api::exchange_info(exchange_info_cb cb) {
-    return pimpl->post(false, "/api/v3/exchangeInfo", "GET", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/exchangeInfo", boost::beast::http::verb::get, {}, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -673,7 +648,7 @@ api::result<depths_t> api::depths(const char *symbol, std::size_t limit, depths_
         ,{"limit", limit}
     };
 
-    return pimpl->post(false, "/api/v3/depth", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/depth", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -684,7 +659,7 @@ api::result<trades_t::trade_t> api::trade(const char *symbol, trade_cb cb) {
         ,{"limit", 1u}
     };
 
-    return pimpl->post(false, "/api/v3/trades", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/trades", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 api::result<trades_t> api::trades(const char *symbol, std::size_t limit, trades_cb cb) {
@@ -693,7 +668,7 @@ api::result<trades_t> api::trades(const char *symbol, std::size_t limit, trades_
         ,{"limit", limit}
     };
 
-    return pimpl->post(false, "/api/v3/trades", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/trades", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -704,7 +679,7 @@ api::result<agg_trades_t::agg_trade_t> api::agg_trade(const char *symbol, agg_tr
         ,{"limit", 1u}
     };
 
-    return pimpl->post(false, "/api/v3/aggTrades", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/aggTrades", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 api::result<agg_trades_t> api::agg_trades(const char *symbol, std::size_t limit, agg_trades_cb cb) {
@@ -713,7 +688,7 @@ api::result<agg_trades_t> api::agg_trades(const char *symbol, std::size_t limit,
         ,{"limit", limit}
     };
 
-    return pimpl->post(false, "/api/v3/aggTrades", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/aggTrades", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -725,7 +700,7 @@ api::result<klines_t> api::klines(const char *symbol, const char *interval, std:
         ,{"interval", interval}
     };
 
-    return pimpl->post(false, "/api/v3/klines", "GET", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/klines", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -733,7 +708,7 @@ api::result<klines_t> api::klines(const char *symbol, const char *interval, std:
 /*************************************************************************************************/
 
 api::result<account_info_t> api::account_info(account_info_cb cb) {
-    return pimpl->post(true, "/api/v3/account", "GET", {}, std::move(cb));
+    return pimpl->post(true, "/api/v3/account", boost::beast::http::verb::get, {}, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -745,7 +720,7 @@ api::result<order_info_t> api::order_info(const char *symbol, std::size_t orderi
         ,{"origClientOrderId", client_orderid}
     };
 
-    return pimpl->post(true, "/api/v3/order", "GET", map, std::move(cb));
+    return pimpl->post(true, "/api/v3/order", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -755,7 +730,7 @@ api::result<orders_info_t> api::open_orders(const char *symbol, open_orders_cb c
         {"symbol", symbol}
     };
 
-    return pimpl->post(true, "/api/v3/openOrders", "GET", map, std::move(cb));
+    return pimpl->post(true, "/api/v3/openOrders", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -776,7 +751,7 @@ api::result<orders_info_t> api::all_orders(
         ,{"limit", limit}
     };
 
-    return pimpl->post(true, "/api/v3/allOrders", "GET", map, std::move(cb));
+    return pimpl->post(true, "/api/v3/allOrders", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -851,7 +826,7 @@ api::new_order(
         ,{"newOrderRespType", responce_type}
     };
 
-    return pimpl->post(true, "/api/v3/order", "POST", map, std::move(cb));
+    return pimpl->post(true, "/api/v3/order", boost::beast::http::verb::post, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -891,7 +866,7 @@ api::result<new_order_resp_type> api::new_test_order(
         ,{"newOrderRespType", responce_type}
     };
 
-    return pimpl->post(true, "/api/v3/order/test", "POST", map, std::move(cb));
+    return pimpl->post(true, "/api/v3/order/test", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -910,7 +885,7 @@ api::result<cancel_order_info_t> api::cancel_order(
         ,{"newClientOrderId", new_client_order_id}
     };
 
-    return pimpl->post(true, "/api/v3/order", "DELETE", map, std::move(cb));
+    return pimpl->post(true, "/api/v3/order", boost::beast::http::verb::delete_, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -931,13 +906,13 @@ api::result<my_trades_info_t> api::my_trades(
         ,{"limit", limit}
     };
 
-    return pimpl->post(true, "/api/v3/myTrades", "GET", map, std::move(cb));
+    return pimpl->post(true, "/api/v3/myTrades", boost::beast::http::verb::get, map, std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<start_user_data_stream_t> api::start_user_data_stream(start_user_data_stream_cb cb) {
-    return pimpl->post(false, "/api/v3/userDataStream", "POST", {}, std::move(cb));
+    return pimpl->post(false, "/api/v3/userDataStream", boost::beast::http::verb::post, {}, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -947,7 +922,7 @@ api::result<ping_user_data_stream_t> api::ping_user_data_stream(const char *list
         {"listenKey", listen_key}
     };
 
-    return pimpl->post(false, "/api/v3/userDataStream", "PUT", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/userDataStream", boost::beast::http::verb::put, map, std::move(cb));
 }
 
 /*************************************************************************************************/
@@ -957,7 +932,7 @@ api::result<close_user_data_stream_t> api::close_user_data_stream(const char *li
         {"listenKey", listen_key}
     };
 
-    return pimpl->post(false, "/api/v3/userDataStream", "DELETE", map, std::move(cb));
+    return pimpl->post(false, "/api/v3/userDataStream", boost::beast::http::verb::delete_, map, std::move(cb));
 }
 
 /*************************************************************************************************/
