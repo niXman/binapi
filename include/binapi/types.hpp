@@ -213,6 +213,12 @@ struct exchange_info_t {
                 friend std::ostream &operator<<(std::ostream &os, const filter_max_num_algo_orders_t &f);
             };
 
+            struct filter_max_position_t {
+               double_type maxPosition;
+
+                friend std::ostream &operator<<(std::ostream &os, const filter_max_position_t &f);
+            };
+
             std::string filterType;
             boost::variant<
                  filter_price_t
@@ -223,6 +229,7 @@ struct exchange_info_t {
                 ,filter_iceberg_parts_t
                 ,filter_max_num_orders_t
                 ,filter_max_num_algo_orders_t
+                ,filter_max_position_t
             > filter;
 
             friend std::ostream &operator<<(std::ostream &os, const filter_t &f);

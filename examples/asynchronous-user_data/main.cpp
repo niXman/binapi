@@ -45,7 +45,16 @@ int main(int argc, char **argv) {
         }
     );
 
-    ioctx.run();
+    while ( true ) {
+        try {
+            ioctx.run();
+            break;
+        } catch (const std::exception &ex) {
+            std::cerr << "std::exception: what: " << ex.what() << std::endl;
+
+            ioctx.restart();
+        }
+    }
 
     return EXIT_SUCCESS;
 }

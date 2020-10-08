@@ -419,6 +419,15 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     return os;
 }
 
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_max_position_t &o) {
+    os
+    << "{"
+    << "\"maxPosition\":\"" << o.maxPosition << "\""
+    << "}";
+
+    return os;
+}
+
 std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t &o) {
     os
     << "{";
@@ -486,6 +495,13 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
         os
         << "\"filterType\":\"" << o.filterType << "\","
         << "\"maxNumAlgoOrders\":" << p->maxNumAlgoOrders;
+    } else if ( o.filterType == "MAX_POSITION" ) {
+        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_max_position_t>(&o.filter);
+        assert(p);
+
+        os
+        << "\"filterType\":\"" << o.filterType << "\","
+        << "\"maxPosition\":\"" << p->maxPosition << "\"";
     } else {
         assert("bad filter type" == nullptr);
     }
@@ -544,7 +560,7 @@ const exchange_info_t::symbol_t& exchange_info_t::get_by_symbol(const char *sym)
 
 exchange_info_t exchange_info_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     exchange_info_t res{};
     __BINAPI_GET(timezone);
@@ -661,6 +677,13 @@ exchange_info_t exchange_info_t::parse(const char *str, std::size_t len) {
 
                     break;
                 }
+                case fnv1a("MAX_POSITION"): {
+                    exchange_info_t::symbol_t::filter_t::filter_max_position_t item{};
+                    __BINAPI_GET2(item, maxPosition, fit);
+                    filter.filter = std::move(item);
+
+                    break;
+                }
                 default: assert("bad filterType" == nullptr);
             }
 
@@ -726,7 +749,7 @@ std::ostream &operator<<(std::ostream &os, const depths_t::depth_t &o) {
 
 depths_t depths_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     depths_t res{};
     __BINAPI_GET(lastUpdateId);
@@ -787,7 +810,7 @@ std::ostream &operator<<(std::ostream &os, const depths_t &o) {
 
 trades_t::trade_t trades_t::trade_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     trades_t::trade_t res{};
     const auto it = json.at(0);
@@ -817,7 +840,7 @@ std::ostream &operator<<(std::ostream &os, const trades_t::trade_t &o) {
 
 trades_t trades_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
     assert(json.is_array());
 
     trades_t res{};
@@ -856,7 +879,7 @@ std::ostream &operator<<(std::ostream &os, const trades_t &o) {
 
 agg_trades_t::agg_trade_t agg_trades_t::agg_trade_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
     assert(json.is_array());
 
     agg_trades_t::agg_trade_t res{};
@@ -893,7 +916,7 @@ std::ostream &operator<<(std::ostream &os, const agg_trades_t::agg_trade_t &o) {
 
 agg_trades_t agg_trades_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
     assert(json.is_array());
 
     agg_trades_t res{};
@@ -954,7 +977,7 @@ std::ostream &operator<<(std::ostream &os, const klines_t::kline_t &o) {
 
 klines_t klines_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
     assert(json.is_array());
 
     klines_t res{};
@@ -998,7 +1021,7 @@ std::ostream &operator<<(std::ostream &os, const klines_t &o) {
 
 order_info_t order_info_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     order_info_t res{};
     __BINAPI_GET(symbol);
@@ -1049,7 +1072,7 @@ std::ostream &operator<<(std::ostream &os, const order_info_t &o) {
 
 orders_info_t orders_info_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
     assert(json.is_array());
 
     orders_info_t res{};
@@ -1100,7 +1123,7 @@ std::ostream &operator<<(std::ostream &os, const orders_info_t &o) {
 
 new_order_info_ask_t new_order_info_ask_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     new_order_info_ask_t res{};
     __BINAPI_GET(symbol);
@@ -1124,7 +1147,7 @@ std::ostream &operator<<(std::ostream &os, const new_order_info_ask_t &o) {
 
 new_order_info_result_t new_order_info_result_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     new_order_info_result_t res{};
     __BINAPI_GET(symbol);
@@ -1200,7 +1223,7 @@ double_type new_order_info_full_t::sum_commission(const std::vector<fill_part> &
 
 new_order_info_full_t new_order_info_full_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     new_order_info_full_t res{};
     __BINAPI_GET(symbol);
@@ -1320,7 +1343,7 @@ std::ostream &operator<<(std::ostream &os, const new_test_order_info_t &o) {
 
 cancel_order_info_t cancel_order_info_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     cancel_order_info_t res{};
     __BINAPI_GET(symbol);
@@ -1363,7 +1386,7 @@ std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o) {
 
 my_trades_info_t::my_trade_info_t my_trades_info_t::my_trade_info_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     assert("unimplemented" == nullptr);
 }
@@ -1391,7 +1414,7 @@ std::ostream &operator<<(std::ostream &os, const my_trades_info_t::my_trade_info
 
 my_trades_info_t my_trades_info_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
     assert(json.is_array());
 
     my_trades_info_t res{};
@@ -1436,7 +1459,7 @@ std::ostream &operator<<(std::ostream &os, const my_trades_info_t &o) {
 
 start_user_data_stream_t start_user_data_stream_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     start_user_data_stream_t res{};
     __BINAPI_GET(listenKey);
@@ -1457,10 +1480,10 @@ std::ostream &operator<<(std::ostream &os, const start_user_data_stream_t &o) {
 
 ping_user_data_stream_t ping_user_data_stream_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     ping_user_data_stream_t res{};
-    res.ok = json.is_object() && json.empty();
+    res.ok = json.is_object() && json.is_empty();
 
     return res;
 }
@@ -1478,10 +1501,10 @@ std::ostream &operator<<(std::ostream &os, const ping_user_data_stream_t &o) {
 
 close_user_data_stream_t close_user_data_stream_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     close_user_data_stream_t res{};
-    res.ok = json.is_object() && json.empty();
+    res.ok = json.is_object() && json.is_empty();
 
     return res;
 }
@@ -1505,7 +1528,7 @@ namespace ws {
 
 agg_trade_t agg_trade_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     agg_trade_t res{};
     __BINAPI_GET(e);
@@ -1546,7 +1569,7 @@ std::ostream &operator<<(std::ostream &os, const agg_trade_t &o) {
 
 trade_t trade_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     trade_t res{};
     __BINAPI_GET(E);
@@ -1591,7 +1614,7 @@ std::ostream &operator<<(std::ostream &os, const depths_t::depth_t &o) {
 
 depths_t depths_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     depths_t res{};
     __BINAPI_GET(E);
@@ -1653,7 +1676,7 @@ std::ostream& operator<<(std::ostream &os, const depths_t &o) {
 
 kline_t kline_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     kline_t res{};
     __BINAPI_GET(E);
@@ -1725,7 +1748,7 @@ std::ostream& ohlc(std::ostream &os, const kline_t &o) {
 
 market_ticker_t market_ticker_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     market_ticker_t res{};
     __BINAPI_GET(E);
@@ -1788,7 +1811,7 @@ std::ostream& operator<<(std::ostream &os, const market_ticker_t &o) {
 
 markets_tickers_t markets_tickers_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
     assert(json.is_array());
 
     markets_tickers_t res{};
@@ -1863,7 +1886,7 @@ std::ostream& operator<<(std::ostream &os, const account_update_t::balance_t &o)
 
 account_update_t account_update_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     account_update_t res{};
     __BINAPI_GET(e);
@@ -1920,7 +1943,7 @@ std::ostream& operator<<(std::ostream &os, const account_update_t &o) {
 
 order_update_t order_update_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
-    assert(json.valid());
+    assert(json.is_valid());
 
     order_update_t res{};
     __BINAPI_GET(e);
