@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <boost/asio/steady_timer.hpp>
 
 /*************************************************************************************************/
 
@@ -237,8 +238,15 @@ int main(int argc, char **argv) {
         }
     );
 
-    // TODO: crashed
-//    wsp.unsubscribe_userdata(user_data_stream);
+    boost::asio::steady_timer unsubscribe_timer{ioctx};
+    unsubscribe_timer.expires_after(std::chrono::seconds{20});
+    unsubscribe_timer.async_wait(
+        [user_data_stream, &wsp]
+        (const boost::system::error_code &) {
+            std::cout << "unsubscribe userdata stream" << std::endl;
+            wsp.unsubscribe_userdata(user_data_stream);
+        }
+    );
 
     auto ping_uds = api.ping_user_data_stream(start_uds.v.listenKey);
     BREAK_IF_ERROR(ping_uds);

@@ -47,38 +47,45 @@ struct websocket::impl {
         ,m_buf{}
         ,m_host{}
         ,m_target{}
+        ,m_stop_requested{}
     {}
 
-    void async_start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb) {
+    void async_start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder) {
         m_host = host;
         m_target = target;
 
-        m_resolver.async_resolve(m_host, port,
-            [this, cb=std::move(cb)]
-            (boost::system::error_code ec, boost::asio::ip::tcp::resolver::results_type res) mutable {
+        m_resolver.async_resolve(
+             m_host
+            ,port
+            ,[this, cb=std::move(cb), holder=std::move(holder)]
+             (boost::system::error_code ec, boost::asio::ip::tcp::resolver::results_type res) mutable {
                 if ( ec ) {
-                    __CB_ON_ERROR(cb, ec);
+                    if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
                 } else {
-                    async_connect(std::move(res), std::move(cb));
+                    async_connect(std::move(res), std::move(cb), std::move(holder));
                 }
             }
         );
     }
-    void async_connect(boost::asio::ip::tcp::resolver::results_type res, on_message_received_cb cb) {
-        boost::asio::async_connect(m_ws.next_layer().next_layer(), res.begin(), res.end(),
-            [this, cb=std::move(cb)]
-            (boost::system::error_code ec, boost::asio::ip::tcp::resolver::iterator) mutable {
+    void async_connect(boost::asio::ip::tcp::resolver::results_type res, on_message_received_cb cb, holder_type holder) {
+        boost::asio::async_connect(
+             m_ws.next_layer().next_layer()
+            ,res.begin()
+            ,res.end()
+            ,[this, cb=std::move(cb), holder=std::move(holder)]
+             (boost::system::error_code ec, boost::asio::ip::tcp::resolver::iterator) mutable {
                 if ( ec ) {
-                    __CB_ON_ERROR(cb, ec);
+                    if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
                 } else {
-                    on_connected(std::move(cb));
+                    on_connected(std::move(cb), std::move(holder));
                 }
             }
         );
     }
-    void on_connected(on_message_received_cb cb) {
+    void on_connected(on_message_received_cb cb, holder_type holder) {
         m_ws.control_callback(
-            [this](boost::beast::websocket::frame_type kind, boost::beast::string_view payload){
+            [this]
+            (boost::beast::websocket::frame_type kind, boost::beast::string_view payload) mutable {
                 (void)kind; (void) payload;
                 //std::cout << "control_callback(" << this << "): kind=" << static_cast<int>(kind) << ", payload=" << payload.data() << std::endl;
                 m_ws.async_pong(
@@ -91,45 +98,55 @@ struct websocket::impl {
 
         m_ws.next_layer().async_handshake(
              boost::asio::ssl::stream_base::client
-            ,[this, cb=std::move(cb)]
-            (boost::system::error_code ec) mutable {
+            ,[this, cb=std::move(cb), holder=std::move(holder)]
+             (boost::system::error_code ec) mutable {
                 if ( ec ) {
-                    __CB_ON_ERROR(cb, ec);
+                    if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
                 } else {
-                    on_async_ssl_handshake(std::move(cb));
+                    on_async_ssl_handshake(std::move(cb), std::move(holder));
                 }
             }
         );
     }
-    void on_async_ssl_handshake(on_message_received_cb cb) {
-        m_ws.async_handshake(m_host, m_target,
-            [this, cb=std::move(cb)](boost::system::error_code ec) mutable
-            { start_read(ec, std::move(cb)); }
+    void on_async_ssl_handshake(on_message_received_cb cb, holder_type holder) {
+        m_ws.async_handshake(
+             m_host
+            ,m_target
+            ,[this, cb=std::move(cb), holder=std::move(holder)]
+             (boost::system::error_code ec) mutable
+             { start_read(ec, std::move(cb), std::move(holder)); }
         );
     }
 
     void stop() {
+        m_stop_requested = true;
+
         if ( m_ws.next_layer().next_layer().is_open() ) {
             boost::system::error_code ec;
             m_ws.close(boost::beast::websocket::close_code::normal, ec);
         }
     }
 
-    void start_read(boost::system::error_code ec, on_message_received_cb cb) {
+    void start_read(boost::system::error_code ec, on_message_received_cb cb, holder_type holder) {
         if ( ec ) {
-            __CB_ON_ERROR(cb, ec);
+            if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
 
             return;
         }
 
-        m_ws.async_read(m_buf,
-            [this, cb=std::move(cb)]
-            (boost::system::error_code ec, std::size_t rd) mutable
-            { on_read(ec, rd, std::move(cb)); }
+        m_ws.async_read(
+             m_buf
+            ,[this, cb=std::move(cb), holder=std::move(holder)]
+             (boost::system::error_code ec, std::size_t rd) mutable
+             { on_read(ec, rd, std::move(cb), std::move(holder)); }
         );
     }
-    void on_read(boost::system::error_code ec, std::size_t rd, on_message_received_cb cb) {
-        if ( ec ) { return; }
+    void on_read(boost::system::error_code ec, std::size_t rd, on_message_received_cb cb, holder_type holder) {
+        if ( ec ) {
+            if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
+
+            return;
+        }
 
         auto size = m_buf.size();
         assert(size == rd);
@@ -146,7 +163,7 @@ struct websocket::impl {
         if ( !ok ) {
             stop();
         } else {
-            start_read(boost::system::error_code{}, std::move(cb));
+            start_read(boost::system::error_code{}, std::move(cb), std::move(holder));
         }
     }
 
@@ -157,6 +174,7 @@ struct websocket::impl {
     boost::beast::multi_buffer m_buf;
     std::string m_host;
     std::string m_target;
+    bool m_stop_requested;
 };
 
 /*************************************************************************************************/
@@ -170,8 +188,8 @@ websocket::~websocket()
 
 /*************************************************************************************************/
 
-void websocket::start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb)
-{ return pimpl->async_start(host, port, target, std::move(cb)); }
+void websocket::start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder)
+{ return pimpl->async_start(host, port, target, std::move(cb), std::move(holder)); }
 
 void websocket::stop() { return pimpl->stop(); }
 
@@ -212,8 +230,8 @@ struct websockets_pool::impl {
         websockets_pool::handle h = invoker.get();
         std::string schannel = make_channel(pair, channel);
 
-        websocket ws{m_ioctx};
-        ws.start(
+        auto ws = std::make_shared<websocket>(m_ioctx);
+        ws->start(
              m_host
             ,m_port
             ,schannel
@@ -227,9 +245,12 @@ struct websockets_pool::impl {
 
                  return inv->invoke(fl, ec, std::move(errmsg), ptr, size);
              }
+             ,ws->shared_from_this()
         );
 
-        m_map.emplace(h, std::move(ws));
+        remove_dead_websockets();
+
+        m_map.emplace(h, ws);
 
         return h;
     }
@@ -238,15 +259,30 @@ struct websockets_pool::impl {
         auto it = m_map.find(h);
         if ( it == m_map.end() ) { return; }
 
-        it->second.stop();
+        if ( auto s = it->second.lock() ) {
+            s->stop();
+        }
 
         m_map.erase(it);
+
+        remove_dead_websockets();
     }
 
     void unsubscribe_all() {
         for ( auto it = m_map.begin(); it != m_map.end(); ++it ) {
-            it->second.stop();
+            if ( auto s = it->second.lock() ) {
+                s->stop();
+            }
+
             it = m_map.erase(it);
+        }
+    }
+
+    void remove_dead_websockets() {
+        for ( auto it = m_map.begin(); it != m_map.end(); ++it ) {
+            if ( ! it->second.lock() ) {
+                it = m_map.erase(it);
+            }
         }
     }
 
@@ -254,7 +290,7 @@ struct websockets_pool::impl {
     std::string m_host;
     std::string m_port;
     on_message_received_cb m_on_message;
-    std::map<websockets_pool::handle, websocket> m_map;
+    std::map<websockets_pool::handle, std::weak_ptr<websocket>> m_map;
 };
 
 /*************************************************************************************************/

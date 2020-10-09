@@ -36,19 +36,16 @@ struct markets_tickers_t;
 
 /*************************************************************************************************/
 
-struct websocket {
-    websocket(const websocket &) = delete;
-    websocket& operator= (const websocket &) = delete;
-    websocket(websocket &&) noexcept = default;
-    websocket& operator= (websocket &&) noexcept = default;
-
+struct websocket: std::enable_shared_from_this<websocket> {
     explicit websocket(boost::asio::io_context &ioctx);
-    ~websocket();
+    virtual ~websocket();
+
+    using holder_type = std::shared_ptr<void>;
 
     using on_message_received_cb = std::function<
         bool(const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size)
     >; // when 'false' returned the stop will called
-    void start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb);
+    void start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder);
     void stop();
 
 private:
