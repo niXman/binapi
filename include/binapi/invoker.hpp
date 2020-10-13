@@ -14,6 +14,7 @@
 
 #include <memory>
 #include <cstdint>
+#include <cstring>
 #include <cstdio>
 
 #include "message.hpp"
