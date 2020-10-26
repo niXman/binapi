@@ -73,6 +73,7 @@ std::ostream &operator<<(std::ostream &os, const ping_t &o) {
 
 server_time_t server_time_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
+    assert(json.is_valid());
 
     server_time_t res{};
     __BINAPI_GET(serverTime);
@@ -93,6 +94,7 @@ std::ostream &operator<<(std::ostream &os, const server_time_t &o) {
 
 prices_t::price_t prices_t::price_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
+    assert(json.is_valid());
 
     prices_t::price_t res{};
     __BINAPI_GET(symbol);
@@ -115,6 +117,7 @@ std::ostream &operator<<(std::ostream &os, const prices_t::price_t &o) {
 
 prices_t prices_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
+    assert(json.is_valid());
     assert(json.is_array());
 
     prices_t res{};
@@ -166,6 +169,7 @@ const prices_t::price_t& prices_t::get_by_symbol(const char *sym) const {
 _24hrs_tickers_t::_24hrs_ticker_t
 _24hrs_tickers_t::_24hrs_ticker_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
+    assert(json.is_valid());
 
     _24hrs_tickers_t::_24hrs_ticker_t res{};
     __BINAPI_GET(symbol);
@@ -256,6 +260,7 @@ std::ostream &operator<<(std::ostream &os, const account_info_t::balance_t &o) {
 
 account_info_t account_info_t::parse(const char *str, std::size_t len) {
     const flatjson::fjson json(str, len);
+    assert(json.is_valid());
 
     account_info_t res{};
     __BINAPI_GET(makerCommission);
