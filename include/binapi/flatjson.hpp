@@ -24,6 +24,45 @@
 #include <cstdio>
 #include <cstring>
 
+/*************************************************************************************************/
+
+#if defined(__clang__)
+#   define __FLATJSON__FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__GNUC__)
+#   define __FLATJSON__FALLTHROUGH __attribute__ ((fallthrough))
+#elif defined(_MSC_VER)
+#   define __FLATJSON__FALLTHROUGH
+#else
+#   error "Unknown compiler"
+#endif //
+
+/*************************************************************************************************/
+
+#define __FLATJSON__STRINGIZE_I(x) #x
+#define __FLATJSON__STRINGIZE(x) __FLATJSON__STRINGIZE_I(x)
+
+#define __FLATJSON__MAKE_ERROR_MESSAGE(msg) \
+    __FILE__ "(" __FLATJSON__STRINGIZE(__LINE__) "): " msg
+
+#ifdef __FLATJSON__DONT_CHECK_OVERFLOW
+#   define __FLATJSON__CHECK_OVERFLOW(expr, type, err)
+#else
+#   define __FLATJSON__CHECK_OVERFLOW(expr, type, err) \
+        if ( (expr) >= (std::numeric_limits<type>::max)() ) return err
+#endif //__FLATJSON__SHOULD_CHECK_OVERFLOW
+
+#ifndef __FLATJSON__KLEN_TYPE
+#   define __FLATJSON__KLEN_TYPE std::uint8_t
+#endif // __FLATJSON__KLEN_TYPE
+#ifndef __FLATJSON__VLEN_TYPE
+#   define __FLATJSON__VLEN_TYPE std::uint16_t
+#endif // __FLATJSON__VLEN_TYPE
+#ifndef __FLATJSON__CHILDS_TYPE
+#   define __FLATJSON__CHILDS_TYPE std::uint8_t
+#endif // __FLATJSON__CHILDS_TYPE
+
+/*************************************************************************************************/
+
 #if __cplusplus >= 201703L
 #   include <string_view>
 namespace flatjson {
@@ -79,16 +118,6 @@ using static_string = details::static_string;
 
 } // ns flatjson
 #endif // __cplusplus >= 201703L
-
-#if defined(__clang__)
-#   define __FLATJSON__FALLTHROUGH [[clang::fallthrough]]
-#elif defined(__GNUC__)
-#   define __FLATJSON__FALLTHROUGH __attribute__ ((fallthrough))
-#elif defined(_MSC_VER)
-#   define __FLATJSON__FALLTHROUGH
-#else
-#   error "Unknown compiler"
-#endif //
 
 namespace flatjson {
 
@@ -156,31 +185,6 @@ inline const char* fj_error_string(e_fj_error_code e) {
 
     return "UNKNOWN ERROR";
 }
-
-/*************************************************************************************************/
-
-#define __FLATJSON__STRINGIZE_I(x) #x
-#define __FLATJSON__STRINGIZE(x) __FLATJSON__STRINGIZE_I(x)
-
-#define __FLATJSON__MAKE_ERROR_MESSAGE(msg) \
-    __FILE__ "(" __FLATJSON__STRINGIZE(__LINE__) "): " msg
-
-#ifdef __FLATJSON__DONT_CHECK_OVERFLOW
-#   define __FLATJSON__CHECK_OVERFLOW(expr, type, err)
-#else
-#   define __FLATJSON__CHECK_OVERFLOW(expr, type, err) \
-        if ( (expr) >= std::numeric_limits<type>::max() ) return err
-#endif //__FLATJSON__SHOULD_CHECK_OVERFLOW
-
-#ifndef __FLATJSON__KLEN_TYPE
-#   define __FLATJSON__KLEN_TYPE std::uint8_t
-#endif // __FLATJSON__KLEN_TYPE
-#ifndef __FLATJSON__VLEN_TYPE
-#   define __FLATJSON__VLEN_TYPE std::uint16_t
-#endif // __FLATJSON__VLEN_TYPE
-#ifndef __FLATJSON__CHILDS_TYPE
-#   define __FLATJSON__CHILDS_TYPE std::uint8_t
-#endif // __FLATJSON__CHILDS_TYPE
 
 /*************************************************************************************************/
 
@@ -1446,8 +1450,8 @@ public:
         }
 
         m_storage->resize(res.toknum);
-        m_beg = &(*m_storage->begin());
-        m_end = &(*m_storage->end());
+        m_beg = m_storage->data();
+        m_end = m_beg + m_storage->size();
 
         return true;
     }
