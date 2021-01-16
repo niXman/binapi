@@ -53,6 +53,34 @@ int main() {
         }
     );
 
+    ws.subscribe_book("BTCUSDT",
+        [](const char *fl, int ec, std::string emsg, auto book) {
+            if ( ec ) {
+                std::cerr << "subscribe book error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+
+                return false;
+            }
+
+            std::cout << "book: " << book << std::endl;
+
+            return true;
+        }
+    );
+
+    ws.subscribe_books(
+        [](const char *fl, int ec, std::string emsg, auto books) {
+            if ( ec ) {
+                std::cerr << "subscribe books error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+
+                return false;
+            }
+
+            std::cout << "books: " << books << std::endl;
+
+            return true;
+        }
+    );
+
     ioctx.run();
 
     return EXIT_SUCCESS;

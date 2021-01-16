@@ -33,6 +33,7 @@ struct agg_trade_t;
 struct kline_t;
 struct market_ticker_t;
 struct markets_tickers_t;
+struct book_ticker_t;
 
 /*************************************************************************************************/
 
@@ -73,30 +74,38 @@ struct websockets_pool {
 
     using handle = void *;
 
-    using on_depth_received_cd = std::function<bool(const char *fl, int ec, std::string errmsg, depths_t msg)>;
-    handle subscribe_depth(const char *pair, on_depth_received_cd cb);
+    using on_depth_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, depths_t msg)>;
+    handle subscribe_depth(const char *pair, on_depth_received_cb cb);
     void unsubscribe_depth(handle h);
 
-    using on_kline_received_cd = std::function<bool(const char *fl, int ec, std::string errmsg, kline_t msg)>;
+    using on_kline_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, kline_t msg)>;
     // period - 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
-    handle subscribe_klines(const char *pair, const char *period, on_kline_received_cd cb);
+    handle subscribe_klines(const char *pair, const char *period, on_kline_received_cb cb);
     void unsubscribe_klines(handle h);
 
-    using on_trade_received_cd = std::function<bool(const char *fl, int ec, std::string errmsg, trade_t msg)>;
-    handle subscribe_trade(const char *pair, on_trade_received_cd cb);
+    using on_trade_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, trade_t msg)>;
+    handle subscribe_trade(const char *pair, on_trade_received_cb cb);
     void unsubscribe_trade(handle h);
 
-    using on_agg_trade_received_cd = std::function<bool(const char *fl, int ec, std::string errmsg, agg_trade_t msg)>;
-    handle subscribe_agg_trade(const char *pair, on_agg_trade_received_cd cb);
+    using on_agg_trade_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, agg_trade_t msg)>;
+    handle subscribe_agg_trade(const char *pair, on_agg_trade_received_cb cb);
     void unsubscribe_agg_trade(handle h);
 
-    using on_market_received_cd = std::function<bool(const char *fl, int ec, std::string errmsg, market_ticker_t msg)>;
-    handle subscribe_market(const char *pair, on_market_received_cd cb);
+    using on_market_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, market_ticker_t msg)>;
+    handle subscribe_market(const char *pair, on_market_received_cb cb);
     void unsubscribe_market(handle h);
 
-    using on_markets_received_cd = std::function<bool(const char *fl, int ec, std::string errmsg, markets_tickers_t msg)>;
-    handle subscribe_markets(on_markets_received_cd cb);
+    using on_markets_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, markets_tickers_t msg)>;
+    handle subscribe_markets(on_markets_received_cb cb);
     void unsubscribe_markets(handle h);
+
+    using on_book_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, book_ticker_t msg)>;
+    handle subscribe_book(const char *pair, on_book_received_cb cb);
+    void unsubscribe_book(handle h);
+
+    using on_books_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, book_ticker_t msg)>;
+    handle subscribe_books(on_books_received_cb cb);
+    void unsubscribe_books(handle h);
 
     using on_order_update_cb = std::function<bool(const char *fl, int ec, std::string errmsg, userdata::order_update_t msg)>;
     using on_account_update_cb = std::function<bool(const char *fl, int ec, std::string errmsg, userdata::account_update_t msg)>;

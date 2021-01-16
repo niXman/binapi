@@ -309,14 +309,14 @@ websockets_pool::~websockets_pool()
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::subscribe_depth(const char *pair, on_depth_received_cd cb)
+websockets_pool::handle websockets_pool::subscribe_depth(const char *pair, on_depth_received_cb cb)
 { return pimpl->start_channel(pair, "depth", std::move(cb)); }
 
 void websockets_pool::unsubscribe_depth(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::subscribe_klines(const char *pair, const char *period, on_kline_received_cd cb) {
+websockets_pool::handle websockets_pool::subscribe_klines(const char *pair, const char *period, on_kline_received_cb cb) {
     static const auto switch_ = [](const char *period) -> const char * {
         const auto hash = fnv1a(period);
         switch ( hash ) {
@@ -354,29 +354,43 @@ void websockets_pool::unsubscribe_klines(handle h) { return pimpl->stop_channel(
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::subscribe_trade(const char *pair, on_trade_received_cd cb)
+websockets_pool::handle websockets_pool::subscribe_trade(const char *pair, on_trade_received_cb cb)
 { return pimpl->start_channel(pair, "trade", std::move(cb)); }
 
 void websockets_pool::unsubscribe_trade(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::subscribe_agg_trade(const char *pair, on_agg_trade_received_cd cb)
+websockets_pool::handle websockets_pool::subscribe_agg_trade(const char *pair, on_agg_trade_received_cb cb)
 { return pimpl->start_channel(pair, "aggTrade", std::move(cb)); }
 
 void websockets_pool::unsubscribe_agg_trade(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::subscribe_market(const char *pair, on_market_received_cd cb)
+websockets_pool::handle websockets_pool::subscribe_market(const char *pair, on_market_received_cb cb)
 { return pimpl->start_channel(pair, "ticker", std::move(cb)); }
 
 void websockets_pool::unsubscribe_market(handle h) { return pimpl->stop_channel(h); }
 
-websockets_pool::handle websockets_pool::subscribe_markets(on_markets_received_cd cb)
+websockets_pool::handle websockets_pool::subscribe_markets(on_markets_received_cb cb)
 { return pimpl->start_channel("!ticker", "arr", std::move(cb)); }
 
 void websockets_pool::unsubscribe_markets(handle h) { return pimpl->stop_channel(h); }
+
+/*************************************************************************************************/
+
+websockets_pool::handle websockets_pool::subscribe_book(const char *pair, on_book_received_cb cb)
+{ return pimpl->start_channel(pair, "bookTicker", std::move(cb)); }
+
+void websockets_pool::unsubscribe_book(handle h) { return pimpl->stop_channel(h); }
+
+/*************************************************************************************************/
+
+websockets_pool::handle websockets_pool::subscribe_books(on_books_received_cb cb)
+{ return pimpl->start_channel(nullptr, "!bookTicker", std::move(cb)); }
+
+void websockets_pool::unsubscribe_books(handle h) { return pimpl->stop_channel(h); }
 
 /*************************************************************************************************/
 
@@ -384,17 +398,17 @@ websockets_pool::handle websockets_pool::subscribe_userdata(const char *lkey, on
     auto cb = [ocb=std::move(ocb), acb=std::move(acb)](const char *fl, int ec, std::string errmsg, userdata::userdata_stream_t msg) {
         if ( ec ) {
             ocb(fl, ec, errmsg, userdata::order_update_t{});
-            acb(fl, ec, errmsg, userdata::account_update_t{});
+            acb(fl, ec, std::move(errmsg), userdata::account_update_t{});
 
             return false;
         }
 
         if ( msg.data.find("outboundAccountInfo") != std::string::npos ) {
             userdata::account_update_t res = userdata::account_update_t::parse(msg.data.c_str(), msg.data.length());
-            return acb(fl, ec, errmsg, std::move(res));
+            return acb(fl, ec, std::move(errmsg), std::move(res));
         } else {
             userdata::order_update_t res = userdata::order_update_t::parse(msg.data.c_str(), msg.data.length());
-            return ocb(fl, ec, errmsg, std::move(res));
+            return ocb(fl, ec, std::move(errmsg), std::move(res));
         }
     };
 

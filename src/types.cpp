@@ -1867,6 +1867,37 @@ std::ostream& operator<<(std::ostream &os, const markets_tickers_t &o) {
 }
 
 /*************************************************************************************************/
+
+book_ticker_t book_ticker_t::parse(const char *str, std::size_t len) {
+    const flatjson::fjson json(str, len);
+    assert(json.is_valid());
+
+    book_ticker_t res{};
+    __BINAPI_GET(u);
+    __BINAPI_GET(s);
+    __BINAPI_GET(b);
+    __BINAPI_GET(B);
+    __BINAPI_GET(a);
+    __BINAPI_GET(A);
+
+    return res;
+}
+
+std::ostream& operator<<(std::ostream &os, const book_ticker_t &o) {
+    os
+    << "{"
+    << "\"u\":" << o.u << ","
+    << "\"s\":\"" << o.s << "\","
+    << "\"b\":\"" << o.b << "\","
+    << "\"B\":\"" << o.B << "\","
+    << "\"a\":\"" << o.a << "\","
+    << "\"A\":\"" << o.A << "\""
+    << "}";
+
+    return os;
+}
+
+/*************************************************************************************************/
 /*************************************************************************************************/
 /*************************************************************************************************/
 

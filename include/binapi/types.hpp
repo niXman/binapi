@@ -744,6 +744,21 @@ struct markets_tickers_t {
 
 /*************************************************************************************************/
 
+// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-book-ticker-streams
+struct book_ticker_t {
+    std::size_t u;
+    std::string s;
+    double_type b;
+    double_type B;
+    double_type a;
+    double_type A;
+
+    static book_ticker_t parse(const char *str, std::size_t len);
+    friend std::ostream& operator<<(std::ostream &os, const book_ticker_t &o);
+};
+
+/*************************************************************************************************/
+
 } // ns ws
 
 /*************************************************************************************************/
