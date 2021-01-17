@@ -26,13 +26,15 @@ This implementation has been developed as a consequence of the lack of suitable 
 - [Close user data stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#close-user-data-stream-user_stream) -> `api::close_user_data_stream()`
 
 # WebSocket API
-- [Partial Book Depth Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams) -> `websockets_pool::subscribe_depth()`, `websockets_pool::unsubscribe_depth()`
-- [Kline/Candlestick Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams) -> `websockets_pool::subscribe_klines()`, `websockets_pool::unsubscribe_klines()`
-- [Trade Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#trade-streams) -> `websockets_pool::subscribe_trade()`, `websockets_pool::subscribe_trade()`
-- [Aggregate Trade Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams) -> `websockets_pool::subscribe_agg_trade()`, `websockets_pool::unsubscribe_agg_trade()`
-- [Individual Symbol Ticker Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams) -> `websockets_pool::subscribe_market()`, `websockets_pool::unsubscribe_market()`
-- [All Market Tickers Stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream) -> `websockets_pool::subscribe_markets()`, `websockets_pool::unsubscribe_markets()`
-- [User Data Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/user-data-stream.md) -> `websockets_pool::subscribe_userdata()`, `websockets_pool::unsubscribe_userdata()`
+- [Partial Book Depth Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams) -> `websockets_pool::depth()`
+- [Kline/Candlestick Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams) -> `websockets_pool::klines()`
+- [Trade Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#trade-streams) -> `websockets_pool::trade()`
+- [Aggregate Trade Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams) -> `websockets_pool::agg_trade()`
+- [Individual Symbol Ticker Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams) -> `websockets_pool::market()`
+- [All Market Tickers Stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream) -> `websockets_pool::markets()`
+- [Individual Symbol Book Ticker Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-book-ticker-streams) -> `websockets_pool::book()`
+- [All Book Tickers Stream](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-book-tickers-stream) -> `websockets_pool::books()`
+- [User Data Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/user-data-stream.md) -> `websockets_pool::userdata()`
 
 # Implementation details
 The project is written using C++14 and [boost](https://www.boost.org/) (at least version 1.70). [boost.beast](https://www.boost.org/doc/libs/1_73_0/libs/beast/index.html) is used to interact with the network.
@@ -129,7 +131,7 @@ int main() {
         ,"9443"
     };
 
-    ws.subscribe_depth("BTCUSDT",
+    ws.depth("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto depths) {
             if ( ec ) {
                 std::cerr << "subscribe depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
@@ -143,7 +145,7 @@ int main() {
         }
     );
 
-    ws.subscribe_trade("BTCUSDT",
+    ws.trade("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto trades) {
             if ( ec ) {
                 std::cerr << "subscribe trades error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
