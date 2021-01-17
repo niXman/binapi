@@ -6,7 +6,7 @@
 //
 // This file is part of FlatJSON(https://github.com/niXman/flatjson) project.
 //
-// Copyright (c) 2019-2020 niXman (github dot nixman dog pm.me). All rights reserved.
+// Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
 #ifndef __FLATJSON__FLATJSON_HPP
