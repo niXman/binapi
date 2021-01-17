@@ -25,7 +25,7 @@ int main() {
         ,"9443"
     };
 
-    ws.subscribe_depth("BTCUSDT",
+    ws.depth("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto depths) {
             if ( ec ) {
                 std::cerr << "subscribe depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
@@ -39,7 +39,7 @@ int main() {
         }
     );
 
-    ws.subscribe_trade("BTCUSDT",
+    ws.trade("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto trades) {
             if ( ec ) {
                 std::cerr << "subscribe trades error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
@@ -53,7 +53,7 @@ int main() {
         }
     );
 
-    ws.subscribe_book("BTCUSDT",
+    ws.book("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto book) {
             if ( ec ) {
                 std::cerr << "subscribe book error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
@@ -67,7 +67,7 @@ int main() {
         }
     );
 
-    ws.subscribe_books(
+    ws.books(
         [](const char *fl, int ec, std::string emsg, auto books) {
             if ( ec ) {
                 std::cerr << "subscribe books error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;

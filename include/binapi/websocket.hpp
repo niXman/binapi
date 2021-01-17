@@ -15,7 +15,11 @@
 #include <memory>
 #include <functional>
 
-#include <boost/asio/io_context.hpp>
+namespace boost {
+namespace asio {
+class io_context;
+} // ns asio
+} // ns boost
 
 namespace binapi {
 namespace userdata {
@@ -74,44 +78,44 @@ struct websockets_pool {
 
     using handle = void *;
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#diff-depth-stream
     using on_depth_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, depths_t msg)>;
-    handle subscribe_depth(const char *pair, on_depth_received_cb cb);
-    void unsubscribe_depth(handle h);
+    handle depth(const char *pair, on_depth_received_cb cb);
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams
     using on_kline_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, kline_t msg)>;
     // period - 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
-    handle subscribe_klines(const char *pair, const char *period, on_kline_received_cb cb);
-    void unsubscribe_klines(handle h);
+    handle klines(const char *pair, const char *period, on_kline_received_cb cb);
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#trade-streams
     using on_trade_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, trade_t msg)>;
-    handle subscribe_trade(const char *pair, on_trade_received_cb cb);
-    void unsubscribe_trade(handle h);
+    handle trade(const char *pair, on_trade_received_cb cb);
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams
     using on_agg_trade_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, agg_trade_t msg)>;
-    handle subscribe_agg_trade(const char *pair, on_agg_trade_received_cb cb);
-    void unsubscribe_agg_trade(handle h);
+    handle agg_trade(const char *pair, on_agg_trade_received_cb cb);
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams
     using on_market_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, market_ticker_t msg)>;
-    handle subscribe_market(const char *pair, on_market_received_cb cb);
-    void unsubscribe_market(handle h);
+    handle market(const char *pair, on_market_received_cb cb);
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream
     using on_markets_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, markets_tickers_t msg)>;
-    handle subscribe_markets(on_markets_received_cb cb);
-    void unsubscribe_markets(handle h);
+    handle markets(on_markets_received_cb cb);
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-book-ticker-streams
     using on_book_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, book_ticker_t msg)>;
-    handle subscribe_book(const char *pair, on_book_received_cb cb);
-    void unsubscribe_book(handle h);
+    handle book(const char *pair, on_book_received_cb cb);
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-book-tickers-stream
     using on_books_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, book_ticker_t msg)>;
-    handle subscribe_books(on_books_received_cb cb);
-    void unsubscribe_books(handle h);
+    handle books(on_books_received_cb cb);
 
     using on_order_update_cb = std::function<bool(const char *fl, int ec, std::string errmsg, userdata::order_update_t msg)>;
     using on_account_update_cb = std::function<bool(const char *fl, int ec, std::string errmsg, userdata::account_update_t msg)>;
-    handle subscribe_userdata(const char *lkey, on_order_update_cb ocb, on_account_update_cb acb);
-    void unsubscribe_userdata(handle h);
+    handle userdata(const char *lkey, on_order_update_cb ocb, on_account_update_cb acb);
 
+    void unsubscribe(handle h);
     void unsubscribe_all();
 
 private:
