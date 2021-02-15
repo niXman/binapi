@@ -195,7 +195,7 @@ int main(int argc, char **argv) {
     BREAK_IF_ERROR(start_uds);
     std::cout << "start_uds=" << start_uds.v << std::endl << std::endl;
 
-    auto user_data_stream = wsp.subscribe_userdata(start_uds.v.listenKey.c_str(),
+    auto user_data_stream = wsp.userdata(start_uds.v.listenKey.c_str(),
          [](const char *fl, int ec, std::string errmsg, binapi::userdata::order_update_t msg) -> bool {
              if ( ec ) {
                  std::cout << "order update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
@@ -215,7 +215,7 @@ int main(int argc, char **argv) {
              return true;
          }
     );
-    wsp.subscribe_depth(testpair,
+    wsp.depth(testpair,
         [](const char *fl, int ec, std::string errmsg, binapi::ws::depths_t msg) -> bool {
             if ( ec ) {
                 std::cout << "subscribe_depth(): fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
@@ -226,7 +226,7 @@ int main(int argc, char **argv) {
             return true;
         }
     );
-    wsp.subscribe_trade(testpair,
+    wsp.trade(testpair,
         [](const char *fl, int ec, std::string errmsg, binapi::ws::trade_t msg) -> bool {
             if ( ec ) {
                 std::cout << "subscribe_trade(): fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
@@ -244,7 +244,7 @@ int main(int argc, char **argv) {
         [user_data_stream, &wsp]
         (const boost::system::error_code &) {
             std::cout << "unsubscribe userdata stream" << std::endl;
-            wsp.unsubscribe_userdata(user_data_stream);
+            wsp.unsubscribe(user_data_stream);
         }
     );
 
