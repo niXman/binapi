@@ -1,6 +1,9 @@
 # binapi
 Binance API implemented in C++ for both synchronous and asynchronous way.
 
+# Donate
+BTC: 3BJKvx6LyKB2J5KgRBqst415KKmwQE5eQX
+
 # Motivation
 This implementation has been developed as a consequence of the lack of suitable alternatives as part of my multiuser trading platform project.
 
