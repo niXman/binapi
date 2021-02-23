@@ -5,33 +5,33 @@ Binance API implemented in C++ for both synchronous and asynchronous way.
 This implementation has been developed as a consequence of the lack of suitable alternatives as part of my multiuser trading platform project.
 
 # REST API
-- [Test connectivity](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#test-connectivity) -> `api::ping()`
-- [Check server time](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#check-server-time) -> `api::time()`
-- [Exchange information](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#exchange-information) -> `api::exchange_info()`
-- [Account information](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-information-user_data) -> `api::account_info()`
-- [Order book](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#order-book) -> `api::depth()`
-- [Recent trades list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#recent-trades-list) -> `api::trades()`
-- [Aggregate trades list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list) -> `api::agg_trades()`
-- [24hr ticker price change statistics](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics) -> `api::_24hrs_ticker()`
-- [Symbol price ticker](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker) -> `api::price()`
-- [New order](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#new-order--trade) -> `api::new_order()`
-- [Query order](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#query-order-user_data) -> `api::order_info()`
-- [Test new order](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#test-new-order-trade) -> `api::new_test_order()`
-- [Cancel order](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#cancel-order-trade) -> `api::cancel_order()`
-- [Current open orders](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#current-open-orders-user_data) -> `api::open_orders()`
-- [All orders](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#all-orders-user_data) -> `api::all_orders()`
-- [Account trade list](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-trade-list-user_data) -> `api::my_trades()`
-- [Start user data stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#start-user-data-stream-user_stream) -> `api::start_user_data_stream()`
-- [Keepalive user data stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#keepalive-user-data-stream-user_stream) -> `api::ping_user_data_stream()`
-- [Close user data stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#close-user-data-stream-user_stream) -> `api::close_user_data_stream()`
+- [Test connectivity](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#test-connectivity) -> `api::ping()`
+- [Check server time](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#check-server-time) -> `api::time()`
+- [Exchange information](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#exchange-information) -> `api::exchange_info()`
+- [Account information](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#account-information-user_data) -> `api::account_info()`
+- [Order book](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#order-book) -> `api::depth()`
+- [Recent trades list](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#recent-trades-list) -> `api::trades()`
+- [Aggregate trades list](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list) -> `api::agg_trades()`
+- [24hr ticker price change statistics](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics) -> `api::_24hrs_ticker()`
+- [Symbol price ticker](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#symbol-price-ticker) -> `api::price()`
+- [New order](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#new-order--trade) -> `api::new_order()`
+- [Query order](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#query-order-user_data) -> `api::order_info()`
+- [Test new order](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#test-new-order-trade) -> `api::new_test_order()`
+- [Cancel order](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#cancel-order-trade) -> `api::cancel_order()`
+- [Current open orders](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#current-open-orders-user_data) -> `api::open_orders()`
+- [All orders](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#all-orders-user_data) -> `api::all_orders()`
+- [Account trade list](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#account-trade-list-user_data) -> `api::my_trades()`
+- [Start user data stream](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#start-user-data-stream-user_stream) -> `api::start_user_data_stream()`
+- [Keepalive user data stream](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#keepalive-user-data-stream-user_stream) -> `api::ping_user_data_stream()`
+- [Close user data stream](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#close-user-data-stream-user_stream) -> `api::close_user_data_stream()`
 
 # WebSocket API
-- [Partial Book Depth Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams) -> `websockets_pool::depth()`
-- [Kline/Candlestick Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams) -> `websockets_pool::klines()`
-- [Trade Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#trade-streams) -> `websockets_pool::trade()`
-- [Aggregate Trade Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams) -> `websockets_pool::agg_trade()`
-- [Individual Symbol Ticker Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams) -> `websockets_pool::market()`
-- [All Market Tickers Stream](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream) -> `websockets_pool::markets()`
+- [Partial Book Depth Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams) -> `websockets_pool::depth()`
+- [Kline/Candlestick Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams) -> `websockets_pool::klines()`
+- [Trade Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#trade-streams) -> `websockets_pool::trade()`
+- [Aggregate Trade Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams) -> `websockets_pool::agg_trade()`
+- [Individual Symbol Ticker Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams) -> `websockets_pool::market()`
+- [All Market Tickers Stream](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream) -> `websockets_pool::markets()`
 - [Individual Symbol Book Ticker Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-book-ticker-streams) -> `websockets_pool::book()`
 - [All Book Tickers Stream](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-book-tickers-stream) -> `websockets_pool::books()`
 - [User Data Streams](https://github.com/binance-exchange/binance-official-api-docs/blob/master/user-data-stream.md) -> `websockets_pool::userdata()`
