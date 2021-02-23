@@ -13,6 +13,7 @@
 #include <binapi/websocket.hpp>
 
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/steady_timer.hpp>
 
 #include <iostream>
 
@@ -53,7 +54,7 @@ int main() {
         }
     );
 
-    ws.book("BTCUSDT",
+    auto book_handler = ws.book("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto book) {
             if ( ec ) {
                 std::cerr << "subscribe book error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
@@ -67,7 +68,7 @@ int main() {
         }
     );
 
-    ws.books(
+    auto books_handler = ws.books(
         [](const char *fl, int ec, std::string emsg, auto books) {
             if ( ec ) {
                 std::cerr << "subscribe books error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
@@ -80,6 +81,18 @@ int main() {
             return true;
         }
     );
+
+    boost::asio::steady_timer timer0{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(5)};
+    timer0.async_wait([&ws, book_handler](const auto &/*ec*/){
+        std::cout << "unsubscribing book_handler: " << book_handler << std::endl;
+        ws.unsubscribe(book_handler);
+    });
+
+    boost::asio::steady_timer timer1{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(6)};
+    timer1.async_wait([&ws, books_handler](const auto &/*ec*/){
+        std::cout << "async unsubscribing books_handler: " << books_handler << std::endl;
+        ws.async_unsubscribe(books_handler);
+    });
 
     ioctx.run();
 

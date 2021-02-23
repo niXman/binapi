@@ -128,6 +128,17 @@ struct websocket::impl {
         }
     }
 
+    void async_stop(holder_type holder) {
+        m_stop_requested = true;
+
+        if ( m_ws.next_layer().next_layer().is_open() ) {
+            m_ws.async_close(
+                 boost::beast::websocket::close_code::normal
+                ,[holder=std::move(holder)](const boost::system::error_code &){}
+            );
+        }
+    }
+
     void start_read(boost::system::error_code ec, on_message_received_cb cb, holder_type holder) {
         if ( ec ) {
             if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
@@ -193,6 +204,8 @@ void websocket::start(const std::string &host, const std::string &port, const st
 { return pimpl->async_start(host, port, target, std::move(cb), std::move(holder)); }
 
 void websocket::stop() { return pimpl->stop(); }
+
+void websocket::async_stop() { return pimpl->async_stop(shared_from_this()); }
 
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -274,12 +287,13 @@ struct websockets_pool::impl {
         return h;
     }
 
-    void stop_channel(const handle h) {
+    template<typename F>
+    void stop_channel_impl(handle h, F f) {
         auto it = m_map.find(h);
         if ( it == m_map.end() ) { return; }
 
         if ( auto s = it->second.lock() ) {
-            s->stop();
+            f(s);
         }
 
         m_map.erase(it);
@@ -287,14 +301,28 @@ struct websockets_pool::impl {
         remove_dead_websockets();
     }
 
-    void unsubscribe_all() {
+    void stop_channel(handle h) {
+        return stop_channel_impl(h, [](const auto &sp){ sp->stop(); });
+    }
+    void async_stop_channel(handle h) {
+        return stop_channel_impl(h, [](const auto &sp){ sp->async_stop(); });
+    }
+
+    template<typename F>
+    void unsubscribe_all_impl(F f) {
         for ( auto it = m_map.begin(); it != m_map.end(); ) {
             if ( auto s = it->second.lock() ) {
-                s->stop();
+                f(s);
             }
 
             it = m_map.erase(it);
         }
+    }
+    void unsubscribe_all() {
+        return unsubscribe_all_impl([](const auto &sp){ sp->stop(); });
+    }
+    void async_unsubscribe_all() {
+        return unsubscribe_all_impl([](const auto &sp){ sp->async_stop(); });
     }
 
     void remove_dead_websockets() {
@@ -421,8 +449,10 @@ websockets_pool::handle websockets_pool::userdata(const char *lkey, on_order_upd
 /*************************************************************************************************/
 
 void websockets_pool::unsubscribe(handle h) { return pimpl->stop_channel(h); }
+void websockets_pool::async_unsubscribe(handle h) { return pimpl->async_stop_channel(h); }
 
 void websockets_pool::unsubscribe_all() { return pimpl->unsubscribe_all(); }
+void websockets_pool::async_unsubscribe_all() { return pimpl->unsubscribe_all(); }
 
 /*************************************************************************************************/
 /*************************************************************************************************/

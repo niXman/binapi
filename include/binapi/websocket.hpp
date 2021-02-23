@@ -52,6 +52,7 @@ struct websocket: std::enable_shared_from_this<websocket> {
     >; // when 'false' returned the stop will called
     void start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder);
     void stop();
+    void async_stop();
 
 private:
     struct impl;
@@ -116,7 +117,9 @@ struct websockets_pool {
     handle userdata(const char *lkey, on_order_update_cb ocb, on_account_update_cb acb);
 
     void unsubscribe(handle h);
+    void async_unsubscribe(handle h);
     void unsubscribe_all();
+    void async_unsubscribe_all();
 
 private:
     struct impl;
