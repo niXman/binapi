@@ -11,7 +11,7 @@
 
 #include <binapi/websocket.hpp>
 #include <binapi/types.hpp>
-#include <binapi/invoker.hpp>
+#include <binapi/message.hpp>
 #include <binapi/fnv1a.hpp>
 
 #include <boost/asio/io_context.hpp>
@@ -224,34 +224,52 @@ struct websockets_pool::impl {
     websockets_pool::handle start_channel(const char *pair, const char *channel, F cb) {
         using args_tuple = typename boost::callable_traits::args<decltype(cb)>::type;
         using message_type = typename std::tuple_element<3, args_tuple>::type;
-        using return_type = typename boost::callable_traits::return_type<F>::type;
-        using invoker_type = detail::invoker<return_type, message_type, F>;
 
-        auto invoker = std::make_shared<invoker_type>(std::move(cb));
-        websockets_pool::handle h = invoker.get();
         std::string schannel = make_channel(pair, channel);
 
         auto ws = std::make_shared<websocket>(m_ioctx);
-        ws->start(
+        auto *h = ws.get();
+        std::weak_ptr<websocket> wp{ws};
+
+        h->start(
              m_host
             ,m_port
             ,schannel
-            ,[this, schannel, inv=std::move(invoker)]
-             (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) {
-                 try {
-                     if ( m_on_message ) { m_on_message(schannel.c_str(), ptr, size); }
-                 } catch (const std::exception &ex) {
-                     std::fprintf(stderr, "%s(%d): %s", __FILE__, __LINE__, ex.what());
-                 }
+            ,[this, schannel, cb=std::move(cb)]
+                (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool {
+                if ( std::strstr(ptr, "\"code\":") && std::strstr(ptr, "\"msg\":") ) {
+                    try {
+                        message_type message{};
+                        return cb(__MAKE_FILELINE, -1, ptr, std::move(message));
+                    } catch (const std::exception &ex) {
+                        std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
+                        std::fflush(stderr);
+                    }
+                }
 
-                 return inv->invoke(fl, ec, std::move(errmsg), ptr, size);
-             }
-             ,ws->shared_from_this()
+                try {
+                    if ( m_on_message ) { m_on_message(schannel.c_str(), ptr, size); }
+                } catch (const std::exception &ex) {
+                    std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
+                    std::fflush(stderr);
+                }
+
+                try {
+                    message_type message = message_type::parse(ptr, size);
+                    return cb(fl, ec, std::move(errmsg), std::move(message));
+                } catch (const std::exception &ex) {
+                    std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
+                    std::fflush(stderr);
+                }
+
+                return false;
+            }
+            ,std::move(ws)
         );
 
         remove_dead_websockets();
 
-        m_map.emplace(h, ws);
+        m_map.emplace(h, std::move(wp));
 
         return h;
     }
@@ -270,7 +288,7 @@ struct websockets_pool::impl {
     }
 
     void unsubscribe_all() {
-        for ( auto it = m_map.begin(); it != m_map.end(); ++it ) {
+        for ( auto it = m_map.begin(); it != m_map.end(); ) {
             if ( auto s = it->second.lock() ) {
                 s->stop();
             }
@@ -280,9 +298,11 @@ struct websockets_pool::impl {
     }
 
     void remove_dead_websockets() {
-        for ( auto it = m_map.begin(); it != m_map.end(); ++it ) {
+        for ( auto it = m_map.begin(); it != m_map.end(); ) {
             if ( ! it->second.lock() ) {
                 it = m_map.erase(it);
+            } else {
+                ++it;
             }
         }
     }

@@ -54,7 +54,7 @@ struct invoker: invoker_base {
                 }
             }
         } catch (const std::exception &ex) {
-            std::fprintf(stderr, "%s(%d): ex=%s\n", __FILE__, __LINE__, ex.what());
+            std::fprintf(stderr, "%s: ex=%s\n", __MAKE_FILELINE, ex.what());
             std::fprintf(stderr, "size=%u, ptr=%s\n", (unsigned)size, ptr);
             std::fflush(stderr);
         }
