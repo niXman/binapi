@@ -244,39 +244,41 @@ struct websockets_pool::impl {
         auto *h = ws.get();
         std::weak_ptr<websocket> wp{ws};
 
+        auto wscb = [this, schannel, cb=std::move(cb)]
+            (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool {
+            if ( std::strstr(ptr, "\"code\":") && std::strstr(ptr, "\"msg\":") ) {
+                try {
+                    message_type message{};
+                    return cb(__MAKE_FILELINE, -1, ptr, std::move(message));
+                } catch (const std::exception &ex) {
+                    std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
+                    std::fflush(stderr);
+                }
+            }
+
+            try {
+                if ( m_on_message ) { m_on_message(schannel.c_str(), ptr, size); }
+            } catch (const std::exception &ex) {
+                std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
+                std::fflush(stderr);
+            }
+
+            try {
+                message_type message = message_type::parse(ptr, size);
+                return cb(fl, ec, std::move(errmsg), std::move(message));
+            } catch (const std::exception &ex) {
+                std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
+                std::fflush(stderr);
+            }
+
+            return false;
+        };
+
         h->start(
              m_host
             ,m_port
             ,schannel
-            ,[this, schannel, cb=std::move(cb)]
-                (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool {
-                if ( std::strstr(ptr, "\"code\":") && std::strstr(ptr, "\"msg\":") ) {
-                    try {
-                        message_type message{};
-                        return cb(__MAKE_FILELINE, -1, ptr, std::move(message));
-                    } catch (const std::exception &ex) {
-                        std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
-                        std::fflush(stderr);
-                    }
-                }
-
-                try {
-                    if ( m_on_message ) { m_on_message(schannel.c_str(), ptr, size); }
-                } catch (const std::exception &ex) {
-                    std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
-                    std::fflush(stderr);
-                }
-
-                try {
-                    message_type message = message_type::parse(ptr, size);
-                    return cb(fl, ec, std::move(errmsg), std::move(message));
-                } catch (const std::exception &ex) {
-                    std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
-                    std::fflush(stderr);
-                }
-
-                return false;
-            }
+            ,std::move(wscb)
             ,std::move(ws)
         );
 
@@ -452,7 +454,7 @@ void websockets_pool::unsubscribe(handle h) { return pimpl->stop_channel(h); }
 void websockets_pool::async_unsubscribe(handle h) { return pimpl->async_stop_channel(h); }
 
 void websockets_pool::unsubscribe_all() { return pimpl->unsubscribe_all(); }
-void websockets_pool::async_unsubscribe_all() { return pimpl->unsubscribe_all(); }
+void websockets_pool::async_unsubscribe_all() { return pimpl->async_unsubscribe_all(); }
 
 /*************************************************************************************************/
 /*************************************************************************************************/

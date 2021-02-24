@@ -88,10 +88,16 @@ int main() {
         ws.unsubscribe(book_handler);
     });
 
-    boost::asio::steady_timer timer1{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(6)};
+    boost::asio::steady_timer timer1{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(10)};
     timer1.async_wait([&ws, books_handler](const auto &/*ec*/){
         std::cout << "async unsubscribing books_handler: " << books_handler << std::endl;
         ws.async_unsubscribe(books_handler);
+    });
+
+    boost::asio::steady_timer timer2{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(15)};
+    timer2.async_wait([&ws](const auto &/*ec*/){
+        std::cout << "async unsubscribing all" << std::endl;
+        ws.async_unsubscribe_all();
     });
 
     ioctx.run();
