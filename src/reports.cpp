@@ -14,7 +14,6 @@
 #include <binapi/tools.hpp>
 #include <binapi/pairslist.hpp>
 #include <binapi/iofmt.hpp>
-#include <binapi/io_state.hpp>
 #include <binapi/dtf.hpp>
 
 #include <boost/format.hpp>
