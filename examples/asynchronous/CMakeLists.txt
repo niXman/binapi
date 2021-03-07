@@ -27,6 +27,7 @@ set(BINAPI_HEADERS
     binapi/flatjson.hpp
     binapi/dtf.hpp
     binapi/double_type.hpp
+    binapi/enums.hpp
     binapi/invoker.hpp
     binapi/message.hpp
     binapi/pairslist.hpp
@@ -38,6 +39,7 @@ set(BINAPI_HEADERS
 
 set(BINAPI_SOURCES
     ../../src/api.cpp
+    ../../src/enums.cpp
     ../../src/pairslist.cpp
     ../../src/reports.cpp
     ../../src/tools.cpp
