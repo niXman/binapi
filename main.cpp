@@ -11,15 +11,14 @@
 
 #include "binapi/websocket.hpp"
 #include "binapi/api.hpp"
-#include "binapi/io_state.hpp"
 #include "binapi/pairslist.hpp"
 #include "binapi/reports.hpp"
 
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/steady_timer.hpp>
 
 #include <iostream>
 #include <fstream>
-#include <boost/asio/steady_timer.hpp>
 
 /*************************************************************************************************/
 
@@ -57,7 +56,7 @@ int main(int argc, char **argv) {
     const std::string pk = argv[1];
     const std::string sk = argv[2];
 
-    binapi::io_state_saver saver(std::cout, 8);
+    std::cout.precision(8);
 
     boost::asio::io_context ioctx;
     binapi::ws::websockets_pool wsp(ioctx, "stream.binance.com", "9443");
@@ -196,16 +195,7 @@ int main(int argc, char **argv) {
     std::cout << "start_uds=" << start_uds.v << std::endl << std::endl;
 
     auto user_data_stream = wsp.userdata(start_uds.v.listenKey.c_str(),
-         [](const char *fl, int ec, std::string errmsg, binapi::userdata::order_update_t msg) -> bool {
-             if ( ec ) {
-                 std::cout << "order update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
-                 return false;
-             }
-
-             std::cout << "order update:\n" << msg << std::endl;
-             return true;
-         }
-        ,[](const char *fl, int ec, std::string errmsg, binapi::userdata::account_update_t msg) -> bool {
+        [](const char *fl, int ec, std::string errmsg, binapi::userdata::account_update_t msg) -> bool {
              if ( ec ) {
                  std::cout << "account update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
                  return false;
@@ -213,7 +203,25 @@ int main(int argc, char **argv) {
 
              std::cout << "account update:\n" << msg << std::endl;
              return true;
-         }
+        }
+        ,[](const char *fl, int ec, std::string errmsg, binapi::userdata::balance_update_t msg) -> bool {
+            if ( ec ) {
+                std::cout << "balance update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
+                return false;
+            }
+
+            std::cout << "balance update:\n" << msg << std::endl;
+            return true;
+        }
+        ,[](const char *fl, int ec, std::string errmsg, binapi::userdata::order_update_t msg) -> bool {
+            if ( ec ) {
+                std::cout << "order update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
+                return false;
+            }
+
+            std::cout << "order update:\n" << msg << std::endl;
+            return true;
+        }
     );
     wsp.depth(testpair,
         [](const char *fl, int ec, std::string errmsg, binapi::ws::depths_t msg) -> bool {
