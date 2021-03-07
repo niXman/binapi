@@ -14,8 +14,8 @@
 #include <binapi/fnv1a.hpp>
 
 #include <type_traits>
-// TODO: comment out
-#include <iostream>
+
+//#include <iostream> // TODO: comment out
 
 namespace binapi {
 
@@ -616,7 +616,7 @@ exchange_info_t exchange_info_t::parse(const char *str, std::size_t len) {
             const auto fit = filters2.at(idx2);
             __BINAPI_GET2(filter, filterType, fit);
 
-            const auto filter_hash = fnv1a(filter.filterType.c_str());
+            const auto filter_hash = fnv1a(filter.filterType.c_str(), filter.filterType.size());
             switch ( filter_hash ) {
                 case fnv1a("PRICE_FILTER"): {
                     exchange_info_t::symbol_t::filter_t::filter_price_t item{};
@@ -1927,13 +1927,6 @@ account_update_t account_update_t::parse(const char *str, std::size_t len) {
     account_update_t res{};
     __BINAPI_GET(e);
     __BINAPI_GET(E);
-    __BINAPI_GET(m);
-    __BINAPI_GET(t);
-    __BINAPI_GET(b);
-    __BINAPI_GET(s);
-    __BINAPI_GET(T);
-    __BINAPI_GET(W);
-    __BINAPI_GET(D);
     __BINAPI_GET(u);
     const auto B = json.at("B");
     for ( auto idx = 0u; idx < B.size(); ++idx ) {
@@ -1954,13 +1947,6 @@ std::ostream& operator<<(std::ostream &os, const account_update_t &o) {
     << "{"
     << "\"e\":\"" << o.e << "\","
     << "\"E\":" << o.E << ","
-    << "\"m\":" << o.m << ","
-    << "\"t\":" << o.t << ","
-    << "\"b\":" << o.b << ","
-    << "\"s\":" << o.s << ","
-    << "\"T\":" << (o.T ? "true" : "false") << ","
-    << "\"W\":" << (o.W ? "true" : "false") << ","
-    << "\"D\":" << (o.D ? "true" : "false") << ","
     << "\"u\":" << o.u << ","
     << "\"B\":[";
     for ( auto it = o.B.begin(); it != o.B.end(); ++it ) {
@@ -1971,6 +1957,35 @@ std::ostream& operator<<(std::ostream &os, const account_update_t &o) {
     }
 
     os << "]}";
+
+    return os;
+}
+
+/*************************************************************************************************/
+
+balance_update_t balance_update_t::parse(const char *str, std::size_t len) {
+    const flatjson::fjson json(str, len);
+    assert(json.is_valid());
+
+    balance_update_t res{};
+    __BINAPI_GET(e);
+    __BINAPI_GET(E);
+    __BINAPI_GET(a);
+    __BINAPI_GET(d);
+    __BINAPI_GET(T);
+
+    return res;
+}
+
+std::ostream& operator<<(std::ostream &os, const balance_update_t &o) {
+    os
+    << "{"
+    << "\"e\":\"" << o.e << "\","
+    << "\"E\":"   << o.E << ","
+    << "\"a\":\"" << o.a << "\","
+    << "\"d\":\"" << o.d << "\","
+    << "\"T\":"   << o.T
+    << "}";
 
     return os;
 }

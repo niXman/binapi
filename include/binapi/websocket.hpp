@@ -25,6 +25,7 @@ namespace binapi {
 namespace userdata {
 
 struct account_update_t;
+struct balance_update_t;
 struct order_update_t;
 
 } // ns userdata
@@ -112,9 +113,15 @@ struct websockets_pool {
     using on_books_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, book_ticker_t msg)>;
     handle books(on_books_received_cb cb);
 
-    using on_order_update_cb = std::function<bool(const char *fl, int ec, std::string errmsg, userdata::order_update_t msg)>;
     using on_account_update_cb = std::function<bool(const char *fl, int ec, std::string errmsg, userdata::account_update_t msg)>;
-    handle userdata(const char *lkey, on_order_update_cb ocb, on_account_update_cb acb);
+    using on_balance_update_cb = std::function<bool(const char *fl, int ec, std::string errmsg, userdata::balance_update_t msg)>;
+    using on_order_update_cb = std::function<bool(const char *fl, int ec, std::string errmsg, userdata::order_update_t msg)>;
+    handle userdata(
+         const char *lkey
+        ,on_account_update_cb account_update
+        ,on_balance_update_cb balance_update
+        ,on_order_update_cb order_update
+    );
 
     void unsubscribe(handle h);
     void async_unsubscribe(handle h);

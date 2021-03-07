@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <binapi/api.hpp>
+#include <binapi/websocket.hpp>
 
 #include <boost/asio/io_context.hpp>
 
@@ -30,6 +31,11 @@ int main(int argc, char **argv) {
         ,std::move(sk)
         ,10000 // recvWindow
     };
+    binapi::ws::websockets_pool wsp(
+         ioctx
+        ,"stream.binance.com"
+        ,"9443"
+    );
 
     auto res = api.account_info(
         [](const char *fl, int ec, std::string emsg, auto res) {
@@ -41,6 +47,41 @@ int main(int argc, char **argv) {
 
             std::cout << "account info: " << res << std::endl;
 
+            return true;
+        }
+    );
+
+    auto start_uds = api.start_user_data_stream();
+    assert(start_uds);
+    std::cout << "start_uds=" << start_uds.v << std::endl << std::endl;
+    //api.close_user_data_stream(start_uds.v.listenKey);
+
+    auto user_data_stream = wsp.userdata(start_uds.v.listenKey.c_str(),
+        [](const char *fl, int ec, std::string errmsg, binapi::userdata::account_update_t msg) -> bool {
+            if ( ec ) {
+                std::cout << "account update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
+                return false;
+            }
+
+            std::cout << "account update:\n" << msg << std::endl;
+            return true;
+        }
+        ,[](const char *fl, int ec, std::string errmsg, binapi::userdata::balance_update_t msg) -> bool {
+            if ( ec ) {
+                std::cout << "balance update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
+                return false;
+            }
+
+            std::cout << "balance update:\n" << msg << std::endl;
+            return true;
+        }
+        ,[](const char *fl, int ec, std::string errmsg, binapi::userdata::order_update_t msg) -> bool {
+            if ( ec ) {
+                std::cout << "order update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
+                return false;
+            }
+
+            std::cout << "order update:\n" << msg << std::endl;
             return true;
         }
     );

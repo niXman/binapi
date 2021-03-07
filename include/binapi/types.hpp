@@ -769,7 +769,7 @@ namespace userdata {
 
 /*************************************************************************************************/
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/user-data-stream.md#account-update
+// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#account-update
 struct account_update_t {
     struct balance_t {
         std::string a;
@@ -781,13 +781,6 @@ struct account_update_t {
 
     std::string e;
     std::size_t E;
-    std::size_t m;
-    std::size_t t;
-    std::size_t b;
-    std::size_t s;
-    bool        T;
-    bool        W;
-    bool        D;
     std::size_t u;
     std::map<std::string, balance_t> B;
 
@@ -797,7 +790,21 @@ struct account_update_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/user-data-stream.md#order-update
+// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#balance-update
+struct balance_update_t {
+    std::string e;
+    std::size_t E;
+    std::string a;
+    double_type d;
+    std::size_t T;
+
+    static balance_update_t parse(const char *str, std::size_t len);
+    friend std::ostream& operator<<(std::ostream &os, const balance_update_t &o);
+};
+
+/*************************************************************************************************/
+
+// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#order-update
 struct order_update_t {
     std::string e;
     std::size_t E;

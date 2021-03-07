@@ -13,6 +13,7 @@
 #include <binapi/types.hpp>
 #include <binapi/message.hpp>
 #include <binapi/fnv1a.hpp>
+#include <binapi/flatjson.hpp>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/connect.hpp>
@@ -29,6 +30,7 @@
 #include <map>
 #include <set>
 #include <cstring>
+
 //#include <iostream> // TODO: comment out
 
 namespace binapi {
@@ -427,22 +429,52 @@ websockets_pool::handle websockets_pool::books(on_books_received_cb cb)
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::userdata(const char *lkey, on_order_update_cb ocb, on_account_update_cb acb) {
-    auto cb = [ocb=std::move(ocb), acb=std::move(acb)](const char *fl, int ec, std::string errmsg, userdata::userdata_stream_t msg) {
+websockets_pool::handle websockets_pool::userdata(
+     const char *lkey
+    ,on_account_update_cb account_update
+    ,on_balance_update_cb balance_update
+    ,on_order_update_cb order_update)
+{
+    auto cb = [acb=std::move(account_update), bcb=std::move(balance_update), ocb=std::move(order_update)]
+        (const char *fl, int ec, std::string errmsg, userdata::userdata_stream_t msg)
+    {
         if ( ec ) {
-            ocb(fl, ec, errmsg, userdata::order_update_t{});
-            acb(fl, ec, std::move(errmsg), userdata::account_update_t{});
+            acb(fl, ec, errmsg, userdata::account_update_t{});
+            bcb(fl, ec, errmsg, userdata::balance_update_t{});
+            ocb(fl, ec, std::move(errmsg), userdata::order_update_t{});
 
             return false;
         }
 
-        if ( msg.data.find("outboundAccountPosition") != std::string::npos ) {
-            userdata::account_update_t res = userdata::account_update_t::parse(msg.data.c_str(), msg.data.length());
-            return acb(fl, ec, std::move(errmsg), std::move(res));
-        } else {
-            userdata::order_update_t res = userdata::order_update_t::parse(msg.data.c_str(), msg.data.length());
-            return ocb(fl, ec, std::move(errmsg), std::move(res));
+        const flatjson::fjson json{msg.data.c_str(), msg.data.length()};
+        assert(json.contains("e"));
+        const auto e = json.at("e");
+        const auto es = e.to_sstring();
+        const auto ehash = fnv1a(es.data(), es.size());
+        switch ( ehash ) {
+            case fnv1a("outboundAccountPosition"): {
+                userdata::account_update_t res = userdata::account_update_t::parse(msg.data.c_str(), msg.data.length());
+                return acb(fl, ec, std::move(errmsg), std::move(res));
+            }
+            case fnv1a("balanceUpdate"): {
+                userdata::balance_update_t res = userdata::balance_update_t::parse(msg.data.c_str(), msg.data.length());
+                return bcb(fl, ec, std::move(errmsg), std::move(res));
+            }
+            case fnv1a("executionReport"): {
+                userdata::order_update_t res = userdata::order_update_t::parse(msg.data.c_str(), msg.data.length());
+                return ocb(fl, ec, std::move(errmsg), std::move(res));
+            }
+            case fnv1a("listStatus"): {
+                assert(!"not implemented");
+                return false;
+            }
+            default: {
+                assert(!"unreachable");
+                return false;
+            }
         }
+
+        return false;
     };
 
     return pimpl->start_channel(nullptr, lkey, std::move(cb));
