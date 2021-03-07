@@ -766,33 +766,6 @@ api::result<orders_info_t> api::all_orders(
 
 /*************************************************************************************************/
 
-const char* order_type_to_string(e_type type) {
-    return type == e_type::limit ? "LIMIT"
-        : type == e_type::market ? "MARKET"
-            : type == e_type::stop_loss ? "STOP_LOSS"
-                : type == e_type::stop_loss_limit ? "STOP_LOSS_LIMIT"
-                    : type == e_type::take_profit ? "TAKE_PROFIT"
-                        : type == e_type::take_profit_limit ? "TAKE_PROFIT_LIMIT"
-                            : type == e_type::limit_maker ? "LIMIT_MAKER"
-                                : nullptr
-    ;
-}
-
-const char* order_time_to_string(e_time time) {
-    return time == e_time::GTC ? "GTC"
-        : time == e_time::FOK ? "FOK"
-            : time == e_time::IOC ? "IOC"
-                : nullptr
-    ;
-}
-
-const char* order_side_to_string(e_side side) {
-    return side == e_side::buy ? "BUY"
-        : side == e_side::sell ? "SELL"
-            : nullptr
-    ;
-}
-
 api::result<new_order_resp_type>
 api::new_order(
      const char *symbol
@@ -806,15 +779,15 @@ api::new_order(
     ,const char *iceberg_amount
     ,new_order_cb cb
 ) {
-    const char *side_str = order_side_to_string(side);
+    const char *side_str = e_side_to_string(side);
     assert(side_str);
 
-    const char *type_str = order_type_to_string(type);
+    const char *type_str = e_type_to_string(type);
     assert(type_str);
 
     const char *time_str = type == e_type::market
         ? nullptr
-        : order_time_to_string(time)
+        : e_time_to_string(time)
     ;
 
     // TODO
@@ -853,13 +826,13 @@ api::result<new_order_resp_type> api::new_test_order(
     ,const char *iceberg_amount
     ,new_order_cb cb
 ) {
-    const char *side_str = order_side_to_string(side);
+    const char *side_str = e_side_to_string(side);
     assert(side_str);
 
-    const char *type_str = order_type_to_string(type);
+    const char *type_str = e_type_to_string(type);
     assert(type_str);
 
-    const char *time_str = type == e_type::market ? nullptr : order_time_to_string(time);
+    const char *time_str = type == e_type::market ? nullptr : e_time_to_string(time);
 
     static const char *responce_type = "RESULT";
 

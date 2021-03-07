@@ -24,6 +24,7 @@ enum class e_side: std::size_t {
 };
 
 e_side e_side_from_string(const char *str);
+const char* e_side_to_string(e_side side);
 
 /*************************************************************************************************/
 
@@ -38,6 +39,7 @@ enum class e_type: std::size_t {
 };
 
 e_type e_type_from_string(const char *str);
+const char* e_type_to_string(e_type type);
 
 /*************************************************************************************************/
 
@@ -48,6 +50,7 @@ enum class e_time: std::size_t {
 };
 
 e_time e_time_from_string(const char *str);
+const char* e_time_to_string(e_time time);
 
 /*************************************************************************************************/
 

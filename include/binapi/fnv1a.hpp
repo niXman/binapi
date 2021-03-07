@@ -13,6 +13,7 @@
 #define __binapi__fnv1a_hpp
 
 #include <cstdint>
+#include <type_traits>
 
 namespace binapi {
 

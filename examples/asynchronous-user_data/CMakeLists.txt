@@ -38,6 +38,7 @@ set(BINAPI_HEADERS
 
 set(BINAPI_SOURCES
     ../../src/api.cpp
+    ../../src/enums.cpp
     ../../src/pairslist.cpp
     ../../src/reports.cpp
     ../../src/tools.cpp

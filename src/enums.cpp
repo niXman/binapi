@@ -9,8 +9,8 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include "enums.hpp"
-#include "fnv1a.hpp"
+#include <binapi/enums.hpp>
+#include <binapi/fnv1a.hpp>
 
 #include <cstring>
 #include <cassert>
@@ -27,6 +27,17 @@ e_side e_side_from_string(const char *str) {
     }
 
     assert(!"unreachable");
+}
+
+const char* e_side_to_string(e_side side) {
+    switch ( side ) {
+        case e_side::buy: return "BUY";
+        case e_side::sell: return "SELL";
+    }
+
+    assert(!"unreachable");
+
+    return nullptr;
 }
 
 /*************************************************************************************************/
@@ -46,6 +57,22 @@ e_type e_type_from_string(const char *str) {
     assert(!"unreachable");
 }
 
+const char* e_type_to_string(e_type type) {
+    switch ( type ) {
+        case e_type::limit: return "LIMIT";
+        case e_type::market: return "MARKET";
+        case e_type::stop_loss: return "STOP_LOSS";
+        case e_type::stop_loss_limit: return "STOP_LOSS_LIMIT";
+        case e_type::take_profit: return "TAKE_PROFIT";
+        case e_type::take_profit_limit: return "TAKE_PROFIT_LIMIT";
+        case e_type::limit_maker: return "LIMIT_MAKER";
+    }
+
+    assert(!"unreachable");
+
+    return nullptr;
+}
+
 /*************************************************************************************************/
 
 e_time e_time_from_string(const char *str) {
@@ -57,6 +84,18 @@ e_time e_time_from_string(const char *str) {
     }
 
     assert(!"unreachable");
+}
+
+const char* e_time_to_string(e_time time) {
+    switch ( time ) {
+        case e_time::GTC: return "GTC";
+        case e_time::IOC: return "IOC";
+        case e_time::FOK: return "FOK";
+    }
+
+    assert(!"unreachable");
+
+    return nullptr;
 }
 
 /*************************************************************************************************/
