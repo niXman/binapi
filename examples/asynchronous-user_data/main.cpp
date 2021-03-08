@@ -54,9 +54,8 @@ int main(int argc, char **argv) {
     auto start_uds = api.start_user_data_stream();
     assert(start_uds);
     std::cout << "start_uds=" << start_uds.v << std::endl << std::endl;
-    //api.close_user_data_stream(start_uds.v.listenKey);
 
-    auto user_data_stream = wsp.userdata(start_uds.v.listenKey.c_str(),
+    wsp.userdata(start_uds.v.listenKey.c_str(),
         [](const char *fl, int ec, std::string errmsg, binapi::userdata::account_update_t msg) -> bool {
             if ( ec ) {
                 std::cout << "account update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;

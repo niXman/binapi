@@ -222,14 +222,33 @@ std::ostream &operator<<(std::ostream &os, const _24hrs_tickers_t::_24hrs_ticker
 }
 
 _24hrs_tickers_t _24hrs_tickers_t::construct(const flatjson::fjson &json) {
-    (void)json;
+    assert(json.is_valid());
 
-    return {};
+    _24hrs_tickers_t res{};
+    for ( auto idx = 0u; idx < json.size(); ++idx ) {
+        auto ji = json.at(idx);
+        assert(ji.is_object());
+
+        _24hrs_tickers_t::_24hrs_ticker_t item = _24hrs_tickers_t::_24hrs_ticker_t::construct(ji);
+        std::string symbol = item.symbol;
+        res.tickers.emplace(std::move(symbol), std::move(item));
+    }
+
+    return res;
 }
 
 std::ostream &operator<<(std::ostream &os, const _24hrs_tickers_t &f) {
-    (void)os;
-    (void)f;
+    os
+    << "[";
+
+    for ( auto it = f.tickers.begin(); it != f.tickers.end(); ++it ) {
+        os << it->second;
+        if ( std::next(it) != f.tickers.end() ) {
+            os << ",";
+        }
+    }
+    os
+    << "]";
 
     return os;
 }

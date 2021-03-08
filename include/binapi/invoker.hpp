@@ -49,7 +49,7 @@ struct invoker: invoker_base {
                 const flatjson::fjson json{ptr, size};
                 assert(json.is_valid());
 
-                if ( json.contains("code") && json.contains("msg") ) {
+                if ( json.is_object() && (json.contains("code") && json.contains("msg")) ) {
                     int code = json.at("code").to_int();
                     std::string msg = json.at("msg").to_string();
 
