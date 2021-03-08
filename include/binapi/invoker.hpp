@@ -18,6 +18,7 @@
 #include <cstdio>
 
 #include "message.hpp"
+#include "flatjson.hpp"
 
 namespace binapi {
 namespace detail {
@@ -45,11 +46,17 @@ struct invoker: invoker_base {
                 T arg{};
                 return m_cb(fl, ec, std::move(errmsg), std::move(arg));
             } else {
-                if ( std::strstr(ptr, "\"code\":") && std::strstr(ptr, "\"msg\":") ) {
+                const flatjson::fjson json{ptr, size};
+                assert(json.is_valid());
+
+                if ( json.contains("code") && json.contains("msg") ) {
+                    int code = json.at("code").to_int();
+                    std::string msg = json.at("msg").to_string();
+
                     T arg{};
-                    return m_cb(__MAKE_FILELINE, -1, ptr, std::move(arg));
+                    return m_cb(__MAKE_FILELINE, code, std::move(msg), std::move(arg));
                 } else {
-                    T arg = T::parse(ptr, size);
+                    T arg = T::construct(json);
                     return m_cb(__MAKE_FILELINE, 0, std::move(errmsg), std::move(arg));
                 }
             }

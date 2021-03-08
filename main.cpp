@@ -13,6 +13,7 @@
 #include "binapi/api.hpp"
 #include "binapi/pairslist.hpp"
 #include "binapi/reports.hpp"
+#include "binapi/flatjson.hpp"
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -77,8 +78,11 @@ int main(int argc, char **argv) {
         const std::string accinfo_str = read_file("accinfo.json");
         const std::string exinfo_str = read_file("exinfo.json");
 
-        binapi::rest::exchange_info_t exinfo = binapi::rest::exchange_info_t::parse(exinfo_str.c_str(), exinfo_str.size());
-        binapi::rest::account_info_t accinfo = binapi::rest::account_info_t::parse(accinfo_str.c_str(), accinfo_str.size());
+        const flatjson::fjson exinfo_json{exinfo_str.c_str(), exinfo_str.size()};
+        binapi::rest::exchange_info_t exinfo = binapi::rest::exchange_info_t::construct(exinfo_json);
+
+        const flatjson::fjson accinfo_json{accinfo_str.c_str(), accinfo_str.size()};
+        binapi::rest::account_info_t accinfo = binapi::rest::account_info_t::construct(accinfo_json);
 
         auto pairs0 = binapi::process_pairs("BTCUSDT", "", exinfo);
         assert(pairs0.size() == 1 && *(pairs0.begin()) == "BTCUSDT");

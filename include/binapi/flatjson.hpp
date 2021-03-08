@@ -1275,6 +1275,8 @@ public:
 
     explicit fjson(std::size_t reserved = 0)
         :m_storage{std::make_shared<storage_type>(reserved)}
+        ,m_src_beg{nullptr}
+        ,m_src_end{nullptr}
         ,m_beg{nullptr}
         ,m_end{nullptr}
         ,m_err{}
@@ -1284,7 +1286,9 @@ public:
         ,typename CharT = typename std::iterator_traits<InputIterator>::value_type
     >
     explicit fjson(const CharT (&str)[L], std::size_t reserved = 0)
-        :m_storage{std::make_shared<storage_type>(reserved)}
+        :m_storage{L-1 ? std::make_shared<storage_type>(reserved) : storage_ptr{}}
+        ,m_src_beg{str}
+        ,m_src_end{str+L-1}
         ,m_beg{nullptr}
         ,m_end{nullptr}
         ,m_err{}
@@ -1292,7 +1296,9 @@ public:
         load(str, L-1);
     }
     fjson(InputIterator ptr, std::size_t size, std::size_t reserved = 0)
-        :m_storage{std::make_shared<storage_type>(reserved)}
+        :m_storage{size ? std::make_shared<storage_type>(reserved) : storage_ptr{}}
+        ,m_src_beg{ptr}
+        ,m_src_end{ptr+size}
         ,m_beg{nullptr}
         ,m_end{nullptr}
         ,m_err{}
@@ -1300,7 +1306,9 @@ public:
         load(ptr, size);
     }
     fjson(InputIterator beg, InputIterator end, std::size_t reserved = 0)
-        :m_storage{std::make_shared<storage_type>(reserved)}
+        :m_storage{beg != end ? std::make_shared<storage_type>(reserved) : storage_ptr{}}
+        ,m_src_beg{beg}
+        ,m_src_end{end}
         ,m_beg{nullptr}
         ,m_end{nullptr}
         ,m_err{}
@@ -1313,6 +1321,8 @@ public:
 private:
     fjson(storage_ptr storage, element_type *beg, element_type *end)
         :m_storage{std::move(storage)}
+        ,m_src_beg{nullptr}
+        ,m_src_end{nullptr}
         ,m_beg{beg}
         ,m_end{end}
         ,m_err{}
@@ -1424,6 +1434,10 @@ public:
     bool load(const char (&str)[N]) { return load(str, str+N-1); }
     bool load(InputIterator beg, std::size_t size) { return load(beg, beg+size); }
     bool load(InputIterator beg, InputIterator end) {
+        if ( beg == end ) {
+            return false;
+        }
+
         if ( m_storage->empty() ) {
             auto res = details::fj_num_tokens(beg, end);
             if ( res.ec ) {
@@ -1493,6 +1507,9 @@ public:
         return res;
     }
 
+    std::pair<InputIterator, InputIterator>
+    get_source_data() const { return {m_src_beg, m_src_end}; }
+
 private:
     static void get_keys_cb(void *userdata, const char *ptr, std::size_t len) {
         auto *vec = static_cast<std::vector<static_string> *>(userdata);
@@ -1559,6 +1576,8 @@ private:
 
 private:
     storage_ptr m_storage;
+    InputIterator m_src_beg;
+    InputIterator m_src_end;
     element_type *m_beg;
     element_type *m_end;
     e_fj_error_code m_err;

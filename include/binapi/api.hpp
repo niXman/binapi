@@ -34,6 +34,11 @@ namespace rest {
 struct api {
     template<typename T>
     struct result {
+        result()
+            :ec{0}
+        {}
+
+        int ec;
         std::string errmsg;
         std::string reply;
         T v;

@@ -248,10 +248,14 @@ struct websockets_pool::impl {
 
         auto wscb = [this, schannel, cb=std::move(cb)]
             (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool {
-            if ( std::strstr(ptr, "\"code\":") && std::strstr(ptr, "\"msg\":") ) {
+            const flatjson::fjson json{ptr, size};
+            if ( json.contains("msg") && json.contains("code") ) {
+                int code = json.at("code").to_int();
+                std::string msg = json.at("msg").to_string();
+
                 try {
                     message_type message{};
-                    return cb(__MAKE_FILELINE, -1, ptr, std::move(message));
+                    return cb(__MAKE_FILELINE, code, std::move(msg), std::move(message));
                 } catch (const std::exception &ex) {
                     std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
                     std::fflush(stderr);
@@ -266,7 +270,7 @@ struct websockets_pool::impl {
             }
 
             try {
-                message_type message = message_type::parse(ptr, size);
+                message_type message = message_type::construct(json);
                 return cb(fl, ec, std::move(errmsg), std::move(message));
             } catch (const std::exception &ex) {
                 std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
@@ -453,15 +457,15 @@ websockets_pool::handle websockets_pool::userdata(
         const auto ehash = fnv1a(es.data(), es.size());
         switch ( ehash ) {
             case fnv1a("outboundAccountPosition"): {
-                userdata::account_update_t res = userdata::account_update_t::parse(msg.data.c_str(), msg.data.length());
+                userdata::account_update_t res = userdata::account_update_t::construct(json);
                 return acb(fl, ec, std::move(errmsg), std::move(res));
             }
             case fnv1a("balanceUpdate"): {
-                userdata::balance_update_t res = userdata::balance_update_t::parse(msg.data.c_str(), msg.data.length());
+                userdata::balance_update_t res = userdata::balance_update_t::construct(json);
                 return bcb(fl, ec, std::move(errmsg), std::move(res));
             }
             case fnv1a("executionReport"): {
-                userdata::order_update_t res = userdata::order_update_t::parse(msg.data.c_str(), msg.data.length());
+                userdata::order_update_t res = userdata::order_update_t::construct(json);
                 return ocb(fl, ec, std::move(errmsg), std::move(res));
             }
             case fnv1a("listStatus"): {

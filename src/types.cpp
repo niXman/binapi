@@ -53,9 +53,12 @@ namespace rest {
 /*************************************************************************************************/
 /*************************************************************************************************/
 
-ping_t ping_t::parse(const char *str, std::size_t len) {
+ping_t ping_t::construct(const flatjson::fjson &json) {
+    assert(json.is_valid());
+    assert(json.is_object());
+
     ping_t res{};
-    res.ok = std::strcmp(str, "{}") == 0 && len == 2;
+    res.ok = json.size() == 0;
 
     return res;
 }
@@ -71,8 +74,7 @@ std::ostream &operator<<(std::ostream &os, const ping_t &o) {
 
 /*************************************************************************************************/
 
-server_time_t server_time_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+server_time_t server_time_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     server_time_t res{};
@@ -92,8 +94,7 @@ std::ostream &operator<<(std::ostream &os, const server_time_t &o) {
 
 /*************************************************************************************************/
 
-prices_t::price_t prices_t::price_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+prices_t::price_t prices_t::price_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     prices_t::price_t res{};
@@ -115,8 +116,7 @@ std::ostream &operator<<(std::ostream &os, const prices_t::price_t &o) {
 
 /*************************************************************************************************/
 
-prices_t prices_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+prices_t prices_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
     assert(json.is_array());
 
@@ -167,8 +167,7 @@ const prices_t::price_t& prices_t::get_by_symbol(const char *sym) const {
 /*************************************************************************************************/
 
 _24hrs_tickers_t::_24hrs_ticker_t
-_24hrs_tickers_t::_24hrs_ticker_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+_24hrs_tickers_t::_24hrs_ticker_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     _24hrs_tickers_t::_24hrs_ticker_t res{};
@@ -222,9 +221,8 @@ std::ostream &operator<<(std::ostream &os, const _24hrs_tickers_t::_24hrs_ticker
     return os;
 }
 
-_24hrs_tickers_t _24hrs_tickers_t::parse(const char *str, std::size_t len) {
-    (void)str;
-    (void)len;
+_24hrs_tickers_t _24hrs_tickers_t::construct(const flatjson::fjson &json) {
+    (void)json;
 
     return {};
 }
@@ -238,9 +236,8 @@ std::ostream &operator<<(std::ostream &os, const _24hrs_tickers_t &f) {
 
 /*************************************************************************************************/
 
-account_info_t::balance_t account_info_t::balance_t::parse(const char *str, std::size_t len) {
-    (void)str;
-    (void)len;
+account_info_t::balance_t account_info_t::balance_t::construct(const flatjson::fjson &json) {
+    (void)json;
 
     static const account_info_t::balance_t res{};
 
@@ -258,8 +255,7 @@ std::ostream &operator<<(std::ostream &os, const account_info_t::balance_t &o) {
     return os;
 }
 
-account_info_t account_info_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+account_info_t account_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     account_info_t res{};
@@ -563,8 +559,7 @@ const exchange_info_t::symbol_t& exchange_info_t::get_by_symbol(const char *sym)
     assert(!"unreachable");
 }
 
-exchange_info_t exchange_info_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     exchange_info_t res{};
@@ -752,8 +747,7 @@ std::ostream &operator<<(std::ostream &os, const depths_t::depth_t &o) {
     return os;
 }
 
-depths_t depths_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+depths_t depths_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     depths_t res{};
@@ -813,8 +807,7 @@ std::ostream &operator<<(std::ostream &os, const depths_t &o) {
 
 /*************************************************************************************************/
 
-trades_t::trade_t trades_t::trade_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+trades_t::trade_t trades_t::trade_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     trades_t::trade_t res{};
@@ -843,10 +836,8 @@ std::ostream &operator<<(std::ostream &os, const trades_t::trade_t &o) {
     return os;
 }
 
-trades_t trades_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+trades_t trades_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
-    assert(json.is_array());
 
     trades_t res{};
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
@@ -882,10 +873,8 @@ std::ostream &operator<<(std::ostream &os, const trades_t &o) {
 
 /*************************************************************************************************/
 
-agg_trades_t::agg_trade_t agg_trades_t::agg_trade_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+agg_trades_t::agg_trade_t agg_trades_t::agg_trade_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
-    assert(json.is_array());
 
     agg_trades_t::agg_trade_t res{};
     const auto it = json.at(0);
@@ -919,10 +908,8 @@ std::ostream &operator<<(std::ostream &os, const agg_trades_t::agg_trade_t &o) {
 
 /*************************************************************************************************/
 
-agg_trades_t agg_trades_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+agg_trades_t agg_trades_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
-    assert(json.is_array());
 
     agg_trades_t res{};
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
@@ -980,10 +967,8 @@ std::ostream &operator<<(std::ostream &os, const klines_t::kline_t &o) {
     return os;
 }
 
-klines_t klines_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+klines_t klines_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
-    assert(json.is_array());
 
     klines_t res{};
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
@@ -1024,8 +1009,7 @@ std::ostream &operator<<(std::ostream &os, const klines_t &o) {
 
 /*************************************************************************************************/
 
-order_info_t order_info_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+order_info_t order_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     order_info_t res{};
@@ -1075,10 +1059,8 @@ std::ostream &operator<<(std::ostream &os, const order_info_t &o) {
 
 /*************************************************************************************************/
 
-orders_info_t orders_info_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+orders_info_t orders_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
-    assert(json.is_array());
 
     orders_info_t res{};
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
@@ -1126,8 +1108,7 @@ std::ostream &operator<<(std::ostream &os, const orders_info_t &o) {
 
 /*************************************************************************************************/
 
-new_order_info_ask_t new_order_info_ask_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+new_order_info_ask_t new_order_info_ask_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     new_order_info_ask_t res{};
@@ -1150,8 +1131,7 @@ std::ostream &operator<<(std::ostream &os, const new_order_info_ask_t &o) {
     return os;
 }
 
-new_order_info_result_t new_order_info_result_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+new_order_info_result_t new_order_info_result_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     new_order_info_result_t res{};
@@ -1226,8 +1206,7 @@ double_type new_order_info_full_t::sum_commission(const std::vector<fill_part> &
     return res;
 }
 
-new_order_info_full_t new_order_info_full_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+new_order_info_full_t new_order_info_full_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     new_order_info_full_t res{};
@@ -1293,22 +1272,24 @@ std::ostream &operator<<(std::ostream &os, const new_order_info_full_t &o) {
 
 /*************************************************************************************************/
 
-new_order_resp_type new_order_resp_type::parse(const char *str, std::size_t len) {
-    if ( std::strstr(str, "\"fills\":") ) {
+new_order_resp_type new_order_resp_type::construct(const flatjson::fjson &json) {
+    assert(json.is_valid());
+
+    if ( json.contains("fills") ) {
         // FULL
-        new_order_info_full_t res = new_order_info_full_t::parse(str, len);
+        new_order_info_full_t res = new_order_info_full_t::construct(json);
         return res;
-    } else if ( std::strstr(str, "\"side\":") ) {
+    } else if ( json.contains("side") ) {
         // RESULT
-        new_order_info_result_t res = new_order_info_result_t::parse(str, len);
+        new_order_info_result_t res = new_order_info_result_t::construct(json);
         return res;
-    } else if ( std::strstr(str, "\"symbol\":") ) {
+    } else if ( json.contains("symbol") ) {
         // ASK
-        new_order_info_ask_t res = new_order_info_ask_t::parse(str, len);
+        new_order_info_ask_t res = new_order_info_ask_t::construct(json);
         return res;
-    } else if ( len == 2 && std::memcmp(str, "{}", 2) == 0 ) {
+    } else if ( json.is_object() && json.size() == 0 ) {
         // TEST
-        new_test_order_info_t res = new_test_order_info_t::parse(str, len);
+        new_test_order_info_t res = new_test_order_info_t::construct(json);
         return res;
     }
 
@@ -1331,9 +1312,12 @@ std::ostream &operator<<(std::ostream &os, const new_order_resp_type &o) {
 
 /*************************************************************************************************/
 
-new_test_order_info_t new_test_order_info_t::parse(const char *str, std::size_t len) {
+new_test_order_info_t new_test_order_info_t::construct(const flatjson::fjson &json) {
+    assert(json.is_valid());
+    assert(json.is_object());
+
     new_test_order_info_t res{};
-    res.ok = len == 2 && std::strncmp(str, "{}", len) == 0;
+    res.ok = json.size() == 0;
 
     return res;
 }
@@ -1346,8 +1330,7 @@ std::ostream &operator<<(std::ostream &os, const new_test_order_info_t &o) {
 
 /*************************************************************************************************/
 
-cancel_order_info_t cancel_order_info_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+cancel_order_info_t cancel_order_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     cancel_order_info_t res{};
@@ -1389,8 +1372,7 @@ std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o) {
 
 /*************************************************************************************************/
 
-my_trades_info_t::my_trade_info_t my_trades_info_t::my_trade_info_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+my_trades_info_t::my_trade_info_t my_trades_info_t::my_trade_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     assert("unimplemented" == nullptr);
@@ -1417,10 +1399,8 @@ std::ostream &operator<<(std::ostream &os, const my_trades_info_t::my_trade_info
 
 /*************************************************************************************************/
 
-my_trades_info_t my_trades_info_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+my_trades_info_t my_trades_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
-    assert(json.is_array());
 
     my_trades_info_t res{};
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
@@ -1462,8 +1442,7 @@ std::ostream &operator<<(std::ostream &os, const my_trades_info_t &o) {
 
 /*************************************************************************************************/
 
-start_user_data_stream_t start_user_data_stream_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+start_user_data_stream_t start_user_data_stream_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     start_user_data_stream_t res{};
@@ -1483,8 +1462,7 @@ std::ostream &operator<<(std::ostream &os, const start_user_data_stream_t &o) {
 
 /*************************************************************************************************/
 
-ping_user_data_stream_t ping_user_data_stream_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+ping_user_data_stream_t ping_user_data_stream_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     ping_user_data_stream_t res{};
@@ -1504,8 +1482,7 @@ std::ostream &operator<<(std::ostream &os, const ping_user_data_stream_t &o) {
 
 /*************************************************************************************************/
 
-close_user_data_stream_t close_user_data_stream_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+close_user_data_stream_t close_user_data_stream_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     close_user_data_stream_t res{};
@@ -1531,8 +1508,7 @@ std::ostream &operator<<(std::ostream &os, const close_user_data_stream_t &o) {
 
 namespace ws {
 
-agg_trade_t agg_trade_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+agg_trade_t agg_trade_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     agg_trade_t res{};
@@ -1572,8 +1548,7 @@ std::ostream &operator<<(std::ostream &os, const agg_trade_t &o) {
 
 /*************************************************************************************************/
 
-trade_t trade_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+trade_t trade_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     trade_t res{};
@@ -1617,8 +1592,7 @@ std::ostream &operator<<(std::ostream &os, const depths_t::depth_t &o) {
     return os;
 }
 
-depths_t depths_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+depths_t depths_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     depths_t res{};
@@ -1679,8 +1653,7 @@ std::ostream& operator<<(std::ostream &os, const depths_t &o) {
 
 /*************************************************************************************************/
 
-kline_t kline_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+kline_t kline_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     kline_t res{};
@@ -1751,8 +1724,7 @@ std::ostream& ohlc(std::ostream &os, const kline_t &o) {
 
 /*************************************************************************************************/
 
-market_ticker_t market_ticker_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+market_ticker_t market_ticker_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     market_ticker_t res{};
@@ -1814,10 +1786,8 @@ std::ostream& operator<<(std::ostream &os, const market_ticker_t &o) {
 
 /*************************************************************************************************/
 
-markets_tickers_t markets_tickers_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+markets_tickers_t markets_tickers_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
-    assert(json.is_array());
 
     markets_tickers_t res{};
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
@@ -1868,8 +1838,7 @@ std::ostream& operator<<(std::ostream &os, const markets_tickers_t &o) {
 
 /*************************************************************************************************/
 
-book_ticker_t book_ticker_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+book_ticker_t book_ticker_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     book_ticker_t res{};
@@ -1920,8 +1889,7 @@ std::ostream& operator<<(std::ostream &os, const account_update_t::balance_t &o)
     return os;
 }
 
-account_update_t account_update_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+account_update_t account_update_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     account_update_t res{};
@@ -1963,8 +1931,7 @@ std::ostream& operator<<(std::ostream &os, const account_update_t &o) {
 
 /*************************************************************************************************/
 
-balance_update_t balance_update_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+balance_update_t balance_update_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     balance_update_t res{};
@@ -1992,8 +1959,7 @@ std::ostream& operator<<(std::ostream &os, const balance_update_t &o) {
 
 /*************************************************************************************************/
 
-order_update_t order_update_t::parse(const char *str, std::size_t len) {
-    const flatjson::fjson json(str, len);
+order_update_t order_update_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     order_update_t res{};
@@ -2070,9 +2036,10 @@ std::ostream& operator<<(std::ostream &os, const order_update_t &o) {
 
 /*************************************************************************************************/
 
-userdata_stream_t userdata_stream_t::parse(const char *str, std::size_t) {
+userdata_stream_t userdata_stream_t::construct(const flatjson::fjson &json) {
     userdata_stream_t res{};
-    res.data = str;
+    const auto json_src = json.get_source_data();
+    res.data.assign(json_src.first, json_src.second);
 
     return res;
 }

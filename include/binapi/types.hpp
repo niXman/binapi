@@ -22,6 +22,11 @@
 #include <cstdint>
 #include <cassert>
 
+// forward
+namespace flatjson {
+struct fjson;
+} // ns flatjson
+
 namespace binapi {
 
 /*************************************************************************************************/
@@ -31,7 +36,7 @@ namespace rest {
 struct ping_t {
     bool ok;
 
-    static ping_t parse(const char *str, std::size_t len);
+    static ping_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const ping_t &f);
 };
 
@@ -39,7 +44,7 @@ struct ping_t {
 struct server_time_t {
     std::size_t serverTime;
 
-    static server_time_t parse(const char *str, std::size_t len);
+    static server_time_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const server_time_t &f);
 };
 
@@ -49,11 +54,11 @@ struct prices_t {
         std::string symbol;
         double_type price;
 
-        static price_t parse(const char *str, std::size_t len);
+        static price_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const price_t &f);
     };
 
-    static prices_t parse(const char *str, std::size_t len);
+    static prices_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const prices_t &f);
 
     std::map<std::string, price_t> prices;
@@ -90,13 +95,13 @@ struct _24hrs_tickers_t {
         std::size_t lastId;
         std::size_t count;
 
-        static _24hrs_ticker_t parse(const char *str, std::size_t len);
+        static _24hrs_ticker_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const _24hrs_ticker_t &f);
     };
 
     std::map<std::string, _24hrs_ticker_t> tickers;
 
-    static _24hrs_tickers_t parse(const char *str, std::size_t len);
+    static _24hrs_tickers_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const _24hrs_tickers_t &f);
 };
 
@@ -116,7 +121,7 @@ struct account_info_t {
         double_type free;
         double_type locked;
 
-        static balance_t parse(const char *str, std::size_t len);
+        static balance_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const balance_t &f);
     };
     std::map<std::string, balance_t> balances;
@@ -133,7 +138,7 @@ struct account_info_t {
     { return sub_balance(symbol.c_str(), amount); }
     const double_type& sub_balance(const char *symbol, const double_type &amount);
 
-    static account_info_t parse(const char *str, std::size_t len);
+    static account_info_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const account_info_t &f);
 };
 
@@ -268,7 +273,7 @@ struct exchange_info_t {
         { return get_by_symbol(sym.c_str()); }
     const symbol_t& get_by_symbol(const char *sym) const;
 
-    static exchange_info_t parse(const char *str, std::size_t len);
+    static exchange_info_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const exchange_info_t &s);
 };
 
@@ -285,7 +290,7 @@ struct depths_t {
     std::vector<depth_t> bids;
     std::vector<depth_t> asks;
 
-    static depths_t parse(const char *str, std::size_t len);
+    static depths_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const depths_t &s);
 };
 
@@ -299,13 +304,13 @@ struct trades_t {
         bool isBuyerMaker;
         bool isBestMatch;
 
-        static trade_t parse(const char *str, std::size_t len);
+        static trade_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const trade_t &s);
     };
 
     std::vector<trade_t> trades;
 
-    static trades_t parse(const char *str, std::size_t len);
+    static trades_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const trades_t &s);
 };
 
@@ -321,13 +326,13 @@ struct agg_trades_t {
         bool isBuyerMaker;
         bool isBestMatch;
 
-        static agg_trade_t parse(const char *str, std::size_t len);
+        static agg_trade_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const agg_trade_t &s);
     };
 
     std::vector<agg_trade_t> trades;
 
-    static agg_trades_t parse(const char *str, std::size_t len);
+    static agg_trades_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const agg_trades_t &s);
 };
 
@@ -351,7 +356,7 @@ struct klines_t {
 
     std::vector<kline_t> klines;
 
-    static klines_t parse(const char *str, std::size_t len);
+    static klines_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const klines_t &s);
 };
 
@@ -374,7 +379,7 @@ struct order_info_t {
     std::size_t updateTime;
     bool isWorking;
 
-    static order_info_t parse(const char *str, std::size_t len);
+    static order_info_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const order_info_t &o);
 };
 
@@ -383,7 +388,7 @@ struct order_info_t {
 struct orders_info_t {
     std::map<std::string, std::vector<order_info_t>> orders;
 
-    static orders_info_t parse(const char *str, std::size_t len);
+    static orders_info_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const orders_info_t &o);
 };
 
@@ -394,7 +399,7 @@ struct new_order_info_ask_t {
     std::string clientOrderId;
     std::size_t transactTime;
 
-    static new_order_info_ask_t parse(const char *str, std::size_t len);
+    static new_order_info_ask_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const new_order_info_ask_t &o);
 };
 
@@ -412,7 +417,7 @@ struct new_order_info_result_t {
     std::string type;
     std::string side;
 
-    static new_order_info_result_t parse(const char *str, std::size_t len);
+    static new_order_info_result_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const new_order_info_result_t &o);
 };
 
@@ -442,7 +447,7 @@ struct new_order_info_full_t {
     static double_type sum_amount(const std::vector<fill_part> &parts);
     static double_type sum_commission(const std::vector<fill_part> &parts);
 
-    static new_order_info_full_t parse(const char *str, std::size_t len);
+    static new_order_info_full_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const new_order_info_full_t &o);
 };
 
@@ -450,7 +455,7 @@ struct new_order_info_full_t {
 struct new_test_order_info_t {
     bool ok;
 
-    static new_test_order_info_t parse(const char *str, std::size_t len);
+    static new_test_order_info_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const new_test_order_info_t &o);
 };
 
@@ -531,7 +536,7 @@ struct new_order_resp_type
         return 0u;
     }
 
-    static new_order_resp_type parse(const char *str, std::size_t len);
+    static new_order_resp_type construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const new_order_resp_type &o);
 };
 
@@ -550,7 +555,7 @@ struct cancel_order_info_t {
     std::string type;
     std::string side;
 
-    static cancel_order_info_t parse(const char *str, std::size_t len);
+    static cancel_order_info_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o);
 };
 
@@ -569,13 +574,13 @@ struct my_trades_info_t {
         bool isMaker;
         bool isBestMatch;
 
-        static my_trade_info_t parse(const char *str, std::size_t len);
+        static my_trade_info_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const my_trade_info_t &o);
     };
 
     std::vector<my_trade_info_t> trades;
 
-    static my_trades_info_t parse(const char *str, std::size_t len);
+    static my_trades_info_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const my_trades_info_t &o);
 };
 
@@ -585,7 +590,7 @@ struct my_trades_info_t {
 struct start_user_data_stream_t {
     std::string listenKey;
 
-    static start_user_data_stream_t parse(const char *str, std::size_t len);
+    static start_user_data_stream_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const start_user_data_stream_t &o);
 };
 
@@ -593,7 +598,7 @@ struct start_user_data_stream_t {
 struct ping_user_data_stream_t {
     bool ok;
 
-    static ping_user_data_stream_t parse(const char *str, std::size_t len);
+    static ping_user_data_stream_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const ping_user_data_stream_t &o);
 };
 
@@ -601,7 +606,7 @@ struct ping_user_data_stream_t {
 struct close_user_data_stream_t {
     bool ok;
 
-    static close_user_data_stream_t parse(const char *str, std::size_t len);
+    static close_user_data_stream_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const close_user_data_stream_t &o);
 };
 
@@ -631,7 +636,7 @@ struct agg_trade_t {
     bool m; // Is the buyer the market maker?
     bool M; // Ignore
 
-    static agg_trade_t parse(const char *str, std::size_t len);
+    static agg_trade_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const agg_trade_t &o);
 };
 
@@ -648,7 +653,7 @@ struct trade_t {
     bool m; // Is the buyer the market maker?
     bool M; // Ignore
 
-    static trade_t parse(const char *str, std::size_t len);
+    static trade_t construct(const flatjson::fjson &json);
     friend std::ostream &operator<<(std::ostream &os, const trade_t &o);
 };
 
@@ -670,7 +675,7 @@ struct depths_t {
     std::vector<depth_t> a;
     std::vector<depth_t> b;
 
-    static depths_t parse(const char *str, std::size_t len);
+    static depths_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const depths_t &o);
 };
 
@@ -696,7 +701,7 @@ struct kline_t {
     double_type V; // Taker buy base asset volume
     double_type Q; // Taker buy quote asset volume
 
-    static kline_t parse(const char *str, std::size_t len);
+    static kline_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const kline_t &o);
     friend bool ohlc_equal(const kline_t &l, const kline_t &r);
 };
@@ -730,7 +735,7 @@ struct market_ticker_t {
     std::size_t L; // Last trade Id
     std::size_t n; // Total number of trades
 
-    static market_ticker_t parse(const char *str, std::size_t len);
+    static market_ticker_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const market_ticker_t &o);
 };
 
@@ -738,7 +743,7 @@ struct market_ticker_t {
 struct markets_tickers_t {
     std::map<std::string, market_ticker_t> tickers;
 
-    static markets_tickers_t parse(const char *str, std::size_t len);
+    static markets_tickers_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const markets_tickers_t &o);
 };
 
@@ -753,7 +758,7 @@ struct book_ticker_t {
     double_type a;
     double_type A;
 
-    static book_ticker_t parse(const char *str, std::size_t len);
+    static book_ticker_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const book_ticker_t &o);
 };
 
@@ -784,7 +789,7 @@ struct account_update_t {
     std::size_t u;
     std::map<std::string, balance_t> B;
 
-    static account_update_t parse(const char *str, std::size_t len);
+    static account_update_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const account_update_t &o);
 };
 
@@ -798,7 +803,7 @@ struct balance_update_t {
     double_type d;
     std::size_t T;
 
-    static balance_update_t parse(const char *str, std::size_t len);
+    static balance_update_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const balance_update_t &o);
 };
 
@@ -836,7 +841,7 @@ struct order_update_t {
     std::size_t O;
     double_type Z;
 
-    static order_update_t parse(const char *str, std::size_t len);
+    static order_update_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const order_update_t &o);
 };
 
@@ -846,7 +851,7 @@ struct order_update_t {
 struct userdata_stream_t {
     std::string data;
 
-    static userdata_stream_t parse(const char *str, std::size_t len);
+    static userdata_stream_t construct(const flatjson::fjson &json);
     friend std::ostream& operator<<(std::ostream &os, const userdata_stream_t &o);
 };
 

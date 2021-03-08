@@ -31,6 +31,7 @@
 
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
+#include <binapi/flatjson.hpp>
 
 namespace binapi {
 namespace rest {
@@ -251,25 +252,23 @@ struct api::impl {
         api::result<R> res{};
         if ( !cb ) {
             try {
-                auto r = sync_post(starget.c_str(), action, std::move(data));
+                api::result<std::string> r = sync_post(starget.c_str(), action, std::move(data));
                 if ( !r.v.empty() && is_html(r.v.c_str()) ) {
                     r.errmsg = std::move(r.v);
-                }
-                if ( !r ) {
-                    res.errmsg = std::move(r.errmsg);
                 } else {
                     std::string strbuf = std::move(r.v);
-                    if ( strbuf.find("\"code\":") != std::string::npos && strbuf.find("\"msg\":") != std::string::npos ) {
-                        res.errmsg = strbuf;
-                        res.reply = std::move(strbuf);
+                    const flatjson::fjson json{strbuf.c_str(), strbuf.length()};
+
+                    if ( json.contains("code") && json.contains("msg") ) {
+                        res.ec     = json.at("code").to_int();
+                        res.errmsg = json.at("msg").to_string();
+                        res.reply  = std::move(strbuf);
                     } else {
-                        res.v = R::parse(strbuf.c_str(), strbuf.length());
+                        res.v = R::construct(json);
                     }
                 }
             } catch (const std::exception &ex) {
                 __MAKE_ERRMSG(res, ex.what())
-            } catch (...) {
-                __MAKE_ERRMSG(res, "unknown exception")
             }
         } else {
             using invoker_type = detail::invoker<typename boost::callable_traits::return_type<CB>::type, R, CB>;
