@@ -82,7 +82,7 @@ struct websockets_pool {
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#diff-depth-stream
     using on_depth_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, depths_t msg)>;
-    handle depth(const char *pair, on_depth_received_cb cb);
+    handle depth(const char *pair, std::size_t ms, on_depth_received_cb cb);
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams
     using on_kline_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, kline_t msg)>;
