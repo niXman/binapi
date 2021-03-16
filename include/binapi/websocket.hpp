@@ -44,41 +44,21 @@ struct book_ticker_t;
 
 /*************************************************************************************************/
 
-struct websocket: std::enable_shared_from_this<websocket> {
-    explicit websocket(boost::asio::io_context &ioctx);
-    virtual ~websocket();
-
-    using on_message_received_cb = std::function<
-        bool(const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size)
-    >; // when 'false' returned the stop will called
-
-    using holder_type = std::shared_ptr<void>;
-    void start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder);
-    void stop();
-    void async_stop();
-
-private:
-    struct impl;
-    std::unique_ptr<impl> pimpl;
-};
-
-/*************************************************************************************************/
-
-struct websockets_pool {
-    websockets_pool(const websockets_pool &) = delete;
-    websockets_pool& operator= (const websockets_pool &) = delete;
-    websockets_pool(websockets_pool &&) noexcept = default;
-    websockets_pool& operator= (websockets_pool &&) noexcept = default;
+struct websockets {
+    websockets(const websockets &) = delete;
+    websockets& operator= (const websockets &) = delete;
+    websockets(websockets &&) noexcept = default;
+    websockets& operator= (websockets &&) noexcept = default;
 
     using on_message_received_cb = std::function<void(const char *channel, const char *ptr, std::size_t size)>;
 
-    websockets_pool(
+    websockets(
          boost::asio::io_context &ioctx
         ,std::string host
         ,std::string port
         ,on_message_received_cb cb = {}
     );
-    ~websockets_pool();
+    ~websockets();
 
     using handle = void *;
 

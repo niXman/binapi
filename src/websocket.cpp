@@ -41,6 +41,26 @@ namespace ws {
 #define __CB_ON_ERROR(cb, ec) \
     cb(__FILE__ "(" BOOST_PP_STRINGIZE(__LINE__) ")", ec.value(), ec.message(), nullptr, 0);
 
+struct websocket: std::enable_shared_from_this<websocket> {
+    explicit websocket(boost::asio::io_context &ioctx);
+    virtual ~websocket();
+
+    using on_message_received_cb = std::function<
+        bool(const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size)
+    >; // when 'false' returned the stop will called
+
+    using holder_type = std::shared_ptr<void>;
+    void start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder);
+    void stop();
+    void async_stop();
+
+private:
+    struct impl;
+    std::unique_ptr<impl> pimpl;
+};
+
+/*************************************************************************************************/
+
 struct websocket::impl {
     impl(boost::asio::io_context &ioctx)
         :m_ioctx{ioctx}
@@ -213,7 +233,7 @@ void websocket::async_stop() { return pimpl->async_stop(shared_from_this()); }
 /*************************************************************************************************/
 /*************************************************************************************************/
 
-struct websockets_pool::impl {
+struct websockets::impl {
     impl(boost::asio::io_context &ioctx, std::string host, std::string port, on_message_received_cb cb)
         :m_ioctx{ioctx}
         ,m_host{std::move(host)}
@@ -236,7 +256,7 @@ struct websockets_pool::impl {
     }
 
     template<typename F>
-    websockets_pool::handle start_channel(const char *pair, const char *channel, F cb) {
+    websockets::handle start_channel(const char *pair, const char *channel, F cb) {
         using args_tuple = typename boost::callable_traits::args<decltype(cb)>::type;
         using message_type = typename std::tuple_element<3, args_tuple>::type;
 
@@ -347,12 +367,12 @@ struct websockets_pool::impl {
     std::string m_host;
     std::string m_port;
     on_message_received_cb m_on_message;
-    std::map<websockets_pool::handle, std::weak_ptr<websocket>> m_map;
+    std::map<websockets::handle, std::weak_ptr<websocket>> m_map;
 };
 
 /*************************************************************************************************/
 
-websockets_pool::websockets_pool(
+websockets::websockets(
      boost::asio::io_context &ioctx
     ,std::string host
     ,std::string port
@@ -361,19 +381,19 @@ websockets_pool::websockets_pool(
     :pimpl{std::make_unique<impl>(ioctx, std::move(host), std::move(port), std::move(cb))}
 {}
 
-websockets_pool::~websockets_pool()
+websockets::~websockets()
 {}
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::depth(const char *pair, e_freq freq, on_depth_received_cb cb) {
+websockets::handle websockets::depth(const char *pair, e_freq freq, on_depth_received_cb cb) {
     std::string ch = "depth@" + std::to_string(static_cast<std::size_t>(freq)) + "ms";
     return pimpl->start_channel(pair, ch.c_str(), std::move(cb));
 }
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::klines(const char *pair, const char *period, on_kline_received_cb cb) {
+websockets::handle websockets::klines(const char *pair, const char *period, on_kline_received_cb cb) {
     static const auto switch_ = [](const char *period) -> const char * {
         const auto hash = fnv1a(period);
         switch ( hash ) {
@@ -409,33 +429,33 @@ websockets_pool::handle websockets_pool::klines(const char *pair, const char *pe
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::trade(const char *pair, on_trade_received_cb cb)
+websockets::handle websockets::trade(const char *pair, on_trade_received_cb cb)
 { return pimpl->start_channel(pair, "trade", std::move(cb)); }
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::agg_trade(const char *pair, on_agg_trade_received_cb cb)
+websockets::handle websockets::agg_trade(const char *pair, on_agg_trade_received_cb cb)
 { return pimpl->start_channel(pair, "aggTrade", std::move(cb)); }
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::market(const char *pair, on_market_received_cb cb)
+websockets::handle websockets::market(const char *pair, on_market_received_cb cb)
 { return pimpl->start_channel(pair, "ticker", std::move(cb)); }
 
-websockets_pool::handle websockets_pool::markets(on_markets_received_cb cb)
+websockets::handle websockets::markets(on_markets_received_cb cb)
 { return pimpl->start_channel("!ticker", "arr", std::move(cb)); }
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::book(const char *pair, on_book_received_cb cb)
+websockets::handle websockets::book(const char *pair, on_book_received_cb cb)
 { return pimpl->start_channel(pair, "bookTicker", std::move(cb)); }
 
-websockets_pool::handle websockets_pool::books(on_books_received_cb cb)
+websockets::handle websockets::books(on_books_received_cb cb)
 { return pimpl->start_channel(nullptr, "!bookTicker", std::move(cb)); }
 
 /*************************************************************************************************/
 
-websockets_pool::handle websockets_pool::userdata(
+websockets::handle websockets::userdata(
      const char *lkey
     ,on_account_update_cb account_update
     ,on_balance_update_cb balance_update
@@ -488,11 +508,11 @@ websockets_pool::handle websockets_pool::userdata(
 
 /*************************************************************************************************/
 
-void websockets_pool::unsubscribe(handle h) { return pimpl->stop_channel(h); }
-void websockets_pool::async_unsubscribe(handle h) { return pimpl->async_stop_channel(h); }
+void websockets::unsubscribe(handle h) { return pimpl->stop_channel(h); }
+void websockets::async_unsubscribe(handle h) { return pimpl->async_stop_channel(h); }
 
-void websockets_pool::unsubscribe_all() { return pimpl->unsubscribe_all(); }
-void websockets_pool::async_unsubscribe_all() { return pimpl->async_unsubscribe_all(); }
+void websockets::unsubscribe_all() { return pimpl->unsubscribe_all(); }
+void websockets::async_unsubscribe_all() { return pimpl->async_unsubscribe_all(); }
 
 /*************************************************************************************************/
 /*************************************************************************************************/
