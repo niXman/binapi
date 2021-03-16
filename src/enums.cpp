@@ -12,7 +12,6 @@
 #include <binapi/enums.hpp>
 #include <binapi/fnv1a.hpp>
 
-#include <cstring>
 #include <cassert>
 
 namespace binapi {
