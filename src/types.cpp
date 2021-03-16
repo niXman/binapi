@@ -1605,32 +1605,28 @@ std::ostream &operator<<(std::ostream &os, const trade_t &o) {
 
 /*************************************************************************************************/
 
-std::ostream &operator<<(std::ostream &os, const depths_t::depth_t &o) {
+std::ostream& operator<< (std::ostream &os, const part_depths_t::depth_t &o) {
     (void)o;
 
     return os;
 }
 
-depths_t depths_t::construct(const flatjson::fjson &json) {
+part_depths_t part_depths_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
-    depths_t res{};
-    __BINAPI_GET(E);
-    __BINAPI_GET(s);
-    __BINAPI_GET(u);
-    __BINAPI_GET(U);
-    const auto a = json.at("a");
+    part_depths_t res{};
+    const auto a = json.at("asks");
     for ( auto idx = 0u; idx < a.size(); ++idx ) {
-        depths_t::depth_t item{};
+        part_depths_t::depth_t item{};
         const auto it = a.at(idx);
         item.price.assign(it.at(0).to_string());
         item.amount.assign(it.at(1).to_string());
 
         res.a.push_back(std::move(item));
     }
-    const auto b = json.at("b");
+    const auto b = json.at("bids");
     for ( auto idx = 0u; idx < b.size(); ++idx ) {
-        depths_t::depth_t item{};
+        part_depths_t::depth_t item{};
         const auto it = b.at(idx);
         item.price.assign(it.at(0).to_string());
         item.amount.assign(it.at(1).to_string());
@@ -1641,7 +1637,70 @@ depths_t depths_t::construct(const flatjson::fjson &json) {
     return res;
 }
 
-std::ostream& operator<<(std::ostream &os, const depths_t &o) {
+std::ostream& operator<<(std::ostream &os, const part_depths_t &o) {
+    os
+    << "{"
+    << "\"asks\":[";
+    for ( auto it = o.a.begin(); it != o.a.end(); ++it ) {
+        os << "[\"" << it->price << "\", \"" << it->amount << "\"]";
+        if ( std::next(it) != o.a.end() ) {
+            os << ",";
+        }
+    }
+    os
+    << "],"
+    << "\"bids\":[";
+    for ( auto it = o.b.begin(); it != o.b.end(); ++it ) {
+        os << "[\"" << it->price << "\", \"" << it->amount << "\"]";
+        if ( std::next(it) != o.b.end() ) {
+            os << ",";
+        }
+    }
+    os
+    << "]}";
+
+    return os;
+}
+
+/*************************************************************************************************/
+
+std::ostream &operator<<(std::ostream &os, const diff_depths_t::depth_t &o) {
+    (void)o;
+
+    return os;
+}
+
+diff_depths_t diff_depths_t::construct(const flatjson::fjson &json) {
+    assert(json.is_valid());
+
+    diff_depths_t res{};
+    __BINAPI_GET(E);
+    __BINAPI_GET(s);
+    __BINAPI_GET(u);
+    __BINAPI_GET(U);
+    const auto a = json.at("a");
+    for ( auto idx = 0u; idx < a.size(); ++idx ) {
+        diff_depths_t::depth_t item{};
+        const auto it = a.at(idx);
+        item.price.assign(it.at(0).to_string());
+        item.amount.assign(it.at(1).to_string());
+
+        res.a.push_back(std::move(item));
+    }
+    const auto b = json.at("b");
+    for ( auto idx = 0u; idx < b.size(); ++idx ) {
+        diff_depths_t::depth_t item{};
+        const auto it = b.at(idx);
+        item.price.assign(it.at(0).to_string());
+        item.amount.assign(it.at(1).to_string());
+
+        res.b.push_back(std::move(item));
+    }
+
+    return res;
+}
+
+std::ostream& operator<<(std::ostream &os, const diff_depths_t &o) {
     os
     << "{"
     << "\"E\":" << o.E << ","
@@ -1650,7 +1709,7 @@ std::ostream& operator<<(std::ostream &os, const depths_t &o) {
     << "\"U\":" << o.U << ","
     << "\"a\":[";
     for ( auto it = o.a.begin(); it != o.a.end(); ++it ) {
-        os << "[\"" << it->price << "\", \"" << it->amount << "\", []]";
+        os << "[\"" << it->price << "\", \"" << it->amount << "\"]";
         if ( std::next(it) != o.a.end() ) {
             os << ",";
         }
@@ -1659,7 +1718,7 @@ std::ostream& operator<<(std::ostream &os, const depths_t &o) {
     << "],"
     << "\"b\":[";
     for ( auto it = o.b.begin(); it != o.b.end(); ++it ) {
-        os << "[\"" << it->price << "\", \"" << it->amount << "\", []]";
+        os << "[\"" << it->price << "\", \"" << it->amount << "\"]";
         if ( std::next(it) != o.b.end() ) {
             os << ",";
         }

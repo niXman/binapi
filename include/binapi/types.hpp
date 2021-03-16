@@ -659,8 +659,26 @@ struct trade_t {
 
 /*************************************************************************************************/
 
+// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams
+struct part_depths_t {
+    struct depth_t {
+        double_type price;
+        double_type amount;
+
+        friend std::ostream &operator<<(std::ostream &os, const depth_t &o);
+    };
+
+    std::vector<depth_t> a;
+    std::vector<depth_t> b;
+
+    static part_depths_t construct(const flatjson::fjson &json);
+    friend std::ostream& operator<<(std::ostream &os, const part_depths_t &o);
+};
+
+/*************************************************************************************************/
+
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#diff-depth-stream
-struct depths_t {
+struct diff_depths_t {
     struct depth_t {
         double_type price;
         double_type amount;
@@ -675,8 +693,8 @@ struct depths_t {
     std::vector<depth_t> a;
     std::vector<depth_t> b;
 
-    static depths_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const depths_t &o);
+    static diff_depths_t construct(const flatjson::fjson &json);
+    friend std::ostream& operator<<(std::ostream &os, const diff_depths_t &o);
 };
 
 /*************************************************************************************************/

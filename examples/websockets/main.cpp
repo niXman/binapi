@@ -26,15 +26,29 @@ int main() {
         ,"9443"
     };
 
-    ws.depth("BTCUSDT", binapi::e_freq::_100ms,
+    ws.part_depth("BTCUSDT", binapi::e_levels::_5, binapi::e_freq::_100ms,
         [](const char *fl, int ec, std::string emsg, auto depths) {
             if ( ec ) {
-                std::cerr << "subscribe depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+                std::cerr << "subscribe part_depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
 
                 return false;
             }
 
-            std::cout << "depths: " << depths << std::endl;
+            std::cout << "part_depths: " << depths << std::endl;
+
+            return true;
+          }
+    );
+
+    ws.diff_depth("BTCUSDT", binapi::e_freq::_100ms,
+        [](const char *fl, int ec, std::string emsg, auto depths) {
+            if ( ec ) {
+                std::cerr << "subscribe diff_depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+
+                return false;
+            }
+
+            std::cout << "diff_depths: " << depths << std::endl;
 
             return true;
         }

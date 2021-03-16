@@ -29,7 +29,8 @@ This implementation has been developed as a consequence of the lack of suitable 
 - [Close user data stream](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#close-user-data-stream-user_stream) -> `api::close_user_data_stream()`
 
 # WebSocket API
-- [Partial Book Depth Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams) -> `websockets_pool::depth()`
+- [Partial Book Depth Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams) -> `websockets_pool::part_depth()`
+- [Diff. Depth Stream](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#diff-depth-stream) -> `websockets_pool::diff_depth()`
 - [Kline/Candlestick Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams) -> `websockets_pool::klines()`
 - [Trade Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#trade-streams) -> `websockets_pool::trade()`
 - [Aggregate Trade Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams) -> `websockets_pool::agg_trade()`
@@ -134,7 +135,7 @@ int main() {
         ,"9443"
     };
 
-    ws.depth("BTCUSDT",
+    ws.part_depth("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto depths) {
             if ( ec ) {
                 std::cerr << "subscribe depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;

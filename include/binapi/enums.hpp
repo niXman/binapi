@@ -59,6 +59,20 @@ enum class e_freq: std::size_t {
     ,_1000ms = 1000
 };
 
+e_freq e_freq_from_string(const char *str);
+const char* e_freq_to_string(e_freq freq);
+
+/*************************************************************************************************/
+
+enum class e_levels: std::size_t {
+     _5 = 5
+    ,_10 = 10
+    ,_20 = 20
+};
+
+e_levels e_levels_from_string(const char *str);
+const char* e_levels_to_string(e_levels level);
+
 /*************************************************************************************************/
 
 } // ns binapi
