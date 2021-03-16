@@ -129,7 +129,7 @@ int main() {
 int main() {
     boost::asio::io_context ioctx;
 
-    binapi::ws::websockets_pool ws{
+    binapi::ws::websockets ws{
          ioctx
         ,"stream.binance.com"
         ,"9443"
