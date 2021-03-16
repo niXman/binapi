@@ -26,7 +26,7 @@ int main() {
         ,"9443"
     };
 
-    ws.depth("BTCUSDT",
+    ws.depth("BTCUSDT", 250,
         [](const char *fl, int ec, std::string emsg, auto depths) {
             if ( ec ) {
                 std::cerr << "subscribe depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;

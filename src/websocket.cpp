@@ -367,7 +367,10 @@ websockets_pool::~websockets_pool()
 /*************************************************************************************************/
 
 websockets_pool::handle websockets_pool::depth(const char *pair, on_depth_received_cb cb)
-{ return pimpl->start_channel(pair, "depth", std::move(cb)); }
+{
+    std::string ch = "depth@" + std::to_string( ms ) + "ms";
+    return pimpl->start_channel(pair, ch, std::move(cb));
+}
 
 /*************************************************************************************************/
 
