@@ -39,7 +39,7 @@ int main() {
             return true;
         }
     );
-#if 0
+
     ws.trade("BTCUSDT",
         [](const char *fl, int ec, std::string emsg, auto trades) {
             if ( ec ) {
@@ -93,7 +93,7 @@ int main() {
         std::cout << "async unsubscribing books_handler: " << books_handler << std::endl;
         ws.async_unsubscribe(books_handler);
     });
-#endif
+
     boost::asio::steady_timer timer2{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(15)};
     timer2.async_wait([&ws](const auto &/*ec*/){
         std::cout << "async unsubscribing all" << std::endl;
