@@ -259,7 +259,7 @@ struct api::impl {
                     std::string strbuf = std::move(r.v);
                     const flatjson::fjson json{strbuf.c_str(), strbuf.length()};
 
-                    if ( json.contains("code") && json.contains("msg") ) {
+                    if ( json.is_object() && (json.contains("code") && json.contains("msg")) ) {
                         res.ec     = json.at("code").to_int();
                         res.errmsg = json.at("msg").to_string();
                         res.reply  = std::move(strbuf);
