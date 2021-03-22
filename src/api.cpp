@@ -771,6 +771,7 @@ api::new_order(
     ,const e_side side
     ,const e_type type
     ,const e_time time
+    ,const e_trade_resp_type resp
     ,const char *amount
     ,const char *price
     ,const char *client_order_id
@@ -789,11 +790,8 @@ api::new_order(
         : e_time_to_string(time)
     ;
 
-    // TODO
-    const char *responce_type = 1 /*type == e_type::market*/
-        ? "FULL"
-        : "RESULT"
-    ;
+    const char *responce_type = e_trade_resp_type_to_string(resp);
+    assert(responce_type);
 
     const impl::init_list_type map = {
          {"symbol", symbol}
@@ -813,11 +811,13 @@ api::new_order(
 
 /*************************************************************************************************/
 
-api::result<new_order_resp_type> api::new_test_order(
+api::result<new_order_resp_type>
+api::new_test_order(
      const char *symbol
     ,const e_side side
     ,const e_type type
     ,const e_time time
+    ,const e_trade_resp_type resp
     ,const char *amount
     ,const char *price
     ,const char *client_order_id
@@ -833,7 +833,8 @@ api::result<new_order_resp_type> api::new_test_order(
 
     const char *time_str = type == e_type::market ? nullptr : e_time_to_string(time);
 
-    static const char *responce_type = "RESULT";
+    const char *responce_type = e_trade_resp_type_to_string(resp);
+    assert(responce_type);
 
     const impl::init_list_type map = {
          {"symbol", symbol}

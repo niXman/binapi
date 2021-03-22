@@ -197,6 +197,7 @@ struct api {
         ,const e_side side
         ,const e_type type
         ,const e_time time
+        ,const e_trade_resp_type resp
         ,const std::string &amount
         ,const std::string &price
         ,const std::string &client_order_id
@@ -209,6 +210,7 @@ struct api {
             ,side
             ,type
             ,time
+            ,resp
             ,(amount.empty() ? nullptr : amount.c_str())
             ,(price.empty() ? nullptr : price.c_str())
             ,(client_order_id.empty() ? nullptr : client_order_id.c_str())
@@ -223,6 +225,7 @@ struct api {
         ,const e_side side
         ,const e_type type
         ,const e_time time
+        ,const e_trade_resp_type resp
         ,const char *amount
         ,const char *price
         ,const char *client_order_id
@@ -238,6 +241,7 @@ struct api {
         ,const e_side side
         ,const e_type type
         ,const e_time time
+        ,const e_trade_resp_type resp
         ,const std::string &amount
         ,const std::string &price
         ,const std::string &client_order_id
@@ -250,6 +254,7 @@ struct api {
             ,side
             ,type
             ,time
+            ,resp
             ,(amount.empty() ? nullptr : amount.c_str())
             ,(price.empty() ? nullptr : price.c_str())
             ,(client_order_id.empty() ? nullptr : client_order_id.c_str())
@@ -264,6 +269,7 @@ struct api {
         ,const e_side side
         ,const e_type type
         ,const e_time time
+        ,const e_trade_resp_type resp
         ,const char *amount
         ,const char *price
         ,const char *client_order_id

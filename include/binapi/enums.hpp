@@ -75,6 +75,17 @@ const char* e_levels_to_string(e_levels level);
 
 /*************************************************************************************************/
 
+enum class e_trade_resp_type: std::size_t {
+     ACK
+    ,RESULT
+    ,FULL
+};
+
+e_trade_resp_type e_trade_resp_type_from_string(const char *str);
+const char* e_trade_resp_type_to_string(e_trade_resp_type resp);
+
+/*************************************************************************************************/
+
 } // ns binapi
 
 #endif // __binapi__enums_hpp

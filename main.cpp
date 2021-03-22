@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
     std::cout.precision(8);
 
     boost::asio::io_context ioctx;
-    binapi::ws::websockets_pool wsp(ioctx, "stream.binance.com", "9443");
+    binapi::ws::websockets wsp(ioctx, "stream.binance.com", "9443");
 
     binapi::rest::api api(
          ioctx
@@ -178,9 +178,10 @@ int main(int argc, char **argv) {
 
 //    auto neworder = api.new_order(
 //         "BNBUSDT"
-//        ,binapi::rest::e_trade::side_sell
-//        ,binapi::rest::e_trade::type_limit
-//        ,binapi::rest::e_trade::time_GTC
+//        ,binapi::e_side::buy
+//        ,binapi::e_type::limit
+//        ,binapi::e_time::GTC
+//        ,binapi::e_trade_resp_type::FULL
 //        ,"0.1"
 //        ,"0"
 //        ,nullptr
@@ -189,7 +190,7 @@ int main(int argc, char **argv) {
 //    );
 //    BREAK_IF_ERROR(neworder);
 //    std::cout << "neworder=" << neworder.v << std::endl << std::endl;
-//
+
 //    auto cancelorder = api.cancel_order("BNBUSDT", 1, nullptr, nullptr);
 //    BREAK_IF_ERROR(cancelorder);
 //    std::cout << "cancelorder=" << cancelorder.v << std::endl << std::endl;
@@ -227,8 +228,8 @@ int main(int argc, char **argv) {
             return true;
         }
     );
-    wsp.depth(testpair,
-        [](const char *fl, int ec, std::string errmsg, binapi::ws::depths_t msg) -> bool {
+    wsp.diff_depth(testpair, binapi::e_freq::_100ms,
+        [](const char *fl, int ec, std::string errmsg, binapi::ws::diff_depths_t msg) -> bool {
             if ( ec ) {
                 std::cout << "subscribe_depth(): fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;
                 return false;

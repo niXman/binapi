@@ -99,4 +99,29 @@ const char* e_time_to_string(e_time time) {
 
 /*************************************************************************************************/
 
+e_trade_resp_type e_trade_resp_type_from_string(const char *str) {
+    const auto hash = fnv1a(str);
+    switch ( hash ) {
+        case fnv1a("ACK"): return e_trade_resp_type::ACK;
+        case fnv1a("RESULT"): return e_trade_resp_type::RESULT;
+        case fnv1a("FULL"): return e_trade_resp_type::FULL;
+    }
+
+    assert(!"unreachable");
+}
+
+const char* e_trade_resp_type_to_string(e_trade_resp_type resp) {
+    switch ( resp ) {
+        case e_trade_resp_type::ACK: return "ASK";
+        case e_trade_resp_type::RESULT: return "RESULT";
+        case e_trade_resp_type::FULL: return "FULL";
+    }
+
+    assert(!"unreachable");
+
+    return nullptr;
+}
+
+/*************************************************************************************************/
+
 } // ns binapi
