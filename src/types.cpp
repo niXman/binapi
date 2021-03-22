@@ -1127,10 +1127,10 @@ std::ostream &operator<<(std::ostream &os, const orders_info_t &o) {
 
 /*************************************************************************************************/
 
-new_order_info_ask_t new_order_info_ask_t::construct(const flatjson::fjson &json) {
+new_order_info_ack_t new_order_info_ack_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
-    new_order_info_ask_t res{};
+    new_order_info_ack_t res{};
     __BINAPI_GET(symbol);
     __BINAPI_GET(orderId);
     __BINAPI_GET(clientOrderId);
@@ -1138,7 +1138,7 @@ new_order_info_ask_t new_order_info_ask_t::construct(const flatjson::fjson &json
 
     return res;
 }
-std::ostream &operator<<(std::ostream &os, const new_order_info_ask_t &o) {
+std::ostream &operator<<(std::ostream &os, const new_order_info_ack_t &o) {
     os
     << "{"
     << "\"symbol\":\"" << o.symbol << "\","
@@ -1304,7 +1304,7 @@ new_order_resp_type new_order_resp_type::construct(const flatjson::fjson &json) 
         return res;
     } else if ( json.contains("symbol") ) {
         // ASK
-        new_order_info_ask_t res = new_order_info_ask_t::construct(json);
+        new_order_info_ack_t res = new_order_info_ack_t::construct(json);
         return res;
     } else if ( json.is_object() && json.size() == 0 ) {
         // TEST
@@ -1316,7 +1316,7 @@ new_order_resp_type new_order_resp_type::construct(const flatjson::fjson &json) 
 }
 
 std::ostream &operator<<(std::ostream &os, const new_order_resp_type &o) {
-    if ( const auto *p = boost::get<new_order_info_ask_t>(&o) ) {
+    if ( const auto *p = boost::get<new_order_info_ack_t>(&o) ) {
         return os << *p;
     } else if ( const auto *p = boost::get<new_order_info_result_t>(&o) ) {
         return os << *p;

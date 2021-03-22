@@ -394,14 +394,14 @@ struct orders_info_t {
 };
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#new-order--trade
-struct new_order_info_ask_t {
+struct new_order_info_ack_t {
     std::string symbol;
     std::size_t orderId;
     std::string clientOrderId;
     std::size_t transactTime;
 
-    static new_order_info_ask_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const new_order_info_ask_t &o);
+    static new_order_info_ack_t construct(const flatjson::fjson &json);
+    friend std::ostream &operator<<(std::ostream &os, const new_order_info_ack_t &o);
 };
 
 struct new_order_info_result_t {
@@ -462,7 +462,7 @@ struct new_test_order_info_t {
 
 struct new_order_resp_type
     :boost::variant<
-         new_order_info_ask_t
+         new_order_info_ack_t
         ,new_order_info_result_t
         ,new_order_info_full_t
         ,new_test_order_info_t
@@ -470,60 +470,71 @@ struct new_order_resp_type
 {
     // ctor inheritance
     using boost::variant<
-         new_order_info_ask_t
+         new_order_info_ack_t
         ,new_order_info_result_t
         ,new_order_info_full_t
         ,new_test_order_info_t
     >::variant;
 
-    e_trade_resp_type get_responce_type() const {
-        if ( boost::get<new_order_info_ask_t>(this) ) {
-            return e_trade_resp_type::ACK;
-        } else if ( boost::get<new_order_info_result_t>(this) ) {
-            return e_trade_resp_type::RESULT;
-        } else if ( boost::get<new_order_info_full_t>(this) ) {
-            return e_trade_resp_type::FULL;
-        } else if ( boost::get<new_test_order_info_t>(this) ) {
-            return e_trade_resp_type::TEST;
+    std::pair<e_trade_resp_type, const void *>
+    get_responce_type() const {
+        if ( const auto *p = boost::get<new_order_info_ack_t>(this) ) {
+            return {e_trade_resp_type::ACK, p};
+        } else if ( const auto *p = boost::get<new_order_info_result_t>(this) ) {
+            return {e_trade_resp_type::RESULT, p};
+        } else if ( const auto *p = boost::get<new_order_info_full_t>(this) ) {
+            return {e_trade_resp_type::FULL, p};
+        } else if ( const auto *p = boost::get<new_test_order_info_t>(this) ) {
+            return {e_trade_resp_type::TEST, p};
         }
 
-        return e_trade_resp_type::UNKNOWN;
+        return {e_trade_resp_type::UNKNOWN, nullptr};
     }
 
-    bool is_valid_responce_type() const { return get_responce_type() != e_trade_resp_type::UNKNOWN; }
-    bool is_ask_responce_type() const { return get_responce_type() == e_trade_resp_type::ACK; }
-    bool is_result_responce_type() const { return get_responce_type() == e_trade_resp_type::RESULT; }
-    bool is_full_responce_type() const { return get_responce_type() == e_trade_resp_type::FULL; }
-    bool is_test_responce_type() const { return get_responce_type() == e_trade_resp_type::TEST; }
+    bool is_valid_responce_type()  const { const auto r =  get_responce_type(); return r.first != e_trade_resp_type::UNKNOWN; }
+    bool is_ask_responce_type()    const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::ACK; }
+    bool is_result_responce_type() const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::RESULT; }
+    bool is_full_responce_type()   const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::FULL; }
+    bool is_test_responce_type()   const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::TEST; }
 
-    const new_order_info_ask_t& get_responce_ask() const {
-        assert(is_ask_responce_type());
+    const new_order_info_ack_t& get_responce_ask() const {
+        const auto r =  get_responce_type();
+        assert(r.first == e_trade_resp_type::ACK);
 
-        return *(boost::get<new_order_info_ask_t>(this));
+        return *static_cast<const new_order_info_ack_t *>(r.second);
     }
     const new_order_info_result_t& get_responce_result() const {
-        assert(is_result_responce_type());
+        const auto r =  get_responce_type();
+        assert(r.first == e_trade_resp_type::RESULT);
 
-        return *(boost::get<new_order_info_result_t>(this));
+        return *static_cast<const new_order_info_result_t *>(r.second);
     }
     const new_order_info_full_t& get_responce_full() const {
-        assert(is_full_responce_type());
+        const auto r =  get_responce_type();
+        assert(r.first == e_trade_resp_type::FULL);
 
-        return *(boost::get<new_order_info_full_t>(this));
+        return *static_cast<const new_order_info_full_t *>(r.second);
     }
     const new_test_order_info_t& get_responce_test() const {
-        assert(is_test_responce_type());
+        const auto r =  get_responce_type();
+        assert(r.first == e_trade_resp_type::TEST);
 
-        return *(boost::get<new_test_order_info_t>(this));
+        return *static_cast<const new_test_order_info_t *>(r.second);
     }
 
     std::size_t get_order_id() const {
-        if ( const auto *p = boost::get<new_order_info_ask_t>(this) ) {
-            return p->orderId;
-        } else if ( const auto *p = boost::get<new_order_info_result_t>(this) ) {
-            return p->orderId;
-        } else if ( const auto *p = boost::get<new_order_info_full_t>(this) ) {
-            return p->orderId;
+        const auto r =  get_responce_type();
+        assert(
+            r.first == e_trade_resp_type::ACK ||
+            r.first == e_trade_resp_type::RESULT ||
+            r.first == e_trade_resp_type::FULL
+        );
+
+        switch ( r.first ) {
+            case e_trade_resp_type::ACK: return static_cast<const new_order_info_ack_t *>(r.second)->orderId;
+            case e_trade_resp_type::RESULT: return static_cast<const new_order_info_result_t *>(r.second)->orderId;
+            case e_trade_resp_type::FULL: return static_cast<const new_order_info_full_t *>(r.second)->orderId;;
+            default: break;
         }
 
         assert(!"unreachable");
