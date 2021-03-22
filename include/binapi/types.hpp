@@ -492,12 +492,12 @@ struct new_order_resp_type
     }
 
     bool is_valid_responce_type()  const { const auto r =  get_responce_type(); return r.first != e_trade_resp_type::UNKNOWN; }
-    bool is_ask_responce_type()    const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::ACK; }
+    bool is_ack_responce_type()    const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::ACK; }
     bool is_result_responce_type() const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::RESULT; }
     bool is_full_responce_type()   const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::FULL; }
     bool is_test_responce_type()   const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::TEST; }
 
-    const new_order_info_ack_t& get_responce_ask() const {
+    const new_order_info_ack_t& get_responce_ack() const {
         const auto r =  get_responce_type();
         assert(r.first == e_trade_resp_type::ACK);
 
