@@ -13,6 +13,7 @@
 #define __binapi__types_hpp
 
 #include "double_type.hpp"
+#include "enums.hpp"
 
 #include <boost/variant.hpp>
 
@@ -475,31 +476,25 @@ struct new_order_resp_type
         ,new_test_order_info_t
     >::variant;
 
-    enum class resp_type {
-         ask
-        ,result
-        ,full
-        ,test
-        ,unknown
-    };
-    resp_type get_responce_type() const {
+    e_trade_resp_type get_responce_type() const {
         if ( boost::get<new_order_info_ask_t>(this) ) {
-            return resp_type::ask;
+            return e_trade_resp_type::ACK;
         } else if ( boost::get<new_order_info_result_t>(this) ) {
-            return resp_type::result;
+            return e_trade_resp_type::RESULT;
         } else if ( boost::get<new_order_info_full_t>(this) ) {
-            return resp_type::full;
+            return e_trade_resp_type::FULL;
         } else if ( boost::get<new_test_order_info_t>(this) ) {
-            return resp_type::test;
+            return e_trade_resp_type::TEST;
         }
 
-        return resp_type::unknown;
+        return e_trade_resp_type::UNKNOWN;
     }
-    bool is_valid_responce_type() const { return get_responce_type() != resp_type::unknown; }
-    bool is_ask_responce_type() const { return get_responce_type() == resp_type::ask; }
-    bool is_result_responce_type() const { return get_responce_type() == resp_type::result; }
-    bool is_full_responce_type() const { return get_responce_type() == resp_type::full; }
-    bool is_test_responce_type() const { return get_responce_type() == resp_type::test; }
+
+    bool is_valid_responce_type() const { return get_responce_type() != e_trade_resp_type::UNKNOWN; }
+    bool is_ask_responce_type() const { return get_responce_type() == e_trade_resp_type::ACK; }
+    bool is_result_responce_type() const { return get_responce_type() == e_trade_resp_type::RESULT; }
+    bool is_full_responce_type() const { return get_responce_type() == e_trade_resp_type::FULL; }
+    bool is_test_responce_type() const { return get_responce_type() == e_trade_resp_type::TEST; }
 
     const new_order_info_ask_t& get_responce_ask() const {
         assert(is_ask_responce_type());

@@ -79,6 +79,8 @@ enum class e_trade_resp_type: std::size_t {
      ACK
     ,RESULT
     ,FULL
+    ,TEST
+    ,UNKNOWN
 };
 
 e_trade_resp_type e_trade_resp_type_from_string(const char *str);

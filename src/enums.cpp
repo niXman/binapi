@@ -105,6 +105,8 @@ e_trade_resp_type e_trade_resp_type_from_string(const char *str) {
         case fnv1a("ACK"): return e_trade_resp_type::ACK;
         case fnv1a("RESULT"): return e_trade_resp_type::RESULT;
         case fnv1a("FULL"): return e_trade_resp_type::FULL;
+        case fnv1a("TEST"): return e_trade_resp_type::TEST;
+        case fnv1a("UNKNOWN"): return e_trade_resp_type::UNKNOWN;
     }
 
     assert(!"unreachable");
@@ -115,6 +117,8 @@ const char* e_trade_resp_type_to_string(e_trade_resp_type resp) {
         case e_trade_resp_type::ACK: return "ASK";
         case e_trade_resp_type::RESULT: return "RESULT";
         case e_trade_resp_type::FULL: return "FULL";
+        case e_trade_resp_type::TEST: return "TEST";
+        case e_trade_resp_type::UNKNOWN: return "UNKNOWN";
     }
 
     assert(!"unreachable");
