@@ -386,7 +386,7 @@ websockets::~websockets()
 
 /*************************************************************************************************/
 
-websockets::handle websockets::part_depth(const char *pair, e_levels level, e_freq freq, on_part_depth_received_cb cb) {
+websockets::handle websockets::part_depth(const char *pair, e_levels level, e_freq freq, on_part_depths_received_cb cb) {
     std::string ch = "depth";
     ch += std::to_string(static_cast<std::size_t>(level));
     ch += "@";
@@ -396,7 +396,7 @@ websockets::handle websockets::part_depth(const char *pair, e_levels level, e_fr
 
 /*************************************************************************************************/
 
-websockets::handle websockets::diff_depth(const char *pair, e_freq freq, on_diff_depth_received_cb cb) {
+websockets::handle websockets::diff_depth(const char *pair, e_freq freq, on_diff_depths_received_cb cb) {
     std::string ch = "depth@" + std::to_string(static_cast<std::size_t>(freq)) + "ms";
     return pimpl->start_channel(pair, ch.c_str(), std::move(cb));
 }

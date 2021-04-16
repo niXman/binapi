@@ -19,6 +19,7 @@
 
 #include "message.hpp"
 #include "flatjson.hpp"
+#include "errors.hpp"
 
 namespace binapi {
 namespace detail {
@@ -49,12 +50,10 @@ struct invoker: invoker_base {
                 const flatjson::fjson json{ptr, size};
                 assert(json.is_valid());
 
-                if ( json.is_object() && (json.contains("code") && json.contains("msg")) ) {
-                    int code = json.at("code").to_int();
-                    std::string msg = json.at("msg").to_string();
-
+                if ( json.is_object() && binapi::rest::is_api_error(json) ) {
+                    auto error = binapi::rest::construct_error(json);
                     T arg{};
-                    return m_cb(__MAKE_FILELINE, code, std::move(msg), std::move(arg));
+                    return m_cb(__MAKE_FILELINE, error.first, std::move(error.second), std::move(arg));
                 } else {
                     T arg = T::construct(json);
                     return m_cb(__MAKE_FILELINE, 0, std::move(errmsg), std::move(arg));

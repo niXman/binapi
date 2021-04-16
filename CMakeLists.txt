@@ -28,6 +28,7 @@ set(BINAPI_HEADERS
     binapi/dtf.hpp
     binapi/double_type.hpp
     binapi/enums.hpp
+    binapi/errors.hpp
     binapi/invoker.hpp
     binapi/message.hpp
     binapi/pairslist.hpp
@@ -40,6 +41,7 @@ set(BINAPI_HEADERS
 set(BINAPI_SOURCES
     src/api.cpp
     src/enums.cpp
+    src/errors.cpp
     src/pairslist.cpp
     src/reports.cpp
     src/tools.cpp

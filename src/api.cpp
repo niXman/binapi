@@ -11,6 +11,7 @@
 
 #include <binapi/api.hpp>
 #include <binapi/invoker.hpp>
+#include <binapi/errors.hpp>
 
 #include <boost/preprocessor.hpp>
 #include <boost/callable_traits.hpp>
@@ -259,10 +260,11 @@ struct api::impl {
                     std::string strbuf = std::move(r.v);
                     const flatjson::fjson json{strbuf.c_str(), strbuf.length()};
 
-                    if ( json.is_object() && (json.contains("code") && json.contains("msg")) ) {
-                        res.ec     = json.at("code").to_int();
-                        res.errmsg = json.at("msg").to_string();
-                        res.reply  = std::move(strbuf);
+                    if ( json.is_object() && binapi::rest::is_api_error(json) ) {
+                        auto error = binapi::rest::construct_error(json);
+                        res.ec     = error.first;
+                        res.errmsg = std::move(error.second);
+                        res.reply.clear();
                     } else {
                         res.v = R::construct(json);
                     }

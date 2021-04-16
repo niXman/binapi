@@ -64,12 +64,12 @@ struct websockets {
     using handle = void *;
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams
-    using on_part_depth_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, part_depths_t msg)>;
-    handle part_depth(const char *pair, e_levels level, e_freq freq, on_part_depth_received_cb cb);
+    using on_part_depths_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, part_depths_t msg)>;
+    handle part_depth(const char *pair, e_levels level, e_freq freq, on_part_depths_received_cb cb);
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#diff-depth-stream
-    using on_diff_depth_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, diff_depths_t msg)>;
-    handle diff_depth(const char *pair, e_freq freq, on_diff_depth_received_cb cb);
+    using on_diff_depths_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, diff_depths_t msg)>;
+    handle diff_depth(const char *pair, e_freq freq, on_diff_depths_received_cb cb);
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams
     using on_kline_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, kline_t msg)>;

@@ -13,36 +13,76 @@
 #define __binapi__errors_hpp
 
 #include <string>
+#include <utility>
 
-/*************************************************************************************************/
+namespace flatjson {
+struct fjson;
+} // ns flatjson
 
 namespace binapi {
-
-
-struct error_reply {
-    /* from 'ccxt' project:
-    '-1000': ExchangeNotAvailable, // {"code":-1000,"msg":"An unknown error occured while processing the request."}
-    '-1013': InvalidOrder, // createOrder -> 'invalid quantity'/'invalid price'/MIN_NOTIONAL
-    '-1021': InvalidNonce, // 'your time is ahead of server'
-    '-1022': AuthenticationError, // {"code":-1022,"msg":"Signature for this request is not valid."}
-    '-1100': InvalidOrder, // createOrder(symbol, 1, asdf) -> 'Illegal characters found in parameter 'price'
-    '-1104': ExchangeError, // Not all sent parameters were read, read 8 parameters but was sent 9
-    '-1128': ExchangeError, // {"code":-1128,"msg":"Combination of optional parameters invalid."}
-    '-2010': ExchangeError, // generic error code for createOrder -> 'Account has insufficient balance for requested action.', {"code":-2010,"msg":"Rest API trading is not enabled."}, etc...
-    '-2011': OrderNotFound, // cancelOrder(1, 'BTC/USDT') -> 'UNKNOWN_ORDER'
-    '-2013': OrderNotFound, // fetchOrder (1, 'BTC/USDT') -> 'Order does not exist'
-    '-2014': AuthenticationError, // { "code":-2014, "msg": "API-key format invalid." }
-    '-2015': AuthenticationError, // "Invalid API-key, IP, or permissions for action."
-    */
-
-    int code;
-    std::string message;
-};
-
-error_reply parse_error(const std::string &msg);
-
-} // ns binapi
+namespace rest {
 
 /*************************************************************************************************/
+
+// https://github.com/binance/binance-spot-api-docs/blob/master/errors.md
+enum class e_error: int {
+     OK = 0
+    ,UNKNOWN = -1000
+    ,DISCONNECTED = -1001
+    ,UNAUTHORIZED = -1002
+    ,TOO_MANY_REQUESTS = -1003
+    ,UNEXPECTED_RESP = -1006
+    ,TIMEOUT = -1007
+    ,UNKNOWN_ORDER_COMPOSITION = -1014
+    ,TOO_MANY_ORDERS = -1015
+    ,SERVICE_SHUTTING_DOWN = -1016
+    ,UNSUPPORTED_OPERATION = -1020
+    ,INVALID_TIMESTAMP = -1021
+    ,INVALID_SIGNATURE = -1022
+    ,ILLEGAL_CHARS = -1100
+    ,TOO_MANY_PARAMETERS = -1101
+    ,MANDATORY_PARAM_EMPTY_OR_MALFORMED = -1102
+    ,UNKNOWN_PARAM = -1103
+    ,UNREAD_PARAMETERS = -1104
+    ,PARAM_EMPTY = -1105
+    ,PARAM_NOT_REQUIRED = -1106
+    ,BAD_PRECISION = -1111
+    ,NO_DEPTH = -1112
+    ,TIF_NOT_REQUIRED = -1114
+    ,INVALID_TIF = -1115
+    ,INVALID_ORDER_TYPE = -1116
+    ,INVALID_SIDE = -1117
+    ,EMPTY_NEW_CL_ORD_ID = -1118
+    ,EMPTY_ORG_CL_ORD_ID = -1119
+    ,BAD_INTERVAL = -1120
+    ,BAD_SYMBOL = -1121
+    ,INVALID_LISTEN_KEY = -1125
+    ,MORE_THAN_XX_HOURS = -1127
+    ,OPTIONAL_PARAMS_BAD_COMBO = -1128
+    ,INVALID_PARAMETER = -1130
+    ,NEW_ORDER_REJECTED = -2010
+    ,CANCEL_REJECTED = -2011
+    ,NO_SUCH_ORDER = -2013
+    ,BAD_API_KEY_FMT = -2014
+    ,REJECTED_MBX_KEY = -2015
+    ,NO_TRADING_WINDOW = -2016
+};
+
+const char* e_error_to_string(e_error v);
+const char* e_error_to_string(int v);
+
+inline bool e_error_equal(int v, e_error err) { return v == static_cast<int>(err); }
+
+/*************************************************************************************************/
+
+bool is_api_error(const flatjson::fjson &json);
+
+std::pair<int, std::string>
+construct_error(const flatjson::fjson &json);
+
+/*************************************************************************************************/
+
+} // ns rest
+} // ns binapi
 
 #endif // __binapi__errors_hpp
