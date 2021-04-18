@@ -14,6 +14,7 @@
 #include <binapi/message.hpp>
 #include <binapi/fnv1a.hpp>
 #include <binapi/flatjson.hpp>
+#include <binapi/errors.hpp>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/connect.hpp>
@@ -269,13 +270,16 @@ struct websockets::impl {
         auto wscb = [this, schannel, cb=std::move(cb)]
             (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool {
             const flatjson::fjson json{ptr, size};
-            if ( json.contains("msg") && json.contains("code") ) {
-                int code = json.at("code").to_int();
-                std::string msg = json.at("msg").to_string();
+            assert(json.is_valid());
+
+            if ( json.is_object() && binapi::rest::is_api_error(json) ) {
+                auto error = binapi::rest::construct_error(json);
+                auto ecode = error.first;
+                auto emsg  = std::move(error.second);
 
                 try {
                     message_type message{};
-                    return cb(__MAKE_FILELINE, code, std::move(msg), std::move(message));
+                    return cb(__MAKE_FILELINE, ecode, std::move(emsg), std::move(message));
                 } catch (const std::exception &ex) {
                     std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
                     std::fflush(stderr);

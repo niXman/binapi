@@ -1865,7 +1865,7 @@ std::ostream& operator<<(std::ostream &os, const market_ticker_t &o) {
 /*************************************************************************************************/
 
 markets_tickers_t markets_tickers_t::construct(const flatjson::fjson &json) {
-    assert(json.is_valid());
+    assert(json.is_array());
 
     markets_tickers_t res{};
     for ( auto idx = 0u; idx < json.size(); ++idx ) {

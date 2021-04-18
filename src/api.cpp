@@ -259,6 +259,7 @@ struct api::impl {
                 } else {
                     std::string strbuf = std::move(r.v);
                     const flatjson::fjson json{strbuf.c_str(), strbuf.length()};
+                    assert(json.is_valid());
 
                     if ( json.is_object() && binapi::rest::is_api_error(json) ) {
                         auto error = binapi::rest::construct_error(json);
