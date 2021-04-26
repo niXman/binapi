@@ -96,6 +96,20 @@ int main() {
         }
     );
 
+    ws.mini_tickers(
+        [](const char *fl, int ec, std::string emsg, auto mini_tickers) {
+            if ( ec ) {
+                std::cerr << "subscribe mini_ticker error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+
+                return false;
+            }
+
+            std::cout << "mini_tickers: " << mini_tickers << std::endl;
+
+            return true;
+        }
+    );
+
     boost::asio::steady_timer timer0{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(5)};
     timer0.async_wait([&ws, book_handler](const auto &/*ec*/){
         std::cout << "unsubscribing book_handler: " << book_handler << std::endl;

@@ -34,6 +34,8 @@ This implementation has been developed as a consequence of the lack of suitable 
 - [Kline/Candlestick Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams) -> `websockets::klines()`
 - [Trade Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#trade-streams) -> `websockets::trade()`
 - [Aggregate Trade Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams) -> `websockets::agg_trade()`
+- [Individual Symbol Mini Ticker Stream](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-mini-ticker-stream) -> `websockets::mini_ticker()`
+- [All Market Mini Tickers Stream](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-market-mini-tickers-stream) -> `websockets::mini_tickers()`
 - [Individual Symbol Ticker Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams) -> `websockets::market()`
 - [All Market Tickers Stream](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream) -> `websockets::markets()`
 - [Individual Symbol Book Ticker Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-book-ticker-streams) -> `websockets::book()`

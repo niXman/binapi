@@ -734,6 +734,31 @@ std::ostream& ohlc(std::ostream &os, const kline_t &o);
 
 /*************************************************************************************************/
 
+// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-mini-ticker-stream
+struct mini_ticker_t {
+    std::size_t E; // Event time
+    std::string s; // Symbol
+    double_type c; // Close price
+    double_type o; // Open price
+    double_type h; // High price
+    double_type l; // Low price
+    double_type v; // Total traded base asset volume
+    double_type q; // Total traded quote asset volume
+
+    static mini_ticker_t construct(const flatjson::fjson &json);
+    friend std::ostream& operator<<(std::ostream &os, const mini_ticker_t &o);
+};
+
+// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-market-mini-tickers-stream
+struct mini_tickers_t {
+    std::map<std::string, mini_ticker_t> tickers;
+
+    static mini_tickers_t construct(const flatjson::fjson &json);
+    friend std::ostream& operator<<(std::ostream &os, const mini_tickers_t &o);
+};
+
+/*************************************************************************************************/
+
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams
 struct market_ticker_t {
     std::size_t E; // Event time

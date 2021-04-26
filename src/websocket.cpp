@@ -247,7 +247,10 @@ struct websockets::impl {
         std::string res{"/ws/"};
         if ( pair ) {
             res += pair;
-            boost::algorithm::to_lower(res);
+            if ( *pair != '!' ) {
+                boost::algorithm::to_lower(res);
+            }
+
             res += '@';
         }
 
@@ -261,11 +264,11 @@ struct websockets::impl {
         using args_tuple = typename boost::callable_traits::args<decltype(cb)>::type;
         using message_type = typename std::tuple_element<3, args_tuple>::type;
 
-        std::string schannel = make_channel(pair, channel);
-
         auto ws = std::make_shared<websocket>(m_ioctx);
         auto *h = ws.get();
         std::weak_ptr<websocket> wp{ws};
+
+        std::string schannel = make_channel(pair, channel);
 
         auto wscb = [this, schannel, cb=std::move(cb)]
             (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool {
@@ -450,6 +453,14 @@ websockets::handle websockets::trade(const char *pair, on_trade_received_cb cb)
 
 websockets::handle websockets::agg_trade(const char *pair, on_agg_trade_received_cb cb)
 { return pimpl->start_channel(pair, "aggTrade", std::move(cb)); }
+
+/*************************************************************************************************/
+
+websockets::handle websockets::mini_ticker(const char *pair, on_mini_ticker_received_cb cb)
+{ return pimpl->start_channel(pair, "miniTicker", std::move(cb)); }
+
+websockets::handle websockets::mini_tickers(on_mini_tickers_received_cb cb)
+{ return pimpl->start_channel("!miniTicker", "arr", std::move(cb)); }
 
 /*************************************************************************************************/
 

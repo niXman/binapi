@@ -1802,9 +1802,66 @@ std::ostream& ohlc(std::ostream &os, const kline_t &o) {
 
 /*************************************************************************************************/
 
-market_ticker_t market_ticker_t::construct(const flatjson::fjson &json) {
-    assert(json.is_valid());
+mini_ticker_t mini_ticker_t::construct(const flatjson::fjson &json) {
+    mini_ticker_t res{};
+    __BINAPI_GET(E);
+    __BINAPI_GET(s);
+    __BINAPI_GET(c);
+    __BINAPI_GET(o);
+    __BINAPI_GET(h);
+    __BINAPI_GET(l);
+    __BINAPI_GET(v);
+    __BINAPI_GET(q);
 
+    return res;
+}
+
+std::ostream& operator<<(std::ostream &os, const mini_ticker_t &o) {
+    os
+    << "{"
+    << "\"E:\"" << o.E << ","
+    << "\"s\":\"" << o.s << "\","
+    << "\"c\":\"" << o.c << "\","
+    << "\"o\":\"" << o.o << "\","
+    << "\"h\":\"" << o.h << "\","
+    << "\"l\":\"" << o.l << "\","
+    << "\"v\":\"" << o.v << "\","
+    << "\"q\":\"" << o.q << "\""
+    << "}";
+
+    return os;
+}
+
+mini_tickers_t mini_tickers_t::construct(const flatjson::fjson &json) {
+    assert(json.is_array());
+
+    mini_tickers_t res{};
+    for ( auto idx = 0u; idx < json.size(); ++idx ) {
+        const auto it = json.at(idx);
+        std::string symbol = it.at("s").to_string();
+        mini_ticker_t item = mini_ticker_t::construct(it);
+        res.tickers.emplace(std::move(symbol), std::move(item));
+    }
+
+    return res;
+}
+
+std::ostream& operator<<(std::ostream &os, const mini_tickers_t &o) {
+    os << "[";
+    for ( auto it = o.tickers.begin(); it !=o.tickers.end(); ++it ) {
+        os << it->second;
+        if ( std::next(it) != o.tickers.end() ) {
+            os << ",";
+        }
+    }
+    os << "]";
+
+    return os;
+}
+
+/*************************************************************************************************/
+
+market_ticker_t market_ticker_t::construct(const flatjson::fjson &json) {
     market_ticker_t res{};
     __BINAPI_GET(E);
     __BINAPI_GET(s);

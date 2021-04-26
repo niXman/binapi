@@ -39,6 +39,8 @@ struct diff_depths_t;
 struct trade_t;
 struct agg_trade_t;
 struct kline_t;
+struct mini_ticker_t;
+struct mini_tickers_t;
 struct market_ticker_t;
 struct markets_tickers_t;
 struct book_ticker_t;
@@ -83,6 +85,14 @@ struct websockets {
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams
     using on_agg_trade_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, agg_trade_t msg)>;
     handle agg_trade(const char *pair, on_agg_trade_received_cb cb);
+
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-mini-ticker-stream
+    using on_mini_ticker_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, mini_ticker_t msg)>;
+    handle mini_ticker(const char *pair, on_mini_ticker_received_cb cb);
+
+    // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-market-mini-tickers-stream
+    using on_mini_tickers_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, mini_tickers_t msg)>;
+    handle mini_tickers(on_mini_tickers_received_cb cb);
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams
     using on_market_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, market_ticker_t msg)>;
