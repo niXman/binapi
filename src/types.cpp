@@ -1392,9 +1392,20 @@ std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o) {
 /*************************************************************************************************/
 
 my_trades_info_t::my_trade_info_t my_trades_info_t::my_trade_info_t::construct(const flatjson::fjson &json) {
-    assert(json.is_valid());
+    my_trade_info_t res{};
+    __BINAPI_GET(symbol);
+    __BINAPI_GET(id);
+    __BINAPI_GET(orderId);
+    __BINAPI_GET(price);
+    __BINAPI_GET(qty);
+    __BINAPI_GET(commission);
+    __BINAPI_GET(commissionAsset);
+    __BINAPI_GET(time);
+    __BINAPI_GET(isBuyer);
+    __BINAPI_GET(isMaker);
+    __BINAPI_GET(isBestMatch);
 
-    assert("unimplemented" == nullptr);
+    return res;
 }
 
 std::ostream &operator<<(std::ostream &os, const my_trades_info_t::my_trade_info_t &o) {
@@ -1423,20 +1434,7 @@ my_trades_info_t my_trades_info_t::construct(const flatjson::fjson &json) {
 
     my_trades_info_t res{};
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
-        my_trade_info_t item{};
-        const auto it = json.at(idx);
-        __BINAPI_GET2(item, symbol, it);
-        __BINAPI_GET2(item, id, it);
-        __BINAPI_GET2(item, orderId, it);
-        __BINAPI_GET2(item, price, it);
-        __BINAPI_GET2(item, qty, it);
-        __BINAPI_GET2(item, commission, it);
-        __BINAPI_GET2(item, commissionAsset, it);
-        __BINAPI_GET2(item, time, it);
-        __BINAPI_GET2(item, isBuyer, it);
-        __BINAPI_GET2(item, isMaker, it);
-        __BINAPI_GET2(item, isBestMatch, it);
-
+        my_trade_info_t item = my_trades_info_t::my_trade_info_t::construct(json.at(idx));
         res.trades.push_back(std::move(item));
     }
 
