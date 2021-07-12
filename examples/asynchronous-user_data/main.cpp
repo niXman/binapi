@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
         ,std::move(sk)
         ,10000 // recvWindow
     };
-    binapi::ws::websockets_pool wsp(
+    binapi::ws::websockets ws(
          ioctx
         ,"stream.binance.com"
         ,"9443"
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
     assert(start_uds);
     std::cout << "start_uds=" << start_uds.v << std::endl << std::endl;
 
-    wsp.userdata(start_uds.v.listenKey.c_str(),
+    ws.userdata(start_uds.v.listenKey.c_str(),
         [](const char *fl, int ec, std::string errmsg, binapi::userdata::account_update_t msg) -> bool {
             if ( ec ) {
                 std::cout << "account update: fl=" << fl << ", ec=" << ec << ", errmsg: " << errmsg << ", msg: " << msg << std::endl;

@@ -23,6 +23,7 @@ if (DEFINED ${BOOST_INCLUDE_DIR})
 endif()
 
 set(BINAPI_HEADERS
+    binapi/errors.hpp
     binapi/api.hpp
     binapi/flatjson.hpp
     binapi/dtf.hpp
@@ -37,6 +38,7 @@ set(BINAPI_HEADERS
 )
 
 set(BINAPI_SOURCES
+    ../../src/errors.cpp
     ../../src/api.cpp
     ../../src/enums.cpp
     ../../src/pairslist.cpp
