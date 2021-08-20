@@ -39,7 +39,7 @@ namespace ws {
 
 /*************************************************************************************************/
 
-#define __CB_ON_ERROR(cb, ec) \
+#define __BINAPI_CB_ON_ERROR(cb, ec) \
     cb(__FILE__ "(" BOOST_PP_STRINGIZE(__LINE__) ")", ec.value(), ec.message(), nullptr, 0);
 
 struct websocket: std::enable_shared_from_this<websocket> {
@@ -84,7 +84,7 @@ struct websocket::impl {
             ,[this, cb=std::move(cb), holder=std::move(holder)]
              (boost::system::error_code ec, boost::asio::ip::tcp::resolver::results_type res) mutable {
                 if ( ec ) {
-                    if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
+                    if ( !m_stop_requested ) { __BINAPI_CB_ON_ERROR(cb, ec); }
                 } else {
                     async_connect(std::move(res), std::move(cb), std::move(holder));
                 }
@@ -92,12 +92,15 @@ struct websocket::impl {
         );
     }
     void async_connect(boost::asio::ip::tcp::resolver::results_type res, on_message_received_cb cb, holder_type holder) {
-        if( !SSL_set_tlsext_host_name(m_ws.next_layer().native_handle() ,m_host.c_str()))
-        {
-            auto error_code = boost::beast::error_code(static_cast<int>(::ERR_get_error()),
-                boost::asio::error::get_ssl_category());
+        if( !SSL_set_tlsext_host_name(m_ws.next_layer().native_handle() ,m_host.c_str())) {
+            auto error_code = boost::beast::error_code(
+                 static_cast<int>(::ERR_get_error())
+                ,boost::asio::error::get_ssl_category()
+            );
 
-            __CB_ON_ERROR(cb, error_code);
+            __BINAPI_CB_ON_ERROR(cb, error_code);
+
+            return;
         }
 
         boost::asio::async_connect(
@@ -107,7 +110,7 @@ struct websocket::impl {
             ,[this, cb=std::move(cb), holder=std::move(holder)]
              (boost::system::error_code ec, boost::asio::ip::tcp::resolver::iterator) mutable {
                 if ( ec ) {
-                    if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
+                    if ( !m_stop_requested ) { __BINAPI_CB_ON_ERROR(cb, ec); }
                 } else {
                     on_connected(std::move(cb), std::move(holder));
                 }
@@ -133,7 +136,7 @@ struct websocket::impl {
             ,[this, cb=std::move(cb), holder=std::move(holder)]
              (boost::system::error_code ec) mutable {
                 if ( ec ) {
-                    if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
+                    if ( !m_stop_requested ) { __BINAPI_CB_ON_ERROR(cb, ec); }
                 } else {
                     on_async_ssl_handshake(std::move(cb), std::move(holder));
                 }
@@ -172,7 +175,11 @@ struct websocket::impl {
 
     void start_read(boost::system::error_code ec, on_message_received_cb cb, holder_type holder) {
         if ( ec ) {
-            if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
+            if ( !m_stop_requested ) {
+                __BINAPI_CB_ON_ERROR(cb, ec);
+            }
+
+            stop();
 
             return;
         }
@@ -186,7 +193,11 @@ struct websocket::impl {
     }
     void on_read(boost::system::error_code ec, std::size_t rd, on_message_received_cb cb, holder_type holder) {
         if ( ec ) {
-            if ( !m_stop_requested ) { __CB_ON_ERROR(cb, ec); }
+            if ( !m_stop_requested ) {
+                __BINAPI_CB_ON_ERROR(cb, ec);
+            }
+
+            stop();
 
             return;
         }
@@ -279,10 +290,20 @@ struct websockets::impl {
         std::string schannel = make_channel(pair, channel);
 
         auto wscb = [this, schannel, cb=std::move(cb)]
-            (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool {
-            const flatjson::fjson json{ptr, size};
-            assert(json.is_valid());
+            (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool
+        {
+            if ( ec ) {
+                try {
+                    cb(fl, ec, std::move(errmsg), message_type{});
+                } catch (const std::exception &ex) {
+                    std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
+                    std::fflush(stderr);
+                }
 
+                return false;
+            }
+
+            const flatjson::fjson json{ptr, size};
             if ( json.is_object() && binapi::rest::is_api_error(json) ) {
                 auto error = binapi::rest::construct_error(json);
                 auto ecode = error.first;

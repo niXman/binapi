@@ -99,7 +99,7 @@ int main() {
     ws.mini_tickers(
         [](const char *fl, int ec, std::string emsg, auto mini_tickers) {
             if ( ec ) {
-                std::cerr << "subscribe mini_ticker error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+                std::cerr << "subscribe mini_tickers error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
 
                 return false;
             }
