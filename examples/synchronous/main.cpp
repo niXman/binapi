@@ -36,7 +36,7 @@ int main() {
 
     auto res2 = api.avg_price("BTCUSDT");
     if ( !res2 ) {
-        std::cerr << "get price error: " << res2.errmsg << std::endl;
+        std::cerr << "get avg price error: " << res2.errmsg << std::endl;
 
         return EXIT_FAILURE;
     }
