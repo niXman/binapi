@@ -107,6 +107,11 @@ struct api {
     result<prices_t>
     prices(prices_cb cb = {});
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#current-average-price
+    using avg_price_cb = std::function<bool(const char *fl, int ec, std::string errmsg, avg_price_t res)>;
+    result<avg_price_t>
+    avg_price(const char *symbol, avg_price_cb cb = {});
+
     // https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics
     using _24hrs_ticker_cb = std::function<bool(const char *fl, int ec, std::string errmsg, _24hrs_tickers_t::_24hrs_ticker_t res)>;
     result<_24hrs_tickers_t::_24hrs_ticker_t>

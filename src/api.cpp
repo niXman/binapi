@@ -634,6 +634,16 @@ api::result<prices_t> api::prices(prices_cb cb) {
 
 /*************************************************************************************************/
 
+api::result<avg_price_t> api::avg_price(const char *symbol, avg_price_cb cb) {
+    const impl::init_list_type map = {
+        {"symbol", symbol}
+    };
+
+    return pimpl->post(false, "/api/v3/avgPrice", boost::beast::http::verb::get, map, std::move(cb));
+}
+
+/*************************************************************************************************/
+
 api::result<_24hrs_tickers_t::_24hrs_ticker_t> api::_24hrs_ticker(const char *symbol, api::_24hrs_ticker_cb cb) {
     const impl::init_list_type map = {
         {"symbol", symbol}

@@ -49,6 +49,15 @@ struct server_time_t {
     friend std::ostream &operator<<(std::ostream &os, const server_time_t &f);
 };
 
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#current-average-price
+struct avg_price_t {
+    std::size_t mins;
+    double_type price;
+
+    static avg_price_t construct(const flatjson::fjson &json);
+    friend std::ostream &operator<<(std::ostream &os, const avg_price_t &f);
+};
+
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker
 struct prices_t {
     struct price_t {

@@ -94,6 +94,28 @@ std::ostream &operator<<(std::ostream &os, const server_time_t &o) {
 
 /*************************************************************************************************/
 
+avg_price_t avg_price_t::construct(const flatjson::fjson &json) {
+    assert(json.is_valid());
+
+    avg_price_t res{};
+    __BINAPI_GET(mins);
+    __BINAPI_GET(price);
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const avg_price_t &o) {
+    os
+    << "{"
+    << "\"mins\":" << o.mins << ","
+    << "\"price\":\"" << o.price << "\""
+    << "}";
+
+    return os;
+}
+
+/*************************************************************************************************/
+
 prices_t::price_t prices_t::price_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
