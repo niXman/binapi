@@ -75,6 +75,12 @@ struct api {
     using exchange_info_cb = std::function<bool(const char *fl, int ec, std::string errmsg, exchange_info_t res)>;
     result<exchange_info_t>
     exchange_info(exchange_info_cb cb = {});
+    result<exchange_info_t>
+    exchange_info(const char *symbol, exchange_info_cb cb = {});
+    result<exchange_info_t>
+    exchange_info(const std::string &symbol, exchange_info_cb cb = {}) { return exchange_info(symbol.c_str(), std::move(cb)); }
+    result<exchange_info_t>
+    exchange_info(const std::vector<std::string> &symbols, exchange_info_cb cb = {});
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#order-book
     using depths_cb = std::function<bool(const char *fl, int ec, std::string errmsg, depths_t res)>;
