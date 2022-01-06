@@ -8,8 +8,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 add_definitions(
     -UNDEBUG
     -DDTF_HEADER_ONLY
-    -D__FLATJSON__CHILDS_TYPE=std::uint32_t
-    -D__FLATJSON__VLEN_TYPE=std::uint32_t
 )
 
 include_directories(

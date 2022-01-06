@@ -55,10 +55,10 @@
 #   define __FLATJSON__KLEN_TYPE std::uint8_t
 #endif // __FLATJSON__KLEN_TYPE
 #ifndef __FLATJSON__VLEN_TYPE
-#   define __FLATJSON__VLEN_TYPE std::uint16_t
+#   define __FLATJSON__VLEN_TYPE std::uint32_t
 #endif // __FLATJSON__VLEN_TYPE
 #ifndef __FLATJSON__CHILDS_TYPE
-#   define __FLATJSON__CHILDS_TYPE std::uint8_t
+#   define __FLATJSON__CHILDS_TYPE std::uint16_t
 #endif // __FLATJSON__CHILDS_TYPE
 
 /*************************************************************************************************/
@@ -190,54 +190,77 @@ inline const char* fj_error_string(e_fj_error_code e) {
 
 namespace details {
 
+#define _FJ_CASE_1(x) \
+    case x:
+
+#define _FJ_CASE_3(S) \
+    _FJ_CASE_1(S) _FJ_CASE_1(S+1) _FJ_CASE_1(S+2)
+
+#define _FJ_CASE_5(S) \
+    _FJ_CASE_3(S) _FJ_CASE_1(S+3) _FJ_CASE_1(S+4)
+
+#define _FJ_CASE_10(S) \
+    _FJ_CASE_5(S) _FJ_CASE_5(S+5)
+
+#define _FJ_CASE_20(S) \
+    _FJ_CASE_10(S) _FJ_CASE_10(S+10)
+
+#define _FJ_CASE_40(S) \
+    _FJ_CASE_20(S) _FJ_CASE_20(S+20)
+
 template<typename CharT>
 bool fj_is_simple_type(CharT v) {
-    static constexpr std::uint8_t map[] = {
-         0 // FJ_TYPE_INVALID
-        ,1 // FJ_TYPE_STRING
-        ,1 // FJ_TYPE_NUMBER
-        ,1 // FJ_TYPE_BOOL
-        ,1 // FJ_TYPE_NULL
-        ,0 // FJ_TYPE_OBJECT
-        ,0 // FJ_TYPE_OBJECT_END
-        ,0 // FJ_TYPE_ARRAY
-        ,0 // FJ_TYPE_ARRAY_END
-    };
-    static_assert(sizeof(map) == __MAX_FJ_TYPE_ID, "");
-
-    return map[v];
+    switch ( static_cast<std::uint8_t>(v) ) {
+        _FJ_CASE_1(0) \
+            return false;
+        _FJ_CASE_3(1) \
+        _FJ_CASE_1(4) \
+            return true;
+        default:
+            return false;
+    }
 }
 
 template<typename CharT>
 bool fj_is_digit(CharT ch) {
-    static constexpr std::uint8_t map[] = {
-         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    };
-    static_assert(sizeof(map) == 256, "");
-
-    return map[static_cast<std::uint8_t>(ch)] == 1;
+    switch ( static_cast<std::uint8_t>(ch) ) {
+        _FJ_CASE_20(0) \
+        _FJ_CASE_20(20) \
+        _FJ_CASE_5(40) \
+        _FJ_CASE_3(45) \
+            return false;
+        _FJ_CASE_10(48) \
+            return true;
+        default:
+            return false;
+    }
 }
 
 template<typename CharT>
 bool fj_is_hex_digit(CharT ch) {
-    static constexpr std::uint8_t map[] = {
-         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-        ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    };
-    static_assert(sizeof(map) == 256, "");
+    if ( fj_is_digit(ch) ) {
+        return true;
+    }
 
-    return fj_is_digit(ch) || map[static_cast<std::uint8_t>(ch)] == 1;
+    switch ( static_cast<std::uint8_t>(ch) ) {
+        _FJ_CASE_20(0) \
+        _FJ_CASE_20(20) \
+        _FJ_CASE_20(40) \
+        _FJ_CASE_5(60) \
+            return false;
+        _FJ_CASE_3(65) \
+        _FJ_CASE_3(68) \
+            return true;
+        _FJ_CASE_20(71) \
+        _FJ_CASE_3(91) \
+        _FJ_CASE_3(94) \
+            return false;
+         _FJ_CASE_3(97) \
+         _FJ_CASE_3(100) \
+            return true;
+        default:
+            return false;
+    }
 }
 
 template<typename CharT>
@@ -247,19 +270,37 @@ bool fj_is_hex_digit4(CharT ch0, CharT ch1, CharT ch2, CharT ch3) {
 
 template<typename CharT>
 std::size_t fj_utf8_char_len(CharT ch) {
-    static constexpr std::uint8_t map[] = {
-         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-        ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-        ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-        ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
-        ,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
-        ,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
-        ,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
-    };
-    static_assert(sizeof(map) == 256, "");
-
-    return map[static_cast<std::uint8_t>(ch)];
+    switch ( static_cast<std::uint8_t>(ch) ) {
+        _FJ_CASE_40(0) \
+        _FJ_CASE_40(40) \
+        _FJ_CASE_40(80) \
+        _FJ_CASE_5 (120) \
+        _FJ_CASE_3 (125) \
+            return 1;
+        _FJ_CASE_40(128) \
+        _FJ_CASE_40(168) \
+        _FJ_CASE_10(208) \
+        _FJ_CASE_5 (218) \
+        _FJ_CASE_1 (223) \
+            return 2;
+        _FJ_CASE_10(224) \
+        _FJ_CASE_5 (234) \
+        _FJ_CASE_1 (239) \
+            return 3;
+        _FJ_CASE_10(240) \
+        _FJ_CASE_5 (250) \
+            return 4;
+        default:
+            assert("unrechable!" == nullptr);
+    }
 }
+
+#undef _FJ_CASE_1
+#undef _FJ_CASE_3
+#undef _FJ_CASE_5
+#undef _FJ_CASE_10
+#undef _FJ_CASE_20
+#undef _FJ_CASE_40
 
 /*************************************************************************************************/
 
@@ -517,17 +558,17 @@ int fj_parse_string(fj_parser<Iterator> *p, Iterator *ptr, std::size_t *size) {
 
     int ch = 0;
     Iterator start = p->js_cur;
-    for ( std::ptrdiff_t len = 0; p->js_cur < p->js_end; p->js_cur += len ) {
+    for ( std::size_t len = 0; p->js_cur < p->js_end; p->js_cur += len ) {
         ch = static_cast<unsigned char>(*(p->js_cur));
         len = fj_utf8_char_len((unsigned char)ch);
         if ( !(ch >= 32 && len > 0) ) return FJ_EC_INVALID;
-        if ( len > (p->js_end - p->js_cur) ) return FJ_EC_INCOMPLETE;
+        if ( static_cast<std::ptrdiff_t>(len) > (p->js_end - p->js_cur) ) return FJ_EC_INCOMPLETE;
 
-        if (ch == '\\') {
+        if ( ch == '\\' ) {
             int n = fj_escape_len(p->js_cur + 1, p->js_end - p->js_cur);
             if ( n <= 0 ) return n;
             len += n;
-        } else if (ch == '"') {
+        } else if ( ch == '"' ) {
             if ( M == parser_mode::parse ) {
                 *ptr = start;
                 *size = p->js_cur - start;
@@ -933,6 +974,14 @@ inline parse_result fj_parse(fj_parser<Iterator> *parser) {
     res.toknum = parser->jstok_cur - parser->jstok_beg;
 
     return res;
+}
+
+template<typename Iterator>
+inline fj_parser<Iterator> fj_make_parser(fj_token<Iterator> *tokbuf, std::size_t toksize, Iterator beg, Iterator end) {
+    fj_parser<Iterator> parser;
+    fj_init(std::addressof(parser), beg, end, tokbuf, toksize);
+
+    return parser;
 }
 
 template<typename Iterator>
