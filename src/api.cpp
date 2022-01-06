@@ -259,13 +259,21 @@ struct api::impl {
                 } else {
                     std::string strbuf = std::move(r.v);
                     const flatjson::fjson json{strbuf.c_str(), strbuf.length()};
-                    assert(json.is_valid());
+                    if ( json.error() != flatjson::FJ_EC_OK ) {
+                        res.ec = json.error();
+                        __MAKE_ERRMSG(res, json.error_string())
+                        res.reply.clear();
+
+                        return res;
+                    }
 
                     if ( json.is_object() && binapi::rest::is_api_error(json) ) {
                         auto error = binapi::rest::construct_error(json);
-                        res.ec     = error.first;
-                        res.errmsg = std::move(error.second);
+                        res.ec = error.first;
+                        __MAKE_ERRMSG(res, error.second)
                         res.reply.clear();
+
+                        return res;
                     } else {
                         res.v = R::construct(json);
                     }
@@ -273,6 +281,8 @@ struct api::impl {
             } catch (const std::exception &ex) {
                 __MAKE_ERRMSG(res, ex.what())
             }
+
+            return res;
         } else {
             using invoker_type = detail::invoker<typename boost::callable_traits::return_type<CB>::type, R, CB>;
             async_req_item item{

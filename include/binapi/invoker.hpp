@@ -48,7 +48,10 @@ struct invoker: invoker_base {
                 return m_cb(fl, ec, std::move(errmsg), std::move(arg));
             } else {
                 const flatjson::fjson json{ptr, size};
-                assert(json.is_valid());
+                if ( json.error() != flatjson::FJ_EC_OK ) {
+                    T arg{};
+                    return m_cb(__MAKE_FILELINE, json.error(), json.error_string(), std::move(arg));
+                }
 
                 if ( json.is_object() && binapi::rest::is_api_error(json) ) {
                     auto error = binapi::rest::construct_error(json);
