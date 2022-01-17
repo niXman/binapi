@@ -112,13 +112,13 @@ int main() {
 
     boost::asio::steady_timer timer0{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(5)};
     timer0.async_wait([&ws, book_handler](const auto &/*ec*/){
-        std::cout << "unsubscribing book_handler: " << book_handler << std::endl;
+        std::cout << "unsubscribing book_handler: " << book_handler.lock().get() << std::endl;
         ws.unsubscribe(book_handler);
     });
 
     boost::asio::steady_timer timer1{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(10)};
     timer1.async_wait([&ws, books_handler](const auto &/*ec*/){
-        std::cout << "async unsubscribing books_handler: " << books_handler << std::endl;
+        std::cout << "async unsubscribing books_handler: " << books_handler.lock().get() << std::endl;
         ws.async_unsubscribe(books_handler);
     });
 

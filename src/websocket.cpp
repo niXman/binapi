@@ -34,13 +34,13 @@
 
 //#include <iostream> // TODO: comment out
 
+#define __BINAPI_CB_ON_ERROR(cb, ec) \
+    cb(__FILE__ "(" BOOST_PP_STRINGIZE(__LINE__) ")", ec.value(), ec.message(), nullptr, 0);
+
 namespace binapi {
 namespace ws {
 
 /*************************************************************************************************/
-
-#define __BINAPI_CB_ON_ERROR(cb, ec) \
-    cb(__FILE__ "(" BOOST_PP_STRINGIZE(__LINE__) ")", ec.value(), ec.message(), nullptr, 0);
 
 struct websocket: std::enable_shared_from_this<websocket> {
     explicit websocket(boost::asio::io_context &ioctx);
@@ -259,7 +259,7 @@ struct websockets::impl {
         ,m_host{std::move(host)}
         ,m_port{std::move(port)}
         ,m_on_message{std::move(cb)}
-        ,m_map{}
+        ,m_set{}
     {}
 
     static std::string make_channel(const char *pair, const char *channel) {
@@ -284,8 +284,7 @@ struct websockets::impl {
         using message_type = typename std::tuple_element<3, args_tuple>::type;
 
         auto ws = std::make_shared<websocket>(m_ioctx);
-        auto *h = ws.get();
-        std::weak_ptr<websocket> wp{ws};
+        std::weak_ptr<void> wp{ws};
 
         std::string schannel = make_channel(pair, channel);
 
@@ -336,7 +335,8 @@ struct websockets::impl {
             return false;
         };
 
-        h->start(
+        auto *ptr = ws.get();
+        ptr->start(
              m_host
             ,m_port
             ,schannel
@@ -346,64 +346,75 @@ struct websockets::impl {
 
         remove_dead_websockets();
 
-        m_map.emplace(h, std::move(wp));
+        m_set.emplace(wp);
 
-        return h;
+        return wp;
     }
 
     template<typename F>
-    void stop_channel_impl(handle h, F f) {
-        auto it = m_map.find(h);
-        if ( it == m_map.end() ) { return; }
+    void stop_channel_impl(const handle &h, F f) {
+        auto it = m_set.find(h);
+        if ( it == m_set.end() ) { return; }
 
-        if ( auto s = it->second.lock() ) {
-            f(s);
+        if ( auto s = it->lock() ) {
+            f(std::static_pointer_cast<websocket>(s));
         }
 
-        m_map.erase(it);
+        m_set.erase(it);
 
         remove_dead_websockets();
     }
 
-    void stop_channel(handle h) {
-        return stop_channel_impl(h, [](const auto &sp){ sp->stop(); });
+    void stop_channel(const handle &h) {
+        return stop_channel_impl(h, [](auto sp){ sp->stop(); });
     }
-    void async_stop_channel(handle h) {
-        return stop_channel_impl(h, [](const auto &sp){ sp->async_stop(); });
+    void async_stop_channel(const handle &h) {
+        return stop_channel_impl(h, [](auto sp){ sp->async_stop(); });
     }
 
     template<typename F>
     void unsubscribe_all_impl(F f) {
-        for ( auto it = m_map.begin(); it != m_map.end(); ) {
-            if ( auto s = it->second.lock() ) {
-                f(s);
+        for ( auto it = m_set.begin(); it != m_set.end(); ) {
+            if ( auto s = it->lock() ) {
+                f(std::static_pointer_cast<websocket>(s));
             }
 
-            it = m_map.erase(it);
+            it = m_set.erase(it);
         }
     }
     void unsubscribe_all() {
-        return unsubscribe_all_impl([](const auto &sp){ sp->stop(); });
+        return unsubscribe_all_impl([](auto sp){ sp->stop(); });
     }
     void async_unsubscribe_all() {
-        return unsubscribe_all_impl([](const auto &sp){ sp->async_stop(); });
+        return unsubscribe_all_impl([](auto sp){ sp->async_stop(); });
     }
 
     void remove_dead_websockets() {
-        for ( auto it = m_map.begin(); it != m_map.end(); ) {
-            if ( ! it->second.lock() ) {
-                it = m_map.erase(it);
+        for ( auto it = m_set.begin(); it != m_set.end(); ) {
+            if ( ! it->lock() ) {
+                it = m_set.erase(it);
             } else {
                 ++it;
             }
         }
     }
 
+    struct weak_ptr_less_cmp {
+        bool operator()(const websockets::handle &l, const websockets::handle &r) const {
+            const auto lp = std::static_pointer_cast<void*>(l.lock());
+            assert(lp);
+            const auto rp = std::static_pointer_cast<void*>(r.lock());
+            assert(rp);
+
+            return lp.get() < rp.get();
+        }
+    };
+
     boost::asio::io_context &m_ioctx;
     std::string m_host;
     std::string m_port;
     on_message_received_cb m_on_message;
-    std::map<websockets::handle, std::weak_ptr<websocket>> m_map;
+    std::set<websockets::handle, weak_ptr_less_cmp> m_set;
 };
 
 /*************************************************************************************************/
@@ -562,8 +573,8 @@ websockets::handle websockets::userdata(
 
 /*************************************************************************************************/
 
-void websockets::unsubscribe(handle h) { return pimpl->stop_channel(h); }
-void websockets::async_unsubscribe(handle h) { return pimpl->async_stop_channel(h); }
+void websockets::unsubscribe(const handle &h) { return pimpl->stop_channel(h); }
+void websockets::async_unsubscribe(const handle &h) { return pimpl->async_stop_channel(h); }
 
 void websockets::unsubscribe_all() { return pimpl->unsubscribe_all(); }
 void websockets::async_unsubscribe_all() { return pimpl->async_unsubscribe_all(); }
