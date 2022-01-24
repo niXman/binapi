@@ -28,6 +28,8 @@
 #include <boost/callable_traits.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
+#include <boost/intrusive/set.hpp>
+
 #include <map>
 #include <set>
 #include <cstring>
@@ -40,30 +42,14 @@
 namespace binapi {
 namespace ws {
 
+struct websockets;
+
 /*************************************************************************************************/
 
 struct websocket: std::enable_shared_from_this<websocket> {
-    explicit websocket(boost::asio::io_context &ioctx);
-    virtual ~websocket();
+    friend struct websockets;
 
-    using on_message_received_cb = std::function<
-        bool(const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size)
-    >; // when 'false' returned the stop will called
-
-    using holder_type = std::shared_ptr<void>;
-    void start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder);
-    void stop();
-    void async_stop();
-
-private:
-    struct impl;
-    std::unique_ptr<impl> pimpl;
-};
-
-/*************************************************************************************************/
-
-struct websocket::impl {
-    impl(boost::asio::io_context &ioctx)
+    explicit websocket(boost::asio::io_context &ioctx)
         :m_ioctx{ioctx}
         ,m_ssl{boost::asio::ssl::context::sslv23_client}
         ,m_resolver{m_ioctx}
@@ -73,7 +59,39 @@ struct websocket::impl {
         ,m_target{}
         ,m_stop_requested{}
     {}
+    virtual ~websocket()
+    {}
 
+    using on_message_received_cb = std::function<
+        bool(const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size)
+    >; // when 'false' returned the stop will called
+
+    using holder_type = std::shared_ptr<websocket>;
+    void start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder)
+    { return async_start(host, port, target, std::move(cb), std::move(holder)); }
+
+    void stop() {
+        m_stop_requested = true;
+
+        if ( m_ws.next_layer().next_layer().is_open() ) {
+            boost::system::error_code ec;
+            m_ws.close(boost::beast::websocket::close_code::normal, ec);
+        }
+    }
+
+    void async_stop() {
+        m_stop_requested = true;
+        holder_type holder = shared_from_this();
+
+        if ( m_ws.next_layer().next_layer().is_open() ) {
+            m_ws.async_close(
+                 boost::beast::websocket::close_code::normal
+                ,[holder=std::move(holder)](const boost::system::error_code &){}
+            );
+        }
+    }
+
+private:
     void async_start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder) {
         m_host = host;
         m_target = target;
@@ -153,26 +171,6 @@ struct websocket::impl {
         );
     }
 
-    void stop() {
-        m_stop_requested = true;
-
-        if ( m_ws.next_layer().next_layer().is_open() ) {
-            boost::system::error_code ec;
-            m_ws.close(boost::beast::websocket::close_code::normal, ec);
-        }
-    }
-
-    void async_stop(holder_type holder) {
-        m_stop_requested = true;
-
-        if ( m_ws.next_layer().next_layer().is_open() ) {
-            m_ws.async_close(
-                 boost::beast::websocket::close_code::normal
-                ,[holder=std::move(holder)](const boost::system::error_code &){}
-            );
-        }
-    }
-
     void start_read(boost::system::error_code ec, on_message_received_cb cb, holder_type holder) {
         if ( ec ) {
             if ( !m_stop_requested ) {
@@ -229,25 +227,13 @@ struct websocket::impl {
     std::string m_host;
     std::string m_target;
     bool m_stop_requested;
+    boost::intrusive::set_member_hook<> m_intrusive_set_hook;
 };
 
-/*************************************************************************************************/
-
-websocket::websocket(boost::asio::io_context &ioctx)
-    :pimpl{std::make_unique<impl>(ioctx)}
-{}
-
-websocket::~websocket()
-{}
-
-/*************************************************************************************************/
-
-void websocket::start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder)
-{ return pimpl->async_start(host, port, target, std::move(cb), std::move(holder)); }
-
-void websocket::stop() { return pimpl->stop(); }
-
-void websocket::async_stop() { return pimpl->async_stop(shared_from_this()); }
+struct websocket_id_getter {
+    using type = const void *;
+    const void* operator()(const websocket &sock) const { return &sock; }
+};
 
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -261,8 +247,11 @@ struct websockets::impl {
         ,m_on_message{std::move(cb)}
         ,m_set{}
     {}
+    ~impl() {
+        unsubscribe_all();
+    }
 
-    static std::string make_channel(const char *pair, const char *channel) {
+    static std::string make_channel_name(const char *pair, const char *channel) {
         std::string res{"/ws/"};
         if ( pair ) {
             res += pair;
@@ -280,13 +269,19 @@ struct websockets::impl {
 
     template<typename F>
     websockets::handle start_channel(const char *pair, const char *channel, F cb) {
-        using args_tuple = typename boost::callable_traits::args<decltype(cb)>::type;
+        using args_tuple = typename boost::callable_traits::args<F>::type;
         using message_type = typename std::tuple_element<3, args_tuple>::type;
 
-        auto ws = std::make_shared<websocket>(m_ioctx);
-        std::weak_ptr<void> wp{ws};
+        static const auto deleter = [this](websocket *ws) {
+            auto it = m_set.find(ws);
+            if ( it != m_set.end() ) {
+                m_set.erase(it);
+            }
 
-        std::string schannel = make_channel(pair, channel);
+            delete ws;
+        };
+        std::shared_ptr<websocket> ws{new websocket(m_ioctx), deleter};
+        std::string schannel = make_channel_name(pair, channel);
 
         auto wscb = [this, schannel, cb=std::move(cb)]
             (const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size) -> bool
@@ -344,40 +339,34 @@ struct websockets::impl {
             ,std::move(ws)
         );
 
-        remove_dead_websockets();
+        m_set.insert(*ptr);
 
-        m_set.emplace(wp);
-
-        return wp;
+        return ptr;
     }
 
     template<typename F>
-    void stop_channel_impl(const handle &h, F f) {
+    void stop_channel_impl(handle h, F f) {
         auto it = m_set.find(h);
         if ( it == m_set.end() ) { return; }
 
-        if ( auto s = it->lock() ) {
-            f(std::static_pointer_cast<websocket>(s));
-        }
+        auto *ws = static_cast<websocket *>(&(*it));
+        f(ws);
 
         m_set.erase(it);
-
-        remove_dead_websockets();
     }
 
-    void stop_channel(const handle &h) {
+    void stop_channel(handle h) {
         return stop_channel_impl(h, [](auto sp){ sp->stop(); });
     }
-    void async_stop_channel(const handle &h) {
+    void async_stop_channel(handle h) {
         return stop_channel_impl(h, [](auto sp){ sp->async_stop(); });
     }
 
     template<typename F>
     void unsubscribe_all_impl(F f) {
         for ( auto it = m_set.begin(); it != m_set.end(); ) {
-            if ( auto s = it->lock() ) {
-                f(std::static_pointer_cast<websocket>(s));
-            }
+            auto *ws = static_cast<websocket *>(&(*it));
+            f(ws);
 
             it = m_set.erase(it);
         }
@@ -389,32 +378,19 @@ struct websockets::impl {
         return unsubscribe_all_impl([](auto sp){ sp->async_stop(); });
     }
 
-    void remove_dead_websockets() {
-        for ( auto it = m_set.begin(); it != m_set.end(); ) {
-            if ( ! it->lock() ) {
-                it = m_set.erase(it);
-            } else {
-                ++it;
-            }
-        }
-    }
-
-    struct weak_ptr_less_cmp {
-        bool operator()(const websockets::handle &l, const websockets::handle &r) const {
-            const auto lp = std::static_pointer_cast<void*>(l.lock());
-            assert(lp);
-            const auto rp = std::static_pointer_cast<void*>(r.lock());
-            assert(rp);
-
-            return lp.get() < rp.get();
-        }
-    };
-
     boost::asio::io_context &m_ioctx;
     std::string m_host;
     std::string m_port;
     on_message_received_cb m_on_message;
-    std::set<websockets::handle, weak_ptr_less_cmp> m_set;
+    boost::intrusive::set<
+         websocket
+        ,boost::intrusive::key_of_value<websocket_id_getter>
+        ,boost::intrusive::member_hook<
+             websocket
+            ,boost::intrusive::set_member_hook<>
+            ,&websocket::m_intrusive_set_hook
+        >
+    > m_set;
 };
 
 /*************************************************************************************************/

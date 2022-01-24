@@ -63,7 +63,7 @@ struct websockets {
     );
     ~websockets();
 
-    using handle = std::weak_ptr<void>;
+    using handle = void *;
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams
     using on_part_depths_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, part_depths_t msg)>;
