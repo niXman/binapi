@@ -232,7 +232,7 @@ private:
 
 struct websocket_id_getter {
     using type = const void *;
-    const void* operator()(const websocket &sock) const { return &sock; }
+    type operator()(const websocket &sock) const { return std::addressof(sock); }
 };
 
 /*************************************************************************************************/
