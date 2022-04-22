@@ -229,9 +229,18 @@ struct exchange_info_t {
             };
 
             struct filter_max_position_t {
-               double_type maxPosition;
+                double_type maxPosition;
 
                 friend std::ostream &operator<<(std::ostream &os, const filter_max_position_t &f);
+            };
+
+            struct filter_trailing_delta_t {
+                std::size_t minTrailingAboveDelta;
+                std::size_t maxTrailingAboveDelta;
+                std::size_t minTrailingBelowDelta;
+                std::size_t maxTrailingBelowDelta;
+
+                friend std::ostream &operator<<(std::ostream &os, const filter_trailing_delta_t &f);
             };
 
             std::string filterType;
@@ -245,6 +254,7 @@ struct exchange_info_t {
                 ,filter_max_num_orders_t
                 ,filter_max_num_algo_orders_t
                 ,filter_max_position_t
+                ,filter_trailing_delta_t
             > filter;
 
             friend std::ostream &operator<<(std::ostream &os, const filter_t &f);

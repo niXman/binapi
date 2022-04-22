@@ -470,6 +470,18 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     return os;
 }
 
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_trailing_delta_t &o) {
+    os
+    << "{"
+    << "\"minTrailingAboveDelta\":\"" << o.minTrailingAboveDelta << "\","
+    << "\"maxTrailingAboveDelta\":\"" << o.maxTrailingAboveDelta << "\","
+    << "\"minTrailingBelowDelta\":\"" << o.minTrailingBelowDelta << "\","
+    << "\"maxTrailingBelowDelta\":\"" << o.maxTrailingBelowDelta << "\""
+    << "}";
+
+    return os;
+}
+
 std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t &o) {
     os
     << "{";
@@ -544,6 +556,16 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
         os
         << "\"filterType\":\"" << o.filterType << "\","
         << "\"maxPosition\":\"" << p->maxPosition << "\"";
+    } else if ( o.filterType == "TRAILING_DELTA" ) {
+        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_trailing_delta_t>(&o.filter);
+        assert(p);
+
+        os
+        << "\"filterType\":\"" << o.filterType << "\","
+        << "\"minTrailingAboveDelta\":" << p->minTrailingAboveDelta << ","
+        << "\"maxTrailingAboveDelta\":" << p->maxTrailingAboveDelta << ","
+        << "\"minTrailingBelowDelta\":" << p->minTrailingBelowDelta << ","
+        << "\"maxTrailingBelowDelta\":" << p->maxTrailingBelowDelta << "";
     } else {
         assert("bad filter type" == nullptr);
     }
@@ -721,6 +743,16 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
                 case fnv1a("MAX_POSITION"): {
                     exchange_info_t::symbol_t::filter_t::filter_max_position_t item{};
                     __BINAPI_GET2(item, maxPosition, fit);
+                    filter.filter = std::move(item);
+
+                    break;
+                }
+                case fnv1a("TRAILING_DELTA"): {
+                    exchange_info_t::symbol_t::filter_t::filter_trailing_delta_t item{};
+                    __BINAPI_GET2(item, minTrailingAboveDelta, fit);
+                    __BINAPI_GET2(item, maxTrailingAboveDelta, fit);
+                    __BINAPI_GET2(item, minTrailingBelowDelta, fit);
+                    __BINAPI_GET2(item, maxTrailingBelowDelta, fit);
                     filter.filter = std::move(item);
 
                     break;

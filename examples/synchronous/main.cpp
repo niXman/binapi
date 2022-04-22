@@ -26,13 +26,21 @@ int main() {
         ,10000 // recvWindow
     };
 
-    auto res = api.price("BTCUSDT");
-    if ( !res ) {
-        std::cerr << "get price error: " << res.errmsg << std::endl;
+    auto res0 = api.exchange_info("BTCUSDT");
+    if ( !res0 ) {
+        std::cerr << "exchange_info error: " << res0.errmsg << std::endl;
 
         return EXIT_FAILURE;
     }
-    std::cout << "price: " << res.v << std::endl;
+    std::cout << "exchange info: " << res0.v << std::endl << std::endl;
+
+    auto res1 = api.price("BTCUSDT");
+    if ( !res1 ) {
+        std::cerr << "get price error: " << res1.errmsg << std::endl;
+
+        return EXIT_FAILURE;
+    }
+    std::cout << "price: " << res1.v << std::endl << std::endl;
 
     auto res2 = api.avg_price("BTCUSDT");
     if ( !res2 ) {
@@ -40,7 +48,7 @@ int main() {
 
         return EXIT_FAILURE;
     }
-    std::cout << "avg price: " << res2.v << std::endl;
+    std::cout << "avg price: " << res2.v << std::endl << std::endl;
 
     return EXIT_SUCCESS;
 }
