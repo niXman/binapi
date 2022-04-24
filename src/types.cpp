@@ -390,9 +390,10 @@ std::ostream& operator<<(std::ostream &os, const exchange_info_t::rate_limit_t &
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_price_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::price_t &o) {
     os
     << "{"
+    << "\"filterType\":\"PRICE_FILTER\","
     << "\"minPrice\":\"" << o.minPrice << "\","
     << "\"maxPrice\":\"" << o.maxPrice << "\","
     << "\"tickSize\":\"" << o.tickSize << "\""
@@ -401,9 +402,10 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_percent_price_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::percent_price_t &o) {
     os
     << "{"
+    << "\"filterType\":\"PERCENT_PRICE\","
     << "\"multiplierUp\":\"" << o.multiplierUp << "\","
     << "\"multiplierDown\":\"" << o.multiplierDown << "\","
     << "\"avgPriceMins\":" << o.avgPriceMins << ""
@@ -412,9 +414,10 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_lot_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::lot_size_t &o) {
     os
     << "{"
+    << "\"filterType\":\"LOT_SIZE\","
     << "\"minQty\":\"" << o.minQty << "\","
     << "\"maxQty\":\"" << o.maxQty << "\","
     << "\"stepSize\":\"" << o.stepSize << "\""
@@ -423,9 +426,10 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_market_lot_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::market_lot_size_t &o) {
     os
     << "{"
+    << "\"filterType\":\"MARKET_LOT_SIZE\","
     << "\"minQty\":\"" << o.minQty << "\","
     << "\"maxQty\":\"" << o.maxQty << "\","
     << "\"stepSize\":\"" << o.stepSize << "\""
@@ -434,45 +438,60 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_min_notional_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::min_notional_t &o) {
     os
     << "{"
+    << "\"filterType\":\"MIN_NOTIONAL\","
     << "\"minNotional\":\"" << o.minNotional << "\""
     << "}";
 
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_iceberg_parts_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::iceberg_parts_t &o) {
     os
     << "{"
+    << "\"filterType\":\"ICEBERG_PARTS\","
     << "\"limit\":" << o.limit
     << "}";
 
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_max_num_algo_orders_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::max_num_orders_t &o) {
     os
     << "{"
+    << "\"filterType\":\"MAX_NUM_ORDERS\","
+    << "\"maxNumAlgoOrders\":" << o.maxNumOrders
+    << "}";
+
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::max_num_algo_orders_t &o) {
+    os
+    << "{"
+    << "\"filterType\":\"MAX_NUM_ALGO_ORDERS\","
     << "\"maxNumAlgoOrders\":" << o.maxNumAlgoOrders
     << "}";
 
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_max_position_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::max_position_t &o) {
     os
     << "{"
+    << "\"filterType\":\"MAX_POSITION\","
     << "\"maxPosition\":\"" << o.maxPosition << "\""
     << "}";
 
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::filter_trailing_delta_t &o) {
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::trailing_delta_t &o) {
     os
     << "{"
+    << "\"filterType\":\"TRAILING_DELTA\","
     << "\"minTrailingAboveDelta\":\"" << o.minTrailingAboveDelta << "\","
     << "\"maxTrailingAboveDelta\":\"" << o.maxTrailingAboveDelta << "\","
     << "\"minTrailingBelowDelta\":\"" << o.minTrailingBelowDelta << "\","
@@ -483,94 +502,8 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
 }
 
 std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t &o) {
-    os
-    << "{";
-    if ( o.filterType == "PRICE_FILTER" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_price_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"minPrice\":\"" << p->minPrice << "\","
-        << "\"maxPrice\":\"" << p->maxPrice << "\","
-        << "\"tickSize\":\"" << p->tickSize << "\"";
-    } else if ( o.filterType == "PERCENT_PRICE" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_percent_price_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"multiplierUp\":\"" << p->multiplierUp << "\","
-        << "\"multiplierDown\":\"" << p->multiplierDown << "\","
-        << "\"avgPriceMins\":" << p->avgPriceMins;
-    } else if ( o.filterType == "LOT_SIZE" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_lot_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"minQty\":\"" << p->minQty << "\","
-        << "\"maxQty\":\"" << p->maxQty << "\","
-        << "\"stepSize\":\"" << p->stepSize << "\"";
-    } else if ( o.filterType == "MARKET_LOT_SIZE" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_market_lot_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"minQty\":\"" << p->minQty << "\","
-        << "\"maxQty\":\"" << p->maxQty << "\","
-        << "\"stepSize\":\"" << p->stepSize << "\"";
-    } else if ( o.filterType == "MIN_NOTIONAL" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_min_notional_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"minNotional\":\"" << p->minNotional << "\"";
-    } else if ( o.filterType == "ICEBERG_PARTS" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_iceberg_parts_t>(&o.filter);
-        assert(p);
-
-        os
-            << "\"filterType\":\"" << o.filterType << "\","
-            << "\"limit\":" << p->limit;
-    } else if ( o.filterType == "MAX_NUM_ORDERS" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_max_num_orders_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"maxNumOrders\":" << p->maxNumOrders;
-    } else if ( o.filterType == "MAX_NUM_ALGO_ORDERS" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_max_num_algo_orders_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"maxNumAlgoOrders\":" << p->maxNumAlgoOrders;
-    } else if ( o.filterType == "MAX_POSITION" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_max_position_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"maxPosition\":\"" << p->maxPosition << "\"";
-    } else if ( o.filterType == "TRAILING_DELTA" ) {
-        auto p = boost::get<exchange_info_t::symbol_t::filter_t::filter_trailing_delta_t>(&o.filter);
-        assert(p);
-
-        os
-        << "\"filterType\":\"" << o.filterType << "\","
-        << "\"minTrailingAboveDelta\":" << p->minTrailingAboveDelta << ","
-        << "\"maxTrailingAboveDelta\":" << p->maxTrailingAboveDelta << ","
-        << "\"minTrailingBelowDelta\":" << p->minTrailingBelowDelta << ","
-        << "\"maxTrailingBelowDelta\":" << p->maxTrailingBelowDelta << "";
-    } else {
-        assert("bad filter type" == nullptr);
-    }
-
-    os << "}";
+    static const auto visitor = [&os](const auto &o){ os << o; };
+    boost::apply_visitor(visitor, o.filter);
 
     return os;
 }
@@ -677,7 +610,7 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
             const auto filter_hash = fnv1a(filter.filterType.c_str(), filter.filterType.size());
             switch ( filter_hash ) {
                 case fnv1a("PRICE_FILTER"): {
-                    exchange_info_t::symbol_t::filter_t::filter_price_t item{};
+                    exchange_info_t::symbol_t::filter_t::price_t item{};
                     __BINAPI_GET2(item, minPrice, fit);
                     __BINAPI_GET2(item, maxPrice, fit);
                     __BINAPI_GET2(item, tickSize, fit);
@@ -686,7 +619,7 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
                     break;
                 }
                 case fnv1a("PERCENT_PRICE"): {
-                    exchange_info_t::symbol_t::filter_t::filter_percent_price_t item{};
+                    exchange_info_t::symbol_t::filter_t::percent_price_t item{};
                     __BINAPI_GET2(item, multiplierUp, fit);
                     __BINAPI_GET2(item, multiplierDown, fit);
                     __BINAPI_GET2(item, avgPriceMins, fit);
@@ -695,7 +628,7 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
                     break;
                 }
                 case fnv1a("LOT_SIZE"): {
-                    exchange_info_t::symbol_t::filter_t::filter_lot_t item{};
+                    exchange_info_t::symbol_t::filter_t::lot_size_t item{};
                     __BINAPI_GET2(item, minQty, fit);
                     __BINAPI_GET2(item, maxQty, fit);
                     __BINAPI_GET2(item, stepSize, fit);
@@ -704,7 +637,7 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
                     break;
                 }
                 case fnv1a("MARKET_LOT_SIZE"): {
-                    exchange_info_t::symbol_t::filter_t::filter_market_lot_t item{};
+                    exchange_info_t::symbol_t::filter_t::market_lot_size_t item{};
                     __BINAPI_GET2(item, minQty, fit);
                     __BINAPI_GET2(item, maxQty, fit);
                     __BINAPI_GET2(item, stepSize, fit);
@@ -713,42 +646,42 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
                     break;
                 }
                 case fnv1a("MIN_NOTIONAL"): {
-                    exchange_info_t::symbol_t::filter_t::filter_min_notional_t item{};
+                    exchange_info_t::symbol_t::filter_t::min_notional_t item{};
                     __BINAPI_GET2(item, minNotional, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("ICEBERG_PARTS"): {
-                    exchange_info_t::symbol_t::filter_t::filter_iceberg_parts_t item{};
+                    exchange_info_t::symbol_t::filter_t::iceberg_parts_t item{};
                     __BINAPI_GET2(item, limit, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("MAX_NUM_ORDERS"): {
-                    exchange_info_t::symbol_t::filter_t::filter_max_num_orders_t item{};
+                    exchange_info_t::symbol_t::filter_t::max_num_orders_t item{};
                     __BINAPI_GET2(item, maxNumOrders, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("MAX_NUM_ALGO_ORDERS"): {
-                    exchange_info_t::symbol_t::filter_t::filter_max_num_algo_orders_t item{};
+                    exchange_info_t::symbol_t::filter_t::max_num_algo_orders_t item{};
                     __BINAPI_GET2(item, maxNumAlgoOrders, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("MAX_POSITION"): {
-                    exchange_info_t::symbol_t::filter_t::filter_max_position_t item{};
+                    exchange_info_t::symbol_t::filter_t::max_position_t item{};
                     __BINAPI_GET2(item, maxPosition, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("TRAILING_DELTA"): {
-                    exchange_info_t::symbol_t::filter_t::filter_trailing_delta_t item{};
+                    exchange_info_t::symbol_t::filter_t::trailing_delta_t item{};
                     __BINAPI_GET2(item, minTrailingAboveDelta, fit);
                     __BINAPI_GET2(item, maxTrailingAboveDelta, fit);
                     __BINAPI_GET2(item, minTrailingBelowDelta, fit);

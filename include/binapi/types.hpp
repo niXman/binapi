@@ -178,83 +178,83 @@ struct exchange_info_t {
         bool icebergAllowed;
 
         struct filter_t {
-            struct filter_price_t {
+            struct price_t {
                 double_type minPrice;
                 double_type maxPrice;
                 double_type tickSize;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_price_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const price_t &f);
             };
-            struct filter_percent_price_t {
+            struct percent_price_t {
                 double_type multiplierUp;
                 double_type multiplierDown;
                 std::size_t avgPriceMins;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_percent_price_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const percent_price_t &f);
             };
-            struct filter_lot_t {
+            struct lot_size_t {
                 double_type minQty;
                 double_type maxQty;
                 double_type stepSize;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_lot_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const lot_size_t &f);
             };
-            struct filter_market_lot_t {
+            struct market_lot_size_t {
                 double_type minQty;
                 double_type maxQty;
                 double_type stepSize;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_market_lot_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const market_lot_size_t &f);
             };
-            struct filter_min_notional_t {
+            struct min_notional_t {
                 double_type minNotional;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_min_notional_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const min_notional_t &f);
             };
-            struct filter_iceberg_parts_t {
+            struct iceberg_parts_t {
                 std::size_t limit;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_iceberg_parts_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const iceberg_parts_t &f);
             };
-            struct filter_max_num_orders_t {
+            struct max_num_orders_t {
                 std::size_t maxNumOrders;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_max_num_orders_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const max_num_orders_t &f);
             };
 
-            struct filter_max_num_algo_orders_t {
+            struct max_num_algo_orders_t {
                 std::size_t maxNumAlgoOrders;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_max_num_algo_orders_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const max_num_algo_orders_t &f);
             };
 
-            struct filter_max_position_t {
+            struct max_position_t {
                 double_type maxPosition;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_max_position_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const max_position_t &f);
             };
 
-            struct filter_trailing_delta_t {
+            struct trailing_delta_t {
                 std::size_t minTrailingAboveDelta;
                 std::size_t maxTrailingAboveDelta;
                 std::size_t minTrailingBelowDelta;
                 std::size_t maxTrailingBelowDelta;
 
-                friend std::ostream &operator<<(std::ostream &os, const filter_trailing_delta_t &f);
+                friend std::ostream &operator<<(std::ostream &os, const trailing_delta_t &f);
             };
 
             std::string filterType;
             boost::variant<
-                 filter_price_t
-                ,filter_percent_price_t
-                ,filter_lot_t
-                ,filter_market_lot_t
-                ,filter_min_notional_t
-                ,filter_iceberg_parts_t
-                ,filter_max_num_orders_t
-                ,filter_max_num_algo_orders_t
-                ,filter_max_position_t
-                ,filter_trailing_delta_t
+                 price_t
+                ,percent_price_t
+                ,lot_size_t
+                ,market_lot_size_t
+                ,min_notional_t
+                ,iceberg_parts_t
+                ,max_num_orders_t
+                ,max_num_algo_orders_t
+                ,max_position_t
+                ,trailing_delta_t
             > filter;
 
             friend std::ostream &operator<<(std::ostream &os, const filter_t &f);
@@ -273,12 +273,26 @@ struct exchange_info_t {
             assert("bad T type" == nullptr);
         }
 
-        const filter_t::filter_price_t& get_filter_price() const
-        { return get_filter<filter_t::filter_price_t>(); }
-        const filter_t::filter_lot_t& get_filter_lot() const
-        { return get_filter<filter_t::filter_lot_t>(); }
-        const filter_t::filter_min_notional_t& get_filter_min_notional() const
-        { return get_filter<filter_t::filter_min_notional_t>(); }
+        const filter_t::price_t& get_filter_price() const
+        { return get_filter<filter_t::price_t>(); }
+        const filter_t::percent_price_t& get_filter_percent_price() const
+        { return get_filter<filter_t::percent_price_t>(); }
+        const filter_t::lot_size_t& get_filter_lot_size() const
+        { return get_filter<filter_t::lot_size_t>(); }
+        const filter_t::market_lot_size_t& get_filter_market_lot_size() const
+        { return get_filter<filter_t::market_lot_size_t>(); }
+        const filter_t::min_notional_t& get_filter_min_notional() const
+        { return get_filter<filter_t::min_notional_t>(); }
+        const filter_t::iceberg_parts_t& get_filter_iceberg_parts() const
+        { return get_filter<filter_t::iceberg_parts_t>(); }
+        const filter_t::max_num_orders_t& get_filter_max_num_orders() const
+        { return get_filter<filter_t::max_num_orders_t>(); }
+        const filter_t::max_num_algo_orders_t& get_filter_max_num_algo_orders() const
+        { return get_filter<filter_t::max_num_algo_orders_t>(); }
+        const filter_t::max_position_t& get_filter_max_position() const
+        { return get_filter<filter_t::max_position_t>(); }
+        const filter_t::trailing_delta_t& get_filter_trailing_delta() const
+        { return get_filter<filter_t::trailing_delta_t>(); }
 
         friend std::ostream &operator<<(std::ostream &os, const symbol_t &s);
     };
