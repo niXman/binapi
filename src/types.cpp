@@ -462,7 +462,7 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     os
     << "{"
     << "\"filterType\":\"MAX_NUM_ORDERS\","
-    << "\"maxNumAlgoOrders\":" << o.maxNumOrders
+    << "\"maxNumOrders\":" << o.maxNumOrders
     << "}";
 
     return os;
