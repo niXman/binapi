@@ -644,6 +644,22 @@ api::result<prices_t> api::prices(prices_cb cb) {
 
 /*************************************************************************************************/
 
+api::result<booktickers_t::bookticker_t> api::bookTicker(const char* symbol, bookTicker_cb cb)
+{
+    const impl::init_list_type map = {
+        { "symbol", symbol }
+    };
+
+    return pimpl->post(false, "/api/v3/ticker/bookTicker", boost::beast::http::verb::get, map, std::move(cb));
+}
+
+api::result<booktickers_t> api::bookTicker(bookTickers_cb cb)
+{
+    return pimpl->post(false, "/api/v3/ticker/bookTicker", boost::beast::http::verb::get, {}, std::move(cb));
+}
+
+/*************************************************************************************************/
+
 api::result<avg_price_t> api::avg_price(const char *symbol, avg_price_cb cb) {
     const impl::init_list_type map = {
         {"symbol", symbol}

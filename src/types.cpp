@@ -188,6 +188,84 @@ const prices_t::price_t& prices_t::get_by_symbol(const char *sym) const {
 
 /*************************************************************************************************/
 
+booktickers_t::bookticker_t booktickers_t::bookticker_t::construct(const flatjson::fjson& json)
+{
+    assert(json.is_valid());
+
+    booktickers_t::bookticker_t res {};
+    __BINAPI_GET(symbol);
+    __BINAPI_GET(bidPrice);
+    __BINAPI_GET(bidQty);
+    __BINAPI_GET(askPrice);
+    __BINAPI_GET(askQty);
+
+    return res;
+}
+
+std::ostream& operator<<(std::ostream& os, const booktickers_t::bookticker_t& o)
+{
+    os
+        << "{"
+        << "\"symbol\":\"" << o.symbol << "\","
+        << "\"bidPrice\":\"" << o.bidPrice << "\","
+        << "\"bidQty\":\"" << o.bidQty << "\","
+        << "\"askPrice\":\"" << o.askPrice << "\""
+        << "\"askQty\":\"" << o.askQty << "\""
+        << "}";
+
+    return os;
+}
+
+/*************************************************************************************************/
+
+booktickers_t booktickers_t::construct(const flatjson::fjson& json)
+{
+    assert(json.is_valid());
+    assert(json.is_array());
+
+    booktickers_t res {};
+    for (auto idx = 0u; idx < json.size(); ++idx) {
+        auto item = booktickers_t::bookticker_t::construct(json[idx]);
+        std::string symbol = item.symbol;
+        res.prices.emplace(std::move(symbol), std::move(item));
+    }
+
+    return res;
+}
+
+std::ostream& operator<<(std::ostream& os, const booktickers_t& o)
+{
+    os
+        << "[";
+    for (auto it = o.prices.begin(); it != o.prices.end(); ++it) {
+        os << it->second;
+        if (std::next(it) != o.prices.end()) {
+            os << ",";
+        }
+    }
+
+    os
+        << "]";
+
+    return os;
+}
+
+bool booktickers_t::is_valid_symbol(const char* sym) const
+{
+    return prices.find(sym) != prices.end();
+}
+
+const booktickers_t::bookticker_t& booktickers_t::get_by_symbol(const char* sym) const
+{
+    auto it = prices.find(sym);
+    if (it != prices.end()) {
+        return it->second;
+    }
+
+    assert(!"unreachable");
+}
+
+/*************************************************************************************************/
 _24hrs_tickers_t::_24hrs_ticker_t
 _24hrs_tickers_t::_24hrs_ticker_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());

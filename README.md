@@ -17,6 +17,7 @@ This implementation has been developed as a consequence of the lack of suitable 
 - [Aggregate trades list](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list) -> `api::agg_trades()`
 - [24hr ticker price change statistics](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics) -> `api::_24hrs_ticker()`
 - [Symbol price ticker](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#symbol-price-ticker) -> `api::price()`
+- [Symbol order book ticker](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#symbol-order-book-ticker) -> `api::bookTicker()`
 - [New order](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#new-order--trade) -> `api::new_order()`
 - [Query order](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#query-order-user_data) -> `api::order_info()`
 - [Test new order](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#test-new-order-trade) -> `api::new_test_order()`

@@ -82,6 +82,37 @@ struct prices_t {
     const price_t& get_by_symbol(const char *sym) const;
 };
 
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#symbol-order-book-ticker
+struct booktickers_t {
+    struct bookticker_t {
+        std::string symbol;
+        double_type bidPrice;
+        double_type bidQty;
+        double_type askPrice;
+        double_type askQty;
+
+        static bookticker_t construct(const flatjson::fjson& json);
+        friend std::ostream& operator<<(std::ostream& os, const bookticker_t& f);
+    };
+
+    static booktickers_t construct(const flatjson::fjson& json);
+    friend std::ostream& operator<<(std::ostream& os, const booktickers_t& f);
+
+    std::map<std::string, bookticker_t> prices;
+
+    bool is_valid_symbol(const std::string& sym) const
+    {
+        return is_valid_symbol(sym.c_str());
+    }
+    bool is_valid_symbol(const char* sym) const;
+
+    const bookticker_t& get_by_symbol(const std::string& sym) const
+    {
+        return get_by_symbol(sym.c_str());
+    }
+    const bookticker_t& get_by_symbol(const char* sym) const;
+};
+
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics
 struct _24hrs_tickers_t {
     struct _24hrs_ticker_t {

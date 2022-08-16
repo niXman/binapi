@@ -113,6 +113,17 @@ struct api {
     result<prices_t>
     prices(prices_cb cb = {});
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#symbol-order-book-ticker
+    using bookTicker_cb = std::function<bool(const char* fl, int ec, std::string errmsg, booktickers_t::bookticker_t res)>;
+    result<booktickers_t::bookticker_t>
+    bookTicker(const std::string& symbol, bookTicker_cb cb = {}) { return bookTicker(symbol.c_str(), std::move(cb)); }
+    result<booktickers_t::bookticker_t>
+    bookTicker(const char* symbol, bookTicker_cb cb = {});
+
+    using bookTickers_cb = std::function<bool(const char* fl, int ec, std::string errmsg, booktickers_t res)>;
+    result<booktickers_t>
+    bookTicker(bookTickers_cb cb = {});
+
     // https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#current-average-price
     using avg_price_cb = std::function<bool(const char *fl, int ec, std::string errmsg, avg_price_t res)>;
     result<avg_price_t>
