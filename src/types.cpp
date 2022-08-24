@@ -414,6 +414,20 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     return os;
 }
 
+std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::percent_price_by_side_t &o) {
+    os
+    << "{"
+    << "\"filterType\":\"PERCENT_PRICE_BY_SIDE\","
+    << "\"bidMultiplierUp\":\"" << o.bidMultiplierUp << "\","
+    << "\"bidMultiplierDown\":\"" << o.bidMultiplierDown << "\","
+    << "\"askMultiplierUp\":\"" << o.askMultiplierUp << "\","
+    << "\"askMultiplierDown\":\"" << o.askMultiplierDown << "\","
+    << "\"avgPriceMins\":" << o.avgPriceMins << ""
+    << "}";
+
+    return os;
+}
+
 std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filter_t::lot_size_t &o) {
     os
     << "{"
@@ -622,6 +636,17 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
                     exchange_info_t::symbol_t::filter_t::percent_price_t item{};
                     __BINAPI_GET2(item, multiplierUp, fit);
                     __BINAPI_GET2(item, multiplierDown, fit);
+                    __BINAPI_GET2(item, avgPriceMins, fit);
+                    filter.filter = std::move(item);
+
+                    break;
+                }
+                case fnv1a("PERCENT_PRICE_BY_SIDE"): {
+                    exchange_info_t::symbol_t::filter_t::percent_price_by_side_t item{};
+                    __BINAPI_GET2(item, bidMultiplierUp, fit);
+                    __BINAPI_GET2(item, bidMultiplierDown, fit);
+                    __BINAPI_GET2(item, askMultiplierUp, fit);
+                    __BINAPI_GET2(item, askMultiplierDown, fit);
                     __BINAPI_GET2(item, avgPriceMins, fit);
                     filter.filter = std::move(item);
 

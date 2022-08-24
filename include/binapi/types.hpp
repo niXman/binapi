@@ -192,6 +192,13 @@ struct exchange_info_t {
 
                 friend std::ostream &operator<<(std::ostream &os, const percent_price_t &f);
             };
+            struct percent_price_by_side_t {
+                double_type bidMultiplierUp;
+                double_type bidMultiplierDown;
+                double_type askMultiplierUp;
+                double_type askMultiplierDown;
+                std::size_t avgPriceMins;
+            };
             struct lot_size_t {
                 double_type minQty;
                 double_type maxQty;
@@ -247,6 +254,7 @@ struct exchange_info_t {
             boost::variant<
                  price_t
                 ,percent_price_t
+                ,percent_price_by_side_t
                 ,lot_size_t
                 ,market_lot_size_t
                 ,min_notional_t
@@ -277,6 +285,8 @@ struct exchange_info_t {
         { return get_filter<filter_t::price_t>(); }
         const filter_t::percent_price_t& get_filter_percent_price() const
         { return get_filter<filter_t::percent_price_t>(); }
+        const filter_t::percent_price_by_side_t& get_filter_percent_price_by_side() const
+        { return get_filter<filter_t::percent_price_by_side_t>(); }
         const filter_t::lot_size_t& get_filter_lot_size() const
         { return get_filter<filter_t::lot_size_t>(); }
         const filter_t::market_lot_size_t& get_filter_market_lot_size() const
