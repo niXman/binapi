@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(binapi)
+project(bg_api)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -20,23 +20,23 @@ if (DEFINED ${BOOST_INCLUDE_DIR})
     )
 endif()
 
-set(BINAPI_HEADERS
-    binapi/api.hpp
-    binapi/flatjson.hpp
-    binapi/dtf.hpp
-    binapi/double_type.hpp
-    binapi/enums.hpp
-    binapi/errors.hpp
-    binapi/invoker.hpp
-    binapi/message.hpp
-    binapi/pairslist.hpp
-    binapi/reports.hpp
-    binapi/tools.hpp
-    binapi/types.hpp
-    binapi/websocket.hpp
+set(BG_API_HEADERS
+    bg_api/api.hpp
+    bg_api/flatjson.hpp
+    bg_api/dtf.hpp
+    bg_api/double_type.hpp
+    bg_api/enums.hpp
+    bg_api/errors.hpp
+    bg_api/invoker.hpp
+    bg_api/message.hpp
+    bg_api/pairslist.hpp
+    bg_api/reports.hpp
+    bg_api/tools.hpp
+    bg_api/types.hpp
+    bg_api/websocket.hpp
 )
 
-set(BINAPI_SOURCES
+set(BG_API_SOURCES
     src/api.cpp
     src/enums.cpp
     src/errors.cpp
@@ -52,7 +52,7 @@ add_executable(
     #
     main.cpp
     #
-    ${BINAPI_SOURCES}
+    ${BG_API_SOURCES}
 )
 
 if (DEFINED ${BOOST_LIB_DIR})

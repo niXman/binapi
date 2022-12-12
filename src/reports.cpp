@@ -4,23 +4,24 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/reports.hpp>
-#include <binapi/api.hpp>
-#include <binapi/tools.hpp>
-#include <binapi/pairslist.hpp>
-#include <binapi/iofmt.hpp>
-#include <binapi/dtf.hpp>
+#include <bg_api/reports.hpp>
+#include <bg_api/api.hpp>
+#include <bg_api/tools.hpp>
+#include <bg_api/pairslist.hpp>
+#include <bg_api/iofmt.hpp>
+#include <bg_api/dtf.hpp>
 
 #include <boost/format.hpp>
 
 #include <iostream> // TODO: comment out
 
-namespace binapi {
+namespace bg_api {
 
 /*************************************************************************************************/
 
@@ -49,7 +50,7 @@ using order_info_container_t = std::vector<rest::order_info_t>;
 
 /*************************************************************************************************/
 
-std::vector<std::string> get_symbols_of_nonempty_balances(const binapi::rest::account_info_t &accinfo) {
+std::vector<std::string> get_symbols_of_nonempty_balances(const bg_api::rest::account_info_t &accinfo) {
     std::vector<std::string> res;
 
     for ( const auto &it: accinfo.balances ) {
@@ -125,7 +126,7 @@ struct cycle_pair {
 };
 
 std::vector<cycle_pair> get_full_cycle_trades(
-     binapi::rest::api &api
+     bg_api::rest::api &api
     ,const trade_info_container_t &trades
     ,const std::function<void(const rest::order_info_t &)> &tick)
 {
@@ -215,7 +216,7 @@ void make_trades_report(
     ,const std::string &start_time_str)
 {
     // TODO: comment out
-    //binapi::io_state_saver saver(std::cout, 8, fmtflags);
+    //bg_api::io_state_saver saver(std::cout, 8, fmtflags);
 
     const auto mtime_from = start_time > 0
         ? start_time
@@ -372,14 +373,14 @@ rest::orders_info_t get_open_orders(
             : 0
     ;
 
-    binapi::rest::orders_info_t orders;
+    bg_api::rest::orders_info_t orders;
     if ( pairs.empty() ) {
         auto req = api.open_orders(nullptr);
         assert(req);
         orders = std::move(req.v);
     } else {
         for ( const auto &it: pairs ) {
-            auto tmp = binapi::process_pairs(it, "", exinfo);
+            auto tmp = bg_api::process_pairs(it, "", exinfo);
             for ( const auto &pit: tmp ) {
                 if ( tick ) { tick(pit); }
 
@@ -396,7 +397,7 @@ rest::orders_info_t get_open_orders(
     }
 
     if ( side ) {
-        binapi::rest::orders_info_t tmp;
+        bg_api::rest::orders_info_t tmp;
         for ( auto &pit: orders.orders ) {
             for ( auto &it: pit.second ) {
                 if ( it.side == side ) {
@@ -409,7 +410,7 @@ rest::orders_info_t get_open_orders(
     }
 
     if ( mstart_time ) {
-        binapi::rest::orders_info_t tmp;
+        bg_api::rest::orders_info_t tmp;
         for ( auto &pit: orders.orders ) {
             for ( auto &it: pit.second ) {
                 if ( it.time >= mstart_time ) {
@@ -428,17 +429,17 @@ rest::orders_info_t get_open_orders(
 
 void make_open_orders_resume(
      std::ostream &os
-    ,binapi::rest::orders_info_t &orders
-    ,const binapi::rest::exchange_info_t &exinfo)
+    ,bg_api::rest::orders_info_t &orders
+    ,const bg_api::rest::exchange_info_t &exinfo)
 {
-    binapi::double_type buy_total, sell_total;
+    bg_api::double_type buy_total, sell_total;
     for ( const auto &pit: orders.orders ) {
         os << pit.first << ":" << std::endl;
         const auto &sym = exinfo.get_by_symbol(pit.first);
 
         std::size_t buy_count{}, sell_count{};
-        binapi::double_type buy_for_pair, sell_for_pair;
-        binapi::double_type buy_amount, sell_amount;
+        bg_api::double_type buy_for_pair, sell_for_pair;
+        bg_api::double_type buy_amount, sell_amount;
         for ( const auto &oit: pit.second ) {
             if ( oit.side == "BUY" ) {
                 ++buy_count;
@@ -475,8 +476,8 @@ void make_open_orders_resume(
 
 void make_open_orders_detailed(
      std::ostream &os
-    ,binapi::rest::orders_info_t &orders
-    ,const binapi::rest::exchange_info_t &exinfo)
+    ,bg_api::rest::orders_info_t &orders
+    ,const bg_api::rest::exchange_info_t &exinfo)
 {
     (void)exinfo;
 
@@ -600,7 +601,7 @@ void show_exchanger_price_for_orders(
     );
 
     for ( const auto &it: out_items ) {
-        const auto price_prec = binapi::num_fractions_from_double_type(exinfo.get_by_symbol(it.pair).get_filter_price().tickSize);
+        const auto price_prec = bg_api::num_fractions_from_double_type(exinfo.get_by_symbol(it.pair).get_filter_price().tickSize);
         os
         << it.pair << ": " << it.exchanger_price.str(price_prec, iofmt) << ", "
         << percents_diff(prices.get_by_symbol(it.pair).price, it.order_price.front()).str(2, iofmt) << "% : ";
@@ -672,7 +673,7 @@ void calc_loss_for_orders(
     for ( const auto &it: out_items ) {
         total_loss += it.loss;
         const auto &sym = exinfo.get_by_symbol(it.pair);
-        const auto price_prec = binapi::num_fractions_from_double_type(exinfo.get_by_symbol(it.pair).get_filter_price().tickSize);
+        const auto price_prec = bg_api::num_fractions_from_double_type(exinfo.get_by_symbol(it.pair).get_filter_price().tickSize);
         os
         << it.pair << ": " << it.loss.str(price_prec, iofmt) << " " << sym.quoteAsset << std::endl;
     }
@@ -684,4 +685,4 @@ void calc_loss_for_orders(
 /*************************************************************************************************/
 /*************************************************************************************************/
 
-} // ns binapi
+} // ns bg_api

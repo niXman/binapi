@@ -4,13 +4,14 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#ifndef __binapi__api_hpp
-#define __binapi__api_hpp
+#ifndef __bg_api__api_hpp
+#define __bg_api__api_hpp
 
 #include "types.hpp"
 #include "enums.hpp"
@@ -26,7 +27,7 @@ class io_context;
 } // ns asio
 } // ns boost
 
-namespace binapi {
+namespace bg_api {
 namespace rest {
 
 /*************************************************************************************************/
@@ -54,7 +55,7 @@ struct api {
         ,std::string pk
         ,std::string sk
         ,std::size_t timeout
-        ,std::string client_api_string = "binapi-0.0.1"
+        ,std::string client_api_string = "bg_api-0.0.1"
     );
     virtual ~api();
 
@@ -359,6 +360,6 @@ private:
 /*************************************************************************************************/
 
 } // ns rest
-} // ns binapi
+} // ns bg_api
 
-#endif // __binapi__api_hpp
+#endif // __bg_api__api_hpp

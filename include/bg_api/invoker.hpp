@@ -4,13 +4,14 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#ifndef __binapi__invoker_hpp
-#define __binapi__invoker_hpp
+#ifndef __bg_api__invoker_hpp
+#define __bg_api__invoker_hpp
 
 #include <memory>
 #include <cstdint>
@@ -21,7 +22,7 @@
 #include "flatjson.hpp"
 #include "errors.hpp"
 
-namespace binapi {
+namespace bg_api {
 namespace detail {
 
 /*************************************************************************************************/
@@ -53,8 +54,8 @@ struct invoker: invoker_base {
                     return m_cb(__MAKE_FILELINE, json.error(), json.error_string(), std::move(arg));
                 }
 
-                if ( json.is_object() && binapi::rest::is_api_error(json) ) {
-                    auto error = binapi::rest::construct_error(json);
+                if ( json.is_object() && bg_api::rest::is_api_error(json) ) {
+                    auto error = bg_api::rest::construct_error(json);
                     T arg{};
                     return m_cb(__MAKE_FILELINE, error.first, std::move(error.second), std::move(arg));
                 } else {
@@ -77,6 +78,6 @@ struct invoker: invoker_base {
 /*************************************************************************************************/
 
 } // ns detail
-} // ns binapi
+} // ns bg_api
 
-#endif // __binapi__invoker_hpp
+#endif // __bg_api__invoker_hpp

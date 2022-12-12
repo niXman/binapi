@@ -4,17 +4,18 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/websocket.hpp>
-#include <binapi/types.hpp>
-#include <binapi/message.hpp>
-#include <binapi/fnv1a.hpp>
-#include <binapi/flatjson.hpp>
-#include <binapi/errors.hpp>
+#include <bg_api/websocket.hpp>
+#include <bg_api/types.hpp>
+#include <bg_api/message.hpp>
+#include <bg_api/fnv1a.hpp>
+#include <bg_api/flatjson.hpp>
+#include <bg_api/errors.hpp>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/connect.hpp>
@@ -36,10 +37,10 @@
 
 //#include <iostream> // TODO: comment out
 
-#define __BINAPI_CB_ON_ERROR(cb, ec) \
+#define __bg_api_CB_ON_ERROR(cb, ec) \
     cb(__FILE__ "(" BOOST_PP_STRINGIZE(__LINE__) ")", ec.value(), ec.message(), nullptr, 0);
 
-namespace binapi {
+namespace bg_api {
 namespace ws {
 
 struct websockets;
@@ -102,7 +103,7 @@ private:
             ,[this, cb=std::move(cb), holder=std::move(holder)]
              (boost::system::error_code ec, boost::asio::ip::tcp::resolver::results_type res) mutable {
                 if ( ec ) {
-                    if ( !m_stop_requested ) { __BINAPI_CB_ON_ERROR(cb, ec); }
+                    if ( !m_stop_requested ) { __bg_api_CB_ON_ERROR(cb, ec); }
                 } else {
                     async_connect(std::move(res), std::move(cb), std::move(holder));
                 }
@@ -116,7 +117,7 @@ private:
                 ,boost::asio::error::get_ssl_category()
             );
 
-            __BINAPI_CB_ON_ERROR(cb, error_code);
+            __bg_api_CB_ON_ERROR(cb, error_code);
 
             return;
         }
@@ -128,7 +129,7 @@ private:
             ,[this, cb=std::move(cb), holder=std::move(holder)]
              (boost::system::error_code ec, boost::asio::ip::tcp::resolver::iterator) mutable {
                 if ( ec ) {
-                    if ( !m_stop_requested ) { __BINAPI_CB_ON_ERROR(cb, ec); }
+                    if ( !m_stop_requested ) { __bg_api_CB_ON_ERROR(cb, ec); }
                 } else {
                     on_connected(std::move(cb), std::move(holder));
                 }
@@ -154,7 +155,7 @@ private:
             ,[this, cb=std::move(cb), holder=std::move(holder)]
              (boost::system::error_code ec) mutable {
                 if ( ec ) {
-                    if ( !m_stop_requested ) { __BINAPI_CB_ON_ERROR(cb, ec); }
+                    if ( !m_stop_requested ) { __bg_api_CB_ON_ERROR(cb, ec); }
                 } else {
                     on_async_ssl_handshake(std::move(cb), std::move(holder));
                 }
@@ -174,7 +175,7 @@ private:
     void start_read(boost::system::error_code ec, on_message_received_cb cb, holder_type holder) {
         if ( ec ) {
             if ( !m_stop_requested ) {
-                __BINAPI_CB_ON_ERROR(cb, ec);
+                __bg_api_CB_ON_ERROR(cb, ec);
             }
 
             stop();
@@ -192,7 +193,7 @@ private:
     void on_read(boost::system::error_code ec, std::size_t rd, on_message_received_cb cb, holder_type holder) {
         if ( ec ) {
             if ( !m_stop_requested ) {
-                __BINAPI_CB_ON_ERROR(cb, ec);
+                __bg_api_CB_ON_ERROR(cb, ec);
             }
 
             stop();
@@ -298,8 +299,8 @@ struct websockets::impl {
             }
 
             const flatjson::fjson json{ptr, size};
-            if ( json.is_object() && binapi::rest::is_api_error(json) ) {
-                auto error = binapi::rest::construct_error(json);
+            if ( json.is_object() && bg_api::rest::is_api_error(json) ) {
+                auto error = bg_api::rest::construct_error(json);
                 auto ecode = error.first;
                 auto emsg  = std::move(error.second);
 
@@ -560,4 +561,4 @@ void websockets::async_unsubscribe_all() { return pimpl->async_unsubscribe_all()
 /*************************************************************************************************/
 
 } // ns ws
-} // ns binapi
+} // ns bg_api

@@ -4,20 +4,21 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/tools.hpp>
-#include <binapi/pairslist.hpp>
+#include <bg_api/tools.hpp>
+#include <bg_api/pairslist.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-namespace binapi {
+namespace bg_api {
 
 /*************************************************************************************************/
 
@@ -117,4 +118,4 @@ bool is_my_orderid(const std::string &client_order_id) {
 
 /*************************************************************************************************/
 
-} // ns binapi
+} // ns bg_api

@@ -4,13 +4,14 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#ifndef __binapi__types_hpp
-#define __binapi__types_hpp
+#ifndef __bg_api__types_hpp
+#define __bg_api__types_hpp
 
 #include "double_type.hpp"
 #include "enums.hpp"
@@ -28,7 +29,7 @@ namespace flatjson {
 struct fjson;
 } // ns flatjson
 
-namespace binapi {
+namespace bg_api {
 
 /*************************************************************************************************/
 
@@ -955,6 +956,6 @@ struct userdata_stream_t {
 /*************************************************************************************************/
 /*************************************************************************************************/
 
-} // ns binapi
+} // ns bg_api
 
-#endif // __binapi__types_hpp
+#endif // __bg_api__types_hpp

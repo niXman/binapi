@@ -4,20 +4,21 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/types.hpp>
-#include <binapi/flatjson.hpp>
-#include <binapi/fnv1a.hpp>
+#include <bg_api/types.hpp>
+#include <bg_api/flatjson.hpp>
+#include <bg_api/fnv1a.hpp>
 
 #include <type_traits>
 
 //#include <iostream> // TODO: comment out
 
-namespace binapi {
+namespace bg_api {
 
 /*************************************************************************************************/
 
@@ -40,10 +41,10 @@ __get_json(T &v, const char *member, const flatjson::fjson &j) {
     v.assign(j.at(member).to_string());
 }
 
-#define __BINAPI_GET2(obj, member, json) \
+#define __bg_api_GET2(obj, member, json) \
     __get_json(obj.member, #member, json)
 
-#define __BINAPI_GET(member) __BINAPI_GET2(res, member, json)
+#define __bg_api_GET(member) __bg_api_GET2(res, member, json)
 
 /*************************************************************************************************/
 
@@ -78,7 +79,7 @@ server_time_t server_time_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     server_time_t res{};
-    __BINAPI_GET(serverTime);
+    __bg_api_GET(serverTime);
 
     return res;
 }
@@ -98,8 +99,8 @@ avg_price_t avg_price_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     avg_price_t res{};
-    __BINAPI_GET(mins);
-    __BINAPI_GET(price);
+    __bg_api_GET(mins);
+    __bg_api_GET(price);
 
     return res;
 }
@@ -120,8 +121,8 @@ prices_t::price_t prices_t::price_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     prices_t::price_t res{};
-    __BINAPI_GET(symbol);
-    __BINAPI_GET(price);
+    __bg_api_GET(symbol);
+    __bg_api_GET(price);
 
     return res;
 }
@@ -147,8 +148,8 @@ prices_t prices_t::construct(const flatjson::fjson &json) {
         const auto it = json[idx];
         prices_t::price_t item{};
 
-        __BINAPI_GET2(item, symbol, it);
-        __BINAPI_GET2(item, price, it);
+        __bg_api_GET2(item, symbol, it);
+        __bg_api_GET2(item, price, it);
 
         std::string symbol = item.symbol;
         res.prices.emplace(std::move(symbol), std::move(item));
@@ -193,25 +194,25 @@ _24hrs_tickers_t::_24hrs_ticker_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     _24hrs_tickers_t::_24hrs_ticker_t res{};
-    __BINAPI_GET(symbol);
-    __BINAPI_GET(priceChange);
-    __BINAPI_GET(priceChangePercent);
-    __BINAPI_GET(weightedAvgPrice);
-    __BINAPI_GET(prevClosePrice);
-    __BINAPI_GET(lastPrice);
-    __BINAPI_GET(lastQty);
-    __BINAPI_GET(bidPrice);
-    __BINAPI_GET(askPrice);
-    __BINAPI_GET(openPrice);
-    __BINAPI_GET(highPrice);
-    __BINAPI_GET(lowPrice);
-    __BINAPI_GET(volume);
-    __BINAPI_GET(quoteVolume);
-    __BINAPI_GET(openTime);
-    __BINAPI_GET(closeTime);
-    __BINAPI_GET(firstId);
-    __BINAPI_GET(lastId);
-    __BINAPI_GET(count);
+    __bg_api_GET(symbol);
+    __bg_api_GET(priceChange);
+    __bg_api_GET(priceChangePercent);
+    __bg_api_GET(weightedAvgPrice);
+    __bg_api_GET(prevClosePrice);
+    __bg_api_GET(lastPrice);
+    __bg_api_GET(lastQty);
+    __bg_api_GET(bidPrice);
+    __bg_api_GET(askPrice);
+    __bg_api_GET(openPrice);
+    __bg_api_GET(highPrice);
+    __bg_api_GET(lowPrice);
+    __bg_api_GET(volume);
+    __bg_api_GET(quoteVolume);
+    __bg_api_GET(openTime);
+    __bg_api_GET(closeTime);
+    __bg_api_GET(firstId);
+    __bg_api_GET(lastId);
+    __bg_api_GET(count);
 
     return res;
 }
@@ -300,22 +301,22 @@ account_info_t account_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     account_info_t res{};
-    __BINAPI_GET(makerCommission);
-    __BINAPI_GET(takerCommission);
-    __BINAPI_GET(buyerCommission);
-    __BINAPI_GET(sellerCommission);
-    __BINAPI_GET(canTrade);
-    __BINAPI_GET(canWithdraw);
-    __BINAPI_GET(canDeposit);
-    __BINAPI_GET(updateTime);
+    __bg_api_GET(makerCommission);
+    __bg_api_GET(takerCommission);
+    __bg_api_GET(buyerCommission);
+    __bg_api_GET(sellerCommission);
+    __bg_api_GET(canTrade);
+    __bg_api_GET(canWithdraw);
+    __bg_api_GET(canDeposit);
+    __bg_api_GET(updateTime);
     const auto arr = json.at("balances");
     assert(arr.is_array());
     for ( auto idx = 0u; idx < arr.size(); ++idx ) {
         account_info_t::balance_t item{};
         const auto it = arr.at(idx);
-        __BINAPI_GET2(item, asset, it);
-        __BINAPI_GET2(item, free, it);
-        __BINAPI_GET2(item, locked, it);
+        __bg_api_GET2(item, asset, it);
+        __bg_api_GET2(item, free, it);
+        __bg_api_GET2(item, locked, it);
 
         std::string symbol = item.asset;
         res.balances.emplace(std::move(symbol), std::move(item));
@@ -573,8 +574,8 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     exchange_info_t res{};
-    __BINAPI_GET(timezone);
-    __BINAPI_GET(serverTime);
+    __bg_api_GET(timezone);
+    __bg_api_GET(serverTime);
 
     const auto filters = json.at("exchangeFilters");
     assert(filters.is_array());
@@ -588,9 +589,9 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
     for ( auto idx = 0u; idx < limits.size(); ++idx ) {
         exchange_info_t::rate_limit_t item{};
         const auto it = limits.at(idx);
-        __BINAPI_GET2(item, rateLimitType, it);
-        __BINAPI_GET2(item, interval, it);
-        __BINAPI_GET2(item, limit, it);
+        __bg_api_GET2(item, rateLimitType, it);
+        __bg_api_GET2(item, interval, it);
+        __bg_api_GET2(item, limit, it);
 
         res.rateLimits.push_back(std::move(item));
     }
@@ -600,13 +601,13 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
     for ( auto idx = 0u; idx < symbols.size(); ++idx ) {
         exchange_info_t::symbol_t sym{};
         const auto sit = symbols.at(idx);
-        __BINAPI_GET2(sym, symbol, sit);
-        __BINAPI_GET2(sym, status, sit);
-        __BINAPI_GET2(sym, baseAsset, sit);
-        __BINAPI_GET2(sym, baseAssetPrecision, sit);
-        __BINAPI_GET2(sym, quoteAsset, sit);
-        __BINAPI_GET2(sym, quotePrecision, sit);
-        __BINAPI_GET2(sym, icebergAllowed, sit);
+        __bg_api_GET2(sym, symbol, sit);
+        __bg_api_GET2(sym, status, sit);
+        __bg_api_GET2(sym, baseAsset, sit);
+        __bg_api_GET2(sym, baseAssetPrecision, sit);
+        __bg_api_GET2(sym, quoteAsset, sit);
+        __bg_api_GET2(sym, quotePrecision, sit);
+        __bg_api_GET2(sym, icebergAllowed, sit);
         const auto types = sit.at("orderTypes");
         assert(types.is_array());
         for ( auto idx2 = 0u; idx2 < types.size(); ++idx2 ) {
@@ -619,98 +620,98 @@ exchange_info_t exchange_info_t::construct(const flatjson::fjson &json) {
         for ( auto idx2 = 0u; idx2 < filters2.size(); ++idx2 ) {
             exchange_info_t::symbol_t::filter_t filter{};
             const auto fit = filters2.at(idx2);
-            __BINAPI_GET2(filter, filterType, fit);
+            __bg_api_GET2(filter, filterType, fit);
 
             const auto filter_hash = fnv1a(filter.filterType.c_str(), filter.filterType.size());
             switch ( filter_hash ) {
                 case fnv1a("PRICE_FILTER"): {
                     exchange_info_t::symbol_t::filter_t::price_t item{};
-                    __BINAPI_GET2(item, minPrice, fit);
-                    __BINAPI_GET2(item, maxPrice, fit);
-                    __BINAPI_GET2(item, tickSize, fit);
+                    __bg_api_GET2(item, minPrice, fit);
+                    __bg_api_GET2(item, maxPrice, fit);
+                    __bg_api_GET2(item, tickSize, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("PERCENT_PRICE"): {
                     exchange_info_t::symbol_t::filter_t::percent_price_t item{};
-                    __BINAPI_GET2(item, multiplierUp, fit);
-                    __BINAPI_GET2(item, multiplierDown, fit);
-                    __BINAPI_GET2(item, avgPriceMins, fit);
+                    __bg_api_GET2(item, multiplierUp, fit);
+                    __bg_api_GET2(item, multiplierDown, fit);
+                    __bg_api_GET2(item, avgPriceMins, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("PERCENT_PRICE_BY_SIDE"): {
                     exchange_info_t::symbol_t::filter_t::percent_price_by_side_t item{};
-                    __BINAPI_GET2(item, bidMultiplierUp, fit);
-                    __BINAPI_GET2(item, bidMultiplierDown, fit);
-                    __BINAPI_GET2(item, askMultiplierUp, fit);
-                    __BINAPI_GET2(item, askMultiplierDown, fit);
-                    __BINAPI_GET2(item, avgPriceMins, fit);
+                    __bg_api_GET2(item, bidMultiplierUp, fit);
+                    __bg_api_GET2(item, bidMultiplierDown, fit);
+                    __bg_api_GET2(item, askMultiplierUp, fit);
+                    __bg_api_GET2(item, askMultiplierDown, fit);
+                    __bg_api_GET2(item, avgPriceMins, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("LOT_SIZE"): {
                     exchange_info_t::symbol_t::filter_t::lot_size_t item{};
-                    __BINAPI_GET2(item, minQty, fit);
-                    __BINAPI_GET2(item, maxQty, fit);
-                    __BINAPI_GET2(item, stepSize, fit);
+                    __bg_api_GET2(item, minQty, fit);
+                    __bg_api_GET2(item, maxQty, fit);
+                    __bg_api_GET2(item, stepSize, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("MARKET_LOT_SIZE"): {
                     exchange_info_t::symbol_t::filter_t::market_lot_size_t item{};
-                    __BINAPI_GET2(item, minQty, fit);
-                    __BINAPI_GET2(item, maxQty, fit);
-                    __BINAPI_GET2(item, stepSize, fit);
+                    __bg_api_GET2(item, minQty, fit);
+                    __bg_api_GET2(item, maxQty, fit);
+                    __bg_api_GET2(item, stepSize, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("MIN_NOTIONAL"): {
                     exchange_info_t::symbol_t::filter_t::min_notional_t item{};
-                    __BINAPI_GET2(item, minNotional, fit);
+                    __bg_api_GET2(item, minNotional, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("ICEBERG_PARTS"): {
                     exchange_info_t::symbol_t::filter_t::iceberg_parts_t item{};
-                    __BINAPI_GET2(item, limit, fit);
+                    __bg_api_GET2(item, limit, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("MAX_NUM_ORDERS"): {
                     exchange_info_t::symbol_t::filter_t::max_num_orders_t item{};
-                    __BINAPI_GET2(item, maxNumOrders, fit);
+                    __bg_api_GET2(item, maxNumOrders, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("MAX_NUM_ALGO_ORDERS"): {
                     exchange_info_t::symbol_t::filter_t::max_num_algo_orders_t item{};
-                    __BINAPI_GET2(item, maxNumAlgoOrders, fit);
+                    __bg_api_GET2(item, maxNumAlgoOrders, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("MAX_POSITION"): {
                     exchange_info_t::symbol_t::filter_t::max_position_t item{};
-                    __BINAPI_GET2(item, maxPosition, fit);
+                    __bg_api_GET2(item, maxPosition, fit);
                     filter.filter = std::move(item);
 
                     break;
                 }
                 case fnv1a("TRAILING_DELTA"): {
                     exchange_info_t::symbol_t::filter_t::trailing_delta_t item{};
-                    __BINAPI_GET2(item, minTrailingAboveDelta, fit);
-                    __BINAPI_GET2(item, maxTrailingAboveDelta, fit);
-                    __BINAPI_GET2(item, minTrailingBelowDelta, fit);
-                    __BINAPI_GET2(item, maxTrailingBelowDelta, fit);
+                    __bg_api_GET2(item, minTrailingAboveDelta, fit);
+                    __bg_api_GET2(item, maxTrailingAboveDelta, fit);
+                    __bg_api_GET2(item, minTrailingBelowDelta, fit);
+                    __bg_api_GET2(item, maxTrailingBelowDelta, fit);
                     filter.filter = std::move(item);
 
                     break;
@@ -782,7 +783,7 @@ depths_t depths_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     depths_t res{};
-    __BINAPI_GET(lastUpdateId);
+    __bg_api_GET(lastUpdateId);
 
     const auto bids = json.at("bids");
     assert(bids.is_array());
@@ -843,12 +844,12 @@ trades_t::trade_t trades_t::trade_t::construct(const flatjson::fjson &json) {
 
     trades_t::trade_t res{};
     const auto it = json.at(0);
-    __BINAPI_GET2(res, id, it);
-    __BINAPI_GET2(res, price, it);
-    __BINAPI_GET2(res, qty, it);
-    __BINAPI_GET2(res, time, it);
-    __BINAPI_GET2(res, isBuyerMaker, it);
-    __BINAPI_GET2(res, isBestMatch, it);
+    __bg_api_GET2(res, id, it);
+    __bg_api_GET2(res, price, it);
+    __bg_api_GET2(res, qty, it);
+    __bg_api_GET2(res, time, it);
+    __bg_api_GET2(res, isBuyerMaker, it);
+    __bg_api_GET2(res, isBestMatch, it);
 
     return res;
 }
@@ -874,12 +875,12 @@ trades_t trades_t::construct(const flatjson::fjson &json) {
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
         trades_t::trade_t item{};
         const auto it = json.at(idx);
-        __BINAPI_GET2(item, id, it);
-        __BINAPI_GET2(item, price, it);
-        __BINAPI_GET2(item, qty, it);
-        __BINAPI_GET2(item, time, it);
-        __BINAPI_GET2(item, isBuyerMaker, it);
-        __BINAPI_GET2(item, isBestMatch, it);
+        __bg_api_GET2(item, id, it);
+        __bg_api_GET2(item, price, it);
+        __bg_api_GET2(item, qty, it);
+        __bg_api_GET2(item, time, it);
+        __bg_api_GET2(item, isBuyerMaker, it);
+        __bg_api_GET2(item, isBestMatch, it);
 
         res.trades.push_back(std::move(item));
     }
@@ -1044,22 +1045,22 @@ order_info_t order_info_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     order_info_t res{};
-    __BINAPI_GET(symbol);
-    __BINAPI_GET(orderId);
-    __BINAPI_GET(clientOrderId);
-    __BINAPI_GET(price);
-    __BINAPI_GET(origQty);
-    __BINAPI_GET(executedQty);
-    __BINAPI_GET(cummulativeQuoteQty);
-    __BINAPI_GET(status);
-    __BINAPI_GET(timeInForce);
-    __BINAPI_GET(type);
-    __BINAPI_GET(side);
-    __BINAPI_GET(stopPrice);
-    __BINAPI_GET(icebergQty);
-    __BINAPI_GET(time);
-    __BINAPI_GET(updateTime);
-    __BINAPI_GET(isWorking);
+    __bg_api_GET(symbol);
+    __bg_api_GET(orderId);
+    __bg_api_GET(clientOrderId);
+    __bg_api_GET(price);
+    __bg_api_GET(origQty);
+    __bg_api_GET(executedQty);
+    __bg_api_GET(cummulativeQuoteQty);
+    __bg_api_GET(status);
+    __bg_api_GET(timeInForce);
+    __bg_api_GET(type);
+    __bg_api_GET(side);
+    __bg_api_GET(stopPrice);
+    __bg_api_GET(icebergQty);
+    __bg_api_GET(time);
+    __bg_api_GET(updateTime);
+    __bg_api_GET(isWorking);
 
     return res;
 }
@@ -1097,22 +1098,22 @@ orders_info_t orders_info_t::construct(const flatjson::fjson &json) {
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
         order_info_t item{};
         const auto it = json.at(idx);
-        __BINAPI_GET2(item, symbol, it);
-        __BINAPI_GET2(item, orderId, it);
-        __BINAPI_GET2(item, clientOrderId, it);
-        __BINAPI_GET2(item, price, it);
-        __BINAPI_GET2(item, origQty, it);
-        __BINAPI_GET2(item, executedQty, it);
-        __BINAPI_GET2(item, cummulativeQuoteQty, it);
-        __BINAPI_GET2(item, status, it);
-        __BINAPI_GET2(item, timeInForce, it);
-        __BINAPI_GET2(item, type, it);
-        __BINAPI_GET2(item, side, it);
-        __BINAPI_GET2(item, stopPrice, it);
-        __BINAPI_GET2(item, icebergQty, it);
-        __BINAPI_GET2(item, time, it);
-        __BINAPI_GET2(item, updateTime, it);
-        __BINAPI_GET2(item, isWorking, it);
+        __bg_api_GET2(item, symbol, it);
+        __bg_api_GET2(item, orderId, it);
+        __bg_api_GET2(item, clientOrderId, it);
+        __bg_api_GET2(item, price, it);
+        __bg_api_GET2(item, origQty, it);
+        __bg_api_GET2(item, executedQty, it);
+        __bg_api_GET2(item, cummulativeQuoteQty, it);
+        __bg_api_GET2(item, status, it);
+        __bg_api_GET2(item, timeInForce, it);
+        __bg_api_GET2(item, type, it);
+        __bg_api_GET2(item, side, it);
+        __bg_api_GET2(item, stopPrice, it);
+        __bg_api_GET2(item, icebergQty, it);
+        __bg_api_GET2(item, time, it);
+        __bg_api_GET2(item, updateTime, it);
+        __bg_api_GET2(item, isWorking, it);
 
         res.orders[item.symbol].push_back(std::move(item));
     }
@@ -1143,10 +1144,10 @@ new_order_info_ack_t new_order_info_ack_t::construct(const flatjson::fjson &json
     assert(json.is_valid());
 
     new_order_info_ack_t res{};
-    __BINAPI_GET(symbol);
-    __BINAPI_GET(orderId);
-    __BINAPI_GET(clientOrderId);
-    __BINAPI_GET(transactTime);
+    __bg_api_GET(symbol);
+    __bg_api_GET(orderId);
+    __bg_api_GET(clientOrderId);
+    __bg_api_GET(transactTime);
 
     return res;
 }
@@ -1166,18 +1167,18 @@ new_order_info_result_t new_order_info_result_t::construct(const flatjson::fjson
     assert(json.is_valid());
 
     new_order_info_result_t res{};
-    __BINAPI_GET(symbol);
-    __BINAPI_GET(orderId);
-    __BINAPI_GET(clientOrderId);
-    __BINAPI_GET(transactTime);
-    __BINAPI_GET(price);
-    __BINAPI_GET(origQty);
-    __BINAPI_GET(executedQty);
-    __BINAPI_GET(cummulativeQuoteQty);
-    __BINAPI_GET(status);
-    __BINAPI_GET(timeInForce);
-    __BINAPI_GET(type);
-    __BINAPI_GET(side);
+    __bg_api_GET(symbol);
+    __bg_api_GET(orderId);
+    __bg_api_GET(clientOrderId);
+    __bg_api_GET(transactTime);
+    __bg_api_GET(price);
+    __bg_api_GET(origQty);
+    __bg_api_GET(executedQty);
+    __bg_api_GET(cummulativeQuoteQty);
+    __bg_api_GET(status);
+    __bg_api_GET(timeInForce);
+    __bg_api_GET(type);
+    __bg_api_GET(side);
 
     return res;
 }
@@ -1241,26 +1242,26 @@ new_order_info_full_t new_order_info_full_t::construct(const flatjson::fjson &js
     assert(json.is_valid());
 
     new_order_info_full_t res{};
-    __BINAPI_GET(symbol);
-    __BINAPI_GET(orderId);
-    __BINAPI_GET(clientOrderId);
-    __BINAPI_GET(transactTime);
-    __BINAPI_GET(price);
-    __BINAPI_GET(origQty);
-    __BINAPI_GET(executedQty);
-    __BINAPI_GET(cummulativeQuoteQty);
-    __BINAPI_GET(status);
-    __BINAPI_GET(timeInForce);
-    __BINAPI_GET(type);
-    __BINAPI_GET(side);
+    __bg_api_GET(symbol);
+    __bg_api_GET(orderId);
+    __bg_api_GET(clientOrderId);
+    __bg_api_GET(transactTime);
+    __bg_api_GET(price);
+    __bg_api_GET(origQty);
+    __bg_api_GET(executedQty);
+    __bg_api_GET(cummulativeQuoteQty);
+    __bg_api_GET(status);
+    __bg_api_GET(timeInForce);
+    __bg_api_GET(type);
+    __bg_api_GET(side);
     const auto fills = json.at("fills");
     for ( auto idx = 0u; idx < fills.size(); ++idx ) {
         new_order_info_full_t::fill_part item{};
         const auto it = fills.at(idx);
-        __BINAPI_GET2(item, price, it);
-        __BINAPI_GET2(item, qty, it);
-        __BINAPI_GET2(item, commission, it);
-        __BINAPI_GET2(item, commissionAsset, it);
+        __bg_api_GET2(item, price, it);
+        __bg_api_GET2(item, qty, it);
+        __bg_api_GET2(item, commission, it);
+        __bg_api_GET2(item, commissionAsset, it);
 
         res.fills.push_back(std::move(item));
     }
@@ -1365,18 +1366,18 @@ cancel_order_info_t cancel_order_info_t::construct(const flatjson::fjson &json) 
     assert(json.is_valid());
 
     cancel_order_info_t res{};
-    __BINAPI_GET(symbol);
-    __BINAPI_GET(orderId);
-    __BINAPI_GET(origClientOrderId);
-    __BINAPI_GET(clientOrderId);
-    __BINAPI_GET(price);
-    __BINAPI_GET(origQty);
-    __BINAPI_GET(executedQty);
-    __BINAPI_GET(cummulativeQuoteQty);
-    __BINAPI_GET(status);
-    __BINAPI_GET(timeInForce);
-    __BINAPI_GET(type);
-    __BINAPI_GET(side);
+    __bg_api_GET(symbol);
+    __bg_api_GET(orderId);
+    __bg_api_GET(origClientOrderId);
+    __bg_api_GET(clientOrderId);
+    __bg_api_GET(price);
+    __bg_api_GET(origQty);
+    __bg_api_GET(executedQty);
+    __bg_api_GET(cummulativeQuoteQty);
+    __bg_api_GET(status);
+    __bg_api_GET(timeInForce);
+    __bg_api_GET(type);
+    __bg_api_GET(side);
 
     return res;
 }
@@ -1405,17 +1406,17 @@ std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o) {
 
 my_trades_info_t::my_trade_info_t my_trades_info_t::my_trade_info_t::construct(const flatjson::fjson &json) {
     my_trade_info_t res{};
-    __BINAPI_GET(symbol);
-    __BINAPI_GET(id);
-    __BINAPI_GET(orderId);
-    __BINAPI_GET(price);
-    __BINAPI_GET(qty);
-    __BINAPI_GET(commission);
-    __BINAPI_GET(commissionAsset);
-    __BINAPI_GET(time);
-    __BINAPI_GET(isBuyer);
-    __BINAPI_GET(isMaker);
-    __BINAPI_GET(isBestMatch);
+    __bg_api_GET(symbol);
+    __bg_api_GET(id);
+    __bg_api_GET(orderId);
+    __bg_api_GET(price);
+    __bg_api_GET(qty);
+    __bg_api_GET(commission);
+    __bg_api_GET(commissionAsset);
+    __bg_api_GET(time);
+    __bg_api_GET(isBuyer);
+    __bg_api_GET(isMaker);
+    __bg_api_GET(isBestMatch);
 
     return res;
 }
@@ -1475,7 +1476,7 @@ start_user_data_stream_t start_user_data_stream_t::construct(const flatjson::fjs
     assert(json.is_valid());
 
     start_user_data_stream_t res{};
-    __BINAPI_GET(listenKey);
+    __bg_api_GET(listenKey);
 
     return res;
 }
@@ -1541,17 +1542,17 @@ agg_trade_t agg_trade_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     agg_trade_t res{};
-    __BINAPI_GET(e);
-    __BINAPI_GET(E);
-    __BINAPI_GET(s);
-    __BINAPI_GET(a);
-    __BINAPI_GET(p);
-    __BINAPI_GET(q);
-    __BINAPI_GET(f);
-    __BINAPI_GET(l);
-    __BINAPI_GET(T);
-    __BINAPI_GET(m);
-    __BINAPI_GET(M);
+    __bg_api_GET(e);
+    __bg_api_GET(E);
+    __bg_api_GET(s);
+    __bg_api_GET(a);
+    __bg_api_GET(p);
+    __bg_api_GET(q);
+    __bg_api_GET(f);
+    __bg_api_GET(l);
+    __bg_api_GET(T);
+    __bg_api_GET(m);
+    __bg_api_GET(M);
 
     return res;
 }
@@ -1581,16 +1582,16 @@ trade_t trade_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     trade_t res{};
-    __BINAPI_GET(E);
-    __BINAPI_GET(s);
-    __BINAPI_GET(t);
-    __BINAPI_GET(p);
-    __BINAPI_GET(q);
-    __BINAPI_GET(b);
-    __BINAPI_GET(a);
-    __BINAPI_GET(T);
-    __BINAPI_GET(m);
-    __BINAPI_GET(M);
+    __bg_api_GET(E);
+    __bg_api_GET(s);
+    __bg_api_GET(t);
+    __bg_api_GET(p);
+    __bg_api_GET(q);
+    __bg_api_GET(b);
+    __bg_api_GET(a);
+    __bg_api_GET(T);
+    __bg_api_GET(m);
+    __bg_api_GET(M);
 
     return res;
 }
@@ -1684,10 +1685,10 @@ diff_depths_t diff_depths_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     diff_depths_t res{};
-    __BINAPI_GET(E);
-    __BINAPI_GET(s);
-    __BINAPI_GET(u);
-    __BINAPI_GET(U);
+    __bg_api_GET(E);
+    __bg_api_GET(s);
+    __bg_api_GET(u);
+    __bg_api_GET(U);
     const auto a = json.at("a");
     for ( auto idx = 0u; idx < a.size(); ++idx ) {
         diff_depths_t::depth_t item{};
@@ -1745,25 +1746,25 @@ kline_t kline_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     kline_t res{};
-    __BINAPI_GET(E);
-    __BINAPI_GET(s);
+    __bg_api_GET(E);
+    __bg_api_GET(s);
 
     const auto k = json.at("k");
-    __BINAPI_GET2(res, t, k);
-    __BINAPI_GET2(res, T, k);
-    __BINAPI_GET2(res, i, k);
-    __BINAPI_GET2(res, f, k);
-    __BINAPI_GET2(res, L, k);
-    __BINAPI_GET2(res, o, k);
-    __BINAPI_GET2(res, c, k);
-    __BINAPI_GET2(res, h, k);
-    __BINAPI_GET2(res, l, k);
-    __BINAPI_GET2(res, v, k);
-    __BINAPI_GET2(res, n, k);
-    __BINAPI_GET2(res, x, k);
-    __BINAPI_GET2(res, q, k);
-    __BINAPI_GET2(res, V, k);
-    __BINAPI_GET2(res, Q, k);
+    __bg_api_GET2(res, t, k);
+    __bg_api_GET2(res, T, k);
+    __bg_api_GET2(res, i, k);
+    __bg_api_GET2(res, f, k);
+    __bg_api_GET2(res, L, k);
+    __bg_api_GET2(res, o, k);
+    __bg_api_GET2(res, c, k);
+    __bg_api_GET2(res, h, k);
+    __bg_api_GET2(res, l, k);
+    __bg_api_GET2(res, v, k);
+    __bg_api_GET2(res, n, k);
+    __bg_api_GET2(res, x, k);
+    __bg_api_GET2(res, q, k);
+    __bg_api_GET2(res, V, k);
+    __bg_api_GET2(res, Q, k);
 
     return res;
 }
@@ -1814,14 +1815,14 @@ std::ostream& ohlc(std::ostream &os, const kline_t &o) {
 
 mini_ticker_t mini_ticker_t::construct(const flatjson::fjson &json) {
     mini_ticker_t res{};
-    __BINAPI_GET(E);
-    __BINAPI_GET(s);
-    __BINAPI_GET(c);
-    __BINAPI_GET(o);
-    __BINAPI_GET(h);
-    __BINAPI_GET(l);
-    __BINAPI_GET(v);
-    __BINAPI_GET(q);
+    __bg_api_GET(E);
+    __bg_api_GET(s);
+    __bg_api_GET(c);
+    __bg_api_GET(o);
+    __bg_api_GET(h);
+    __bg_api_GET(l);
+    __bg_api_GET(v);
+    __bg_api_GET(q);
 
     return res;
 }
@@ -1873,28 +1874,28 @@ std::ostream& operator<<(std::ostream &os, const mini_tickers_t &o) {
 
 market_ticker_t market_ticker_t::construct(const flatjson::fjson &json) {
     market_ticker_t res{};
-    __BINAPI_GET(E);
-    __BINAPI_GET(s);
-    __BINAPI_GET(p);
-    __BINAPI_GET(P);
-    __BINAPI_GET(w);
-    __BINAPI_GET(x);
-    __BINAPI_GET(c);
-    __BINAPI_GET(Q);
-    __BINAPI_GET(b);
-    __BINAPI_GET(B);
-    __BINAPI_GET(a);
-    __BINAPI_GET(A);
-    __BINAPI_GET(o);
-    __BINAPI_GET(h);
-    __BINAPI_GET(l);
-    __BINAPI_GET(v);
-    __BINAPI_GET(q);
-    __BINAPI_GET(O);
-    __BINAPI_GET(C);
-    __BINAPI_GET(F);
-    __BINAPI_GET(L);
-    __BINAPI_GET(n);
+    __bg_api_GET(E);
+    __bg_api_GET(s);
+    __bg_api_GET(p);
+    __bg_api_GET(P);
+    __bg_api_GET(w);
+    __bg_api_GET(x);
+    __bg_api_GET(c);
+    __bg_api_GET(Q);
+    __bg_api_GET(b);
+    __bg_api_GET(B);
+    __bg_api_GET(a);
+    __bg_api_GET(A);
+    __bg_api_GET(o);
+    __bg_api_GET(h);
+    __bg_api_GET(l);
+    __bg_api_GET(v);
+    __bg_api_GET(q);
+    __bg_api_GET(O);
+    __bg_api_GET(C);
+    __bg_api_GET(F);
+    __bg_api_GET(L);
+    __bg_api_GET(n);
 
     return res;
 }
@@ -1938,28 +1939,28 @@ markets_tickers_t markets_tickers_t::construct(const flatjson::fjson &json) {
     for ( auto idx = 0u; idx < json.size(); ++idx ) {
         market_ticker_t item{};
         const auto it = json.at(idx);
-        __BINAPI_GET2(item, E, it);
-        __BINAPI_GET2(item, s, it);
-        __BINAPI_GET2(item, p, it);
-        __BINAPI_GET2(item, P, it);
-        __BINAPI_GET2(item, w, it);
-        __BINAPI_GET2(item, x, it);
-        __BINAPI_GET2(item, c, it);
-        __BINAPI_GET2(item, Q, it);
-        __BINAPI_GET2(item, b, it);
-        __BINAPI_GET2(item, B, it);
-        __BINAPI_GET2(item, a, it);
-        __BINAPI_GET2(item, A, it);
-        __BINAPI_GET2(item, o, it);
-        __BINAPI_GET2(item, h, it);
-        __BINAPI_GET2(item, l, it);
-        __BINAPI_GET2(item, v, it);
-        __BINAPI_GET2(item, q, it);
-        __BINAPI_GET2(item, O, it);
-        __BINAPI_GET2(item, C, it);
-        __BINAPI_GET2(item, F, it);
-        __BINAPI_GET2(item, L, it);
-        __BINAPI_GET2(item, n, it);
+        __bg_api_GET2(item, E, it);
+        __bg_api_GET2(item, s, it);
+        __bg_api_GET2(item, p, it);
+        __bg_api_GET2(item, P, it);
+        __bg_api_GET2(item, w, it);
+        __bg_api_GET2(item, x, it);
+        __bg_api_GET2(item, c, it);
+        __bg_api_GET2(item, Q, it);
+        __bg_api_GET2(item, b, it);
+        __bg_api_GET2(item, B, it);
+        __bg_api_GET2(item, a, it);
+        __bg_api_GET2(item, A, it);
+        __bg_api_GET2(item, o, it);
+        __bg_api_GET2(item, h, it);
+        __bg_api_GET2(item, l, it);
+        __bg_api_GET2(item, v, it);
+        __bg_api_GET2(item, q, it);
+        __bg_api_GET2(item, O, it);
+        __bg_api_GET2(item, C, it);
+        __bg_api_GET2(item, F, it);
+        __bg_api_GET2(item, L, it);
+        __bg_api_GET2(item, n, it);
 
         std::string symbol = item.s;
         res.tickers.emplace(std::move(symbol), std::move(item));
@@ -1987,12 +1988,12 @@ book_ticker_t book_ticker_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     book_ticker_t res{};
-    __BINAPI_GET(u);
-    __BINAPI_GET(s);
-    __BINAPI_GET(b);
-    __BINAPI_GET(B);
-    __BINAPI_GET(a);
-    __BINAPI_GET(A);
+    __bg_api_GET(u);
+    __bg_api_GET(s);
+    __bg_api_GET(b);
+    __bg_api_GET(B);
+    __bg_api_GET(a);
+    __bg_api_GET(A);
 
     return res;
 }
@@ -2038,16 +2039,16 @@ account_update_t account_update_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     account_update_t res{};
-    __BINAPI_GET(e);
-    __BINAPI_GET(E);
-    __BINAPI_GET(u);
+    __bg_api_GET(e);
+    __bg_api_GET(E);
+    __bg_api_GET(u);
     const auto B = json.at("B");
     for ( auto idx = 0u; idx < B.size(); ++idx ) {
         account_update_t::balance_t item{};
         const auto it = B.at(idx);
-        __BINAPI_GET2(item, a, it);
-        __BINAPI_GET2(item, l, it);
-        __BINAPI_GET2(item, f, it);
+        __bg_api_GET2(item, a, it);
+        __bg_api_GET2(item, l, it);
+        __bg_api_GET2(item, f, it);
 
         res.B[item.a] = std::move(item);
     }
@@ -2080,11 +2081,11 @@ balance_update_t balance_update_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     balance_update_t res{};
-    __BINAPI_GET(e);
-    __BINAPI_GET(E);
-    __BINAPI_GET(a);
-    __BINAPI_GET(d);
-    __BINAPI_GET(T);
+    __bg_api_GET(e);
+    __bg_api_GET(E);
+    __bg_api_GET(a);
+    __bg_api_GET(d);
+    __bg_api_GET(T);
 
     return res;
 }
@@ -2108,35 +2109,35 @@ order_update_t order_update_t::construct(const flatjson::fjson &json) {
     assert(json.is_valid());
 
     order_update_t res{};
-    __BINAPI_GET(e);
-    __BINAPI_GET(E);
-    __BINAPI_GET(s);
-    __BINAPI_GET(c);
-    __BINAPI_GET(S);
-    __BINAPI_GET(o);
-    __BINAPI_GET(f);
-    __BINAPI_GET(q);
-    __BINAPI_GET(p);
-    __BINAPI_GET(P);
-    __BINAPI_GET(F);
-    __BINAPI_GET(C);
-    __BINAPI_GET(x);
-    __BINAPI_GET(X);
-    __BINAPI_GET(r);
-    __BINAPI_GET(i);
-    __BINAPI_GET(l);
-    __BINAPI_GET(z);
-    __BINAPI_GET(L);
-    __BINAPI_GET(n);
-    __BINAPI_GET(N);
-    __BINAPI_GET(T);
-    __BINAPI_GET(t);
-    __BINAPI_GET(I);
-    __BINAPI_GET(w);
-    __BINAPI_GET(m);
-    __BINAPI_GET(M);
-    __BINAPI_GET(O);
-    __BINAPI_GET(Z);
+    __bg_api_GET(e);
+    __bg_api_GET(E);
+    __bg_api_GET(s);
+    __bg_api_GET(c);
+    __bg_api_GET(S);
+    __bg_api_GET(o);
+    __bg_api_GET(f);
+    __bg_api_GET(q);
+    __bg_api_GET(p);
+    __bg_api_GET(P);
+    __bg_api_GET(F);
+    __bg_api_GET(C);
+    __bg_api_GET(x);
+    __bg_api_GET(X);
+    __bg_api_GET(r);
+    __bg_api_GET(i);
+    __bg_api_GET(l);
+    __bg_api_GET(z);
+    __bg_api_GET(L);
+    __bg_api_GET(n);
+    __bg_api_GET(N);
+    __bg_api_GET(T);
+    __bg_api_GET(t);
+    __bg_api_GET(I);
+    __bg_api_GET(w);
+    __bg_api_GET(m);
+    __bg_api_GET(M);
+    __bg_api_GET(O);
+    __bg_api_GET(Z);
 
     return res;
 }
@@ -2200,4 +2201,4 @@ std::ostream& operator<<(std::ostream &os, const userdata_stream_t &o) {
 /*************************************************************************************************/
 
 } // ns userdata
-} // ns binapi
+} // ns bg_api

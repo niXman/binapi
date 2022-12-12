@@ -4,14 +4,15 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/api.hpp>
-#include <binapi/invoker.hpp>
-#include <binapi/errors.hpp>
+#include <bg_api/api.hpp>
+#include <bg_api/invoker.hpp>
+#include <bg_api/errors.hpp>
 
 #include <boost/preprocessor.hpp>
 #include <boost/callable_traits.hpp>
@@ -32,9 +33,9 @@
 
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
-#include <binapi/flatjson.hpp>
+#include <bg_api/flatjson.hpp>
 
-namespace binapi {
+namespace bg_api {
 namespace rest {
 
 /*************************************************************************************************/
@@ -267,8 +268,8 @@ struct api::impl {
                         return res;
                     }
 
-                    if ( json.is_object() && binapi::rest::is_api_error(json) ) {
-                        auto error = binapi::rest::construct_error(json);
+                    if ( json.is_object() && bg_api::rest::is_api_error(json) ) {
+                        auto error = bg_api::rest::construct_error(json);
                         res.ec = error.first;
                         __MAKE_ERRMSG(res, error.second)
                         res.reply.clear();
@@ -973,4 +974,4 @@ api::result<close_user_data_stream_t> api::close_user_data_stream(const char *li
 /*************************************************************************************************/
 
 } // ns rest
-} // ns binapi
+} // ns bg_api

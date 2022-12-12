@@ -4,34 +4,35 @@
 //                        Version 2.0, January 2004
 //                     http://www.apache.org/licenses/
 //
-// This file is part of binapi(https://github.com/niXman/binapi) project.
+// This file is part of bg_api(https://github.com/patrickk33/bg_api) project. A fork of 
+// niXman's binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/pairslist.hpp>
-#include <binapi/tools.hpp>
-#include <binapi/types.hpp>
+#include <bg_api/pairslist.hpp>
+#include <bg_api/tools.hpp>
+#include <bg_api/types.hpp>
 
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <cassert>
 
-namespace binapi {
+namespace bg_api {
 
 /*************************************************************************************************/
 
 std::set<std::string> process_pairs(
      const std::string &whitelist
     ,const std::string &blacklist
-    ,const binapi::rest::exchange_info_t &exinfo
+    ,const bg_api::rest::exchange_info_t &exinfo
 ) {
     std::set<std::string> res;
 
     assert(!whitelist.empty());
 
     if ( !whitelist.empty() ) {
-        auto p = binapi::split_string(whitelist, ",");
+        auto p = bg_api::split_string(whitelist, ",");
         if ( p.size() == 1 && p.front() == "*" ) {
             for ( const auto &sit: exinfo.symbols ) {
                 res.insert(sit.first);
@@ -63,7 +64,7 @@ std::set<std::string> process_pairs(
 
     // white list was applied, apply black list.
     if ( !res.empty() && !blacklist.empty() ) {
-        auto p = binapi::split_string(blacklist, ",");
+        auto p = bg_api::split_string(blacklist, ",");
         if ( p.size() == 1 && p.front() == "*" ) {
             res.clear();
         } else {
@@ -103,7 +104,7 @@ std::set<std::string> process_pairs(
         // white list was not used - get pairs from
         // exchange and filter it using black list.
     } else if ( !blacklist.empty() ) {
-        auto p = binapi::split_string(blacklist, ",");
+        auto p = bg_api::split_string(blacklist, ",");
         for ( auto &pit: p ) {
             if ( pit.front() == '*' ) { // *USDT
                 auto quoted = pit.substr(1);
@@ -156,9 +157,9 @@ void test_blackwhite_list() {
         ,__MAKE_PAIR("BTC", "ADA")
     };
 
-    binapi::rest::exchange_info_t exinfo{};
+    bg_api::rest::exchange_info_t exinfo{};
     for ( const auto &it: pairs ) {
-        binapi::rest::exchange_info_t::symbol_t item{};
+        bg_api::rest::exchange_info_t::symbol_t item{};
         item.symbol = it.pair;
         item.baseAsset = it.base;
         item.quoteAsset = it.quote;
@@ -220,4 +221,4 @@ void test_blackwhite_list() {
 
 /*************************************************************************************************/
 
-} // ns binapi
+} // ns bg_api
