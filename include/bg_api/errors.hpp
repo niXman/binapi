@@ -26,64 +26,88 @@ namespace rest {
 /*************************************************************************************************/
 
 // https://github.com/binance/binance-spot-api-docs/blob/master/errors.md
-enum class e_error: int {
-     OK = 0
-    ,UNKNOWN = -1000
-    ,DISCONNECTED = -1001
-    ,UNAUTHORIZED = -1002
-    ,TOO_MANY_REQUESTS = -1003
-    ,UNEXPECTED_RESP = -1006
-    ,TIMEOUT = -1007
-    ,UNKNOWN_ORDER_COMPOSITION = -1014
-    ,TOO_MANY_ORDERS = -1015
-    ,SERVICE_SHUTTING_DOWN = -1016
-    ,UNSUPPORTED_OPERATION = -1020
-    ,INVALID_TIMESTAMP = -1021
-    ,INVALID_SIGNATURE = -1022
-    ,ILLEGAL_CHARS = -1100
-    ,TOO_MANY_PARAMETERS = -1101
-    ,MANDATORY_PARAM_EMPTY_OR_MALFORMED = -1102
-    ,UNKNOWN_PARAM = -1103
-    ,UNREAD_PARAMETERS = -1104
-    ,PARAM_EMPTY = -1105
-    ,PARAM_NOT_REQUIRED = -1106
-    ,BAD_PRECISION = -1111
-    ,NO_DEPTH = -1112
-    ,TIF_NOT_REQUIRED = -1114
-    ,INVALID_TIF = -1115
-    ,INVALID_ORDER_TYPE = -1116
-    ,INVALID_SIDE = -1117
-    ,EMPTY_NEW_CL_ORD_ID = -1118
-    ,EMPTY_ORG_CL_ORD_ID = -1119
-    ,BAD_INTERVAL = -1120
-    ,BAD_SYMBOL = -1121
-    ,INVALID_LISTEN_KEY = -1125
-    ,MORE_THAN_XX_HOURS = -1127
-    ,OPTIONAL_PARAMS_BAD_COMBO = -1128
-    ,INVALID_PARAMETER = -1130
-    ,NEW_ORDER_REJECTED = -2010
-    ,CANCEL_REJECTED = -2011
-    ,NO_SUCH_ORDER = -2013
-    ,BAD_API_KEY_FMT = -2014
-    ,REJECTED_MBX_KEY = -2015
-    ,NO_TRADING_WINDOW = -2016
-};
-
-const char* e_error_to_string(e_error v);
-const char* e_error_to_string(int v);
-
-inline bool e_error_equal(int v, e_error err) { return v == static_cast<int>(err); }
+    enum class error : int {
+        OK = 0,
+        EMPTY_ACCESS_KEY = 40001,
+        EMPTY_ACCESS_SIGN = 40002,
+        EMPTY_ACCESS_TIMESTAMP = 40003,
+        INVALID_ACCESS_TIMESTAMP = 40005,
+        INVALID_ACCESS_KEY = 40006,
+        INVALID_CONTENT_TYPE = 40007,
+        TIMESTAMP_EXPIRED = 40008,
+        API_VERIFICATION_FAILED = 40009,
+        REQUEST_TOO_FREQUENT = 429,
+        EMPTY_ACCESS_PASSPHRASE = 40011,
+        INCORRECT_APIKEY_PASSPHRASE = 40012,
+        USER_FROZEN = 40013,
+        INCORRECT_PERMISSIONS = 40014,
+        SYSTEM_ERROR = 40015,
+        BIND_PHONE_GOOGLE = 40016,
+        PARAMETER_VERIFICATION_FAILED = 40017,
+        ILLEGAL_IP_REQUEST = 40018,
+        TP_GREATER_1 = 43013,
+        TP_GREATER_2 = 43014,
+        SL_LESS_1 = 43015,
+        SL_LESS_2 = 43016,
+        NO_LIQUIDATION_LIMIT = 43001,
+        TP_SL_DNE = 43020,
+        TP_SL_CLOSED = 43021,
+        FAILED_DEFAULT_SL = 43022,
+        INSUFFICIENT_POSITION = 43023,
+        TP_SL_IN_EXISTING = 43024,
+        LIMIT_ORDER_DNE = 43025,
+        LIMIT_ORDER_CLOSED = 43026,
+        TOO_MANY_OPEN = 45116,
+        PLEASE_CLOSE_POSITION = 40728,
+        DUPLICATE_CLIENT_OID = 40757,
+        NOT_ENOUGH_POSITION_AVAIL = 40786,
+        SERVICE_ERROR = 40725,
+        REQUEST_TIMEOUT = 40010
+    };
+    const char* error_to_string(error v);
+    const char* error_to_string(int v);
+    inline bool error_equal(int v, error err) { return v == static_cast<int>(err); }
 
 /*************************************************************************************************/
 
-bool is_api_error(const flatjson::fjson &json);
+    bool is_api_error(const flatjson::fjson &json);
 
-std::pair<int, std::string>
-construct_error(const flatjson::fjson &json);
+    std::pair<int, std::string>
+    construct_error(const flatjson::fjson &json);
 
 /*************************************************************************************************/
 
 } // ns rest
+
+namespace ws {
+    enum class error : int {
+        OK = 0,
+        CHANNEL_DNE = 30001,
+        ILLEGAL_REQUEST = 30002,
+        INVALID_OP = 30003,
+        NEED_LOGIN = 30004,
+        LOGIN_FAILED = 30005,
+        INVALID_ACCESS_KEY = 30011,
+        INVALID_ACCESS_PASSPHRASE = 30012,
+        INVALID_ACCESS_TIMESTAMP = 30013,
+        REQUEST_TIMESTAMP_EXPIRED = 30014,
+        INVALID_SIGNATURE = 30015
+    };
+    const char* error_to_string(error v);
+    const char* error_to_string(int v);
+    inline bool error_equal(int v, error err) { return v == static_cast<int>(err); }
+
+/*************************************************************************************************/
+
+    bool is_api_error(const flatjson::fjson &json);
+
+    std::pair<int, std::string>
+    construct_error(const flatjson::fjson &json);
+
+/*************************************************************************************************/
+
+} // ns ws
+
 } // ns bg_api
 
 #endif // __bg_api__errors_hpp

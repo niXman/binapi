@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <cstdint>
 #include <cassert>
 
@@ -35,632 +36,650 @@ namespace bg_api {
 
 namespace rest {
 
-struct ping_t {
-    bool ok;
+//------------------------------------------------------------------------------
+    
+    // Public endpoints
 
-    static ping_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const ping_t &f);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#check-server-time
-struct server_time_t {
-    std::size_t serverTime;
-
-    static server_time_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const server_time_t &f);
-};
-
-// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#current-average-price
-struct avg_price_t {
-    std::size_t mins;
-    double_type price;
-
-    static avg_price_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const avg_price_t &f);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker
-struct prices_t {
-    struct price_t {
-        std::string symbol;
-        double_type price;
-
-        static price_t construct(const flatjson::fjson &json);
-        friend std::ostream &operator<<(std::ostream &os, const price_t &f);
+    struct server_time_t {
+        std::size_t reqTime;
+        std::size_t serverTime;
+        
+        static server_time_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const server_time_t &f);
     };
 
-    static prices_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const prices_t &f);
+    struct coin_t {
+        std::size_t coinId;
+        std::string coinName;
+        bool transfer;
 
-    std::map<std::string, price_t> prices;
+        struct chain_t {
+            std::string chain;
+            bool needTag;
+            bool withdrawAble;
+            bool rechargeAble;
+            double_type withdrawFee;
+            std::size_t depositConfirm;
+            std::size_t withdrawConfirm;
+            double_type minDepositAmount;
+            double_type minWithdrawAmount;
+            std::string browseUrl;
 
-    bool is_valid_symbol(const std::string &sym) const
-        { return is_valid_symbol(sym.c_str()); }
-    bool is_valid_symbol(const char *sym) const;
-
-    const price_t& get_by_symbol(const std::string &sym) const
-        { return get_by_symbol(sym.c_str()); }
-    const price_t& get_by_symbol(const char *sym) const;
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics
-struct _24hrs_tickers_t {
-    struct _24hrs_ticker_t {
-        std::string symbol;
-        double_type priceChange;
-        double_type priceChangePercent;
-        double_type weightedAvgPrice;
-        double_type prevClosePrice;
-        double_type lastPrice;
-        double_type lastQty;
-        double_type bidPrice;
-        double_type askPrice;
-        double_type openPrice;
-        double_type highPrice;
-        double_type lowPrice;
-        double_type volume;
-        double_type quoteVolume;
-        std::size_t openTime;
-        std::size_t closeTime;
-        std::size_t firstId;
-        std::size_t lastId;
-        std::size_t count;
-
-        static _24hrs_ticker_t construct(const flatjson::fjson &json);
-        friend std::ostream &operator<<(std::ostream &os, const _24hrs_ticker_t &f);
-    };
-
-    std::map<std::string, _24hrs_ticker_t> tickers;
-
-    static _24hrs_tickers_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const _24hrs_tickers_t &f);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-information-user_data
-struct account_info_t {
-    std::size_t makerCommission;
-    std::size_t takerCommission;
-    std::size_t buyerCommission;
-    std::size_t sellerCommission;
-    bool canTrade;
-    bool canWithdraw;
-    bool canDeposit;
-    std::size_t updateTime;
-
-    struct balance_t {
-        std::string asset;
-        double_type free;
-        double_type locked;
-
-        static balance_t construct(const flatjson::fjson &json);
-        friend std::ostream &operator<<(std::ostream &os, const balance_t &f);
-    };
-    std::map<std::string, balance_t> balances;
-
-    const balance_t& get_balance(const std::string &symbol) const
-        { return get_balance(symbol.c_str()); }
-    const balance_t& get_balance(const char *symbol) const;
-
-    const double_type& add_balance(const std::string &symbol, const double_type &amount)
-    { return add_balance(symbol.c_str(), amount); }
-    const double_type& add_balance(const char *symbol, const double_type &amount);
-
-    const double_type& sub_balance(const std::string &symbol, const double_type &amount)
-    { return sub_balance(symbol.c_str(), amount); }
-    const double_type& sub_balance(const char *symbol, const double_type &amount);
-
-    static account_info_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const account_info_t &f);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#exchange-information
-struct exchange_info_t {
-    std::string timezone;
-    std::size_t serverTime;
-    std::vector<std::string> exchangeFilters;
-
-    struct rate_limit_t {
-        std::string rateLimitType;
-        std::string interval;
-        std::size_t limit;
-
-        friend std::ostream &operator<<(std::ostream &os, const rate_limit_t &f);
-    };
-    std::vector<rate_limit_t> rateLimits;
-
-    struct symbol_t {
-        std::string symbol;
-        std::string status;
-        std::string baseAsset;
-        std::size_t baseAssetPrecision;
-        std::string quoteAsset;
-        std::size_t quotePrecision;
-        std::vector<std::string> orderTypes;
-        bool icebergAllowed;
-
-        struct filter_t {
-            struct price_t {
-                double_type minPrice;
-                double_type maxPrice;
-                double_type tickSize;
-
-                friend std::ostream &operator<<(std::ostream &os, const price_t &f);
-            };
-            struct percent_price_t {
-                double_type multiplierUp;
-                double_type multiplierDown;
-                std::size_t avgPriceMins;
-
-                friend std::ostream &operator<<(std::ostream &os, const percent_price_t &f);
-            };
-            struct percent_price_by_side_t {
-                double_type bidMultiplierUp;
-                double_type bidMultiplierDown;
-                double_type askMultiplierUp;
-                double_type askMultiplierDown;
-                std::size_t avgPriceMins;
-            };
-            struct lot_size_t {
-                double_type minQty;
-                double_type maxQty;
-                double_type stepSize;
-
-                friend std::ostream &operator<<(std::ostream &os, const lot_size_t &f);
-            };
-            struct market_lot_size_t {
-                double_type minQty;
-                double_type maxQty;
-                double_type stepSize;
-
-                friend std::ostream &operator<<(std::ostream &os, const market_lot_size_t &f);
-            };
-            struct min_notional_t {
-                double_type minNotional;
-
-                friend std::ostream &operator<<(std::ostream &os, const min_notional_t &f);
-            };
-            struct iceberg_parts_t {
-                std::size_t limit;
-
-                friend std::ostream &operator<<(std::ostream &os, const iceberg_parts_t &f);
-            };
-            struct max_num_orders_t {
-                std::size_t maxNumOrders;
-
-                friend std::ostream &operator<<(std::ostream &os, const max_num_orders_t &f);
-            };
-
-            struct max_num_algo_orders_t {
-                std::size_t maxNumAlgoOrders;
-
-                friend std::ostream &operator<<(std::ostream &os, const max_num_algo_orders_t &f);
-            };
-
-            struct max_position_t {
-                double_type maxPosition;
-
-                friend std::ostream &operator<<(std::ostream &os, const max_position_t &f);
-            };
-
-            struct trailing_delta_t {
-                std::size_t minTrailingAboveDelta;
-                std::size_t maxTrailingAboveDelta;
-                std::size_t minTrailingBelowDelta;
-                std::size_t maxTrailingBelowDelta;
-
-                friend std::ostream &operator<<(std::ostream &os, const trailing_delta_t &f);
-            };
-
-            std::string filterType;
-            boost::variant<
-                 price_t
-                ,percent_price_t
-                ,percent_price_by_side_t
-                ,lot_size_t
-                ,market_lot_size_t
-                ,min_notional_t
-                ,iceberg_parts_t
-                ,max_num_orders_t
-                ,max_num_algo_orders_t
-                ,max_position_t
-                ,trailing_delta_t
-            > filter;
-
-            friend std::ostream &operator<<(std::ostream &os, const filter_t &f);
+            friend std::ostream &operator<<(std::ostream &os, const chain_t &f);
         };
-        std::vector<filter_t> filters;
+        std::vector<chain_t> chainList;
 
-        template<typename T>
-        const T& get_filter() const {
-            for ( const auto &it: filters ) {
-                const T *p = boost::get<T>(&it.filter);
-                if ( p ) {
-                    return *p;
-                }
-            }
-
-            assert("bad T type" == nullptr);
-        }
-
-        const filter_t::price_t& get_filter_price() const
-        { return get_filter<filter_t::price_t>(); }
-        const filter_t::percent_price_t& get_filter_percent_price() const
-        { return get_filter<filter_t::percent_price_t>(); }
-        const filter_t::percent_price_by_side_t& get_filter_percent_price_by_side() const
-        { return get_filter<filter_t::percent_price_by_side_t>(); }
-        const filter_t::lot_size_t& get_filter_lot_size() const
-        { return get_filter<filter_t::lot_size_t>(); }
-        const filter_t::market_lot_size_t& get_filter_market_lot_size() const
-        { return get_filter<filter_t::market_lot_size_t>(); }
-        const filter_t::min_notional_t& get_filter_min_notional() const
-        { return get_filter<filter_t::min_notional_t>(); }
-        const filter_t::iceberg_parts_t& get_filter_iceberg_parts() const
-        { return get_filter<filter_t::iceberg_parts_t>(); }
-        const filter_t::max_num_orders_t& get_filter_max_num_orders() const
-        { return get_filter<filter_t::max_num_orders_t>(); }
-        const filter_t::max_num_algo_orders_t& get_filter_max_num_algo_orders() const
-        { return get_filter<filter_t::max_num_algo_orders_t>(); }
-        const filter_t::max_position_t& get_filter_max_position() const
-        { return get_filter<filter_t::max_position_t>(); }
-        const filter_t::trailing_delta_t& get_filter_trailing_delta() const
-        { return get_filter<filter_t::trailing_delta_t>(); }
-
-        friend std::ostream &operator<<(std::ostream &os, const symbol_t &s);
+        static coin_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const coin_t &f);
     };
 
-    std::map<std::string, symbol_t> symbols;
+    struct symbol_t {   // Single symbol
+        std::string symbol;
+        std::string symbolName;
+        std::string baseCoin;
+        std::string quoteCoin;
+        double_type minTradeAmount;
+        double_type maxTradeAmount;
+        double_type takerFeeRate;
+        double_type makerFeeRate;
+        int priceScale;
+        int quantityScale;
 
-    bool is_valid_symbol(const std::string &sym) const
-        { return is_valid_symbol(sym.c_str()); }
-    bool is_valid_symbol(const char *sym) const;
-
-    const symbol_t& get_by_symbol(const std::string &sym) const
-        { return get_by_symbol(sym.c_str()); }
-    const symbol_t& get_by_symbol(const char *sym) const;
-
-    static exchange_info_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const exchange_info_t &s);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#order-book
-struct depths_t {
-    struct depth_t {
-        double_type price;
-        double_type amount;
-
-        friend std::ostream &operator<<(std::ostream &os, const depth_t &s);
+        static symbol_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const symbol_t &f);
     };
 
-    std::size_t lastUpdateId;
-    std::vector<depth_t> bids;
-    std::vector<depth_t> asks;
+//------------------------------------------------------------------------------
 
-    static depths_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const depths_t &s);
-};
+    // Market endpoints
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#recent-trades-list
-struct trades_t {
+    struct ticker_t {
+        std::string symbol;
+        double_type last;            // Futures only. When called from spot, set to -1.0
+        double_type bestAsk;         // Futures only. When called from spot, set to -1.0
+        double_type bestBid;         // Futures only. When called from spot, set to -1.0
+        double_type high24h;
+        double_type low24h;
+        double_type close;           // Spot only. When called from futures, set to -1.0
+        double_type quoteVol;
+        double_type baseVol;
+        double_type usdtVol;
+        std::size_t ts;
+        double_type buyOne;
+        double_type sellOne;
+        double_type openUtc0;
+        double_type priceChangePct;  // Futures only. When called from spot, set to -1.0
+        double_type chgUtc;          // Futures only. When called from spot, set to -1.0
+
+        static ticker_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const ticker_t &f);
+    };
+
     struct trade_t {
-        std::size_t id;
-        double_type price;
-        double_type qty;
-        std::size_t time;
-        bool isBuyerMaker;
-        bool isBestMatch;
+        std::string symbol;
+        std::string tradeId;
+        _side side;
+        double_type fillPrice;
+        double_type fillQuantity;
+        std::size_t fillTime;
 
         static trade_t construct(const flatjson::fjson &json);
-        friend std::ostream &operator<<(std::ostream &os, const trade_t &s);
+        friend std::ostream &operator<<(std::ostream &os, const trade_t &f);
     };
 
-    std::vector<trade_t> trades;
-
-    static trades_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const trades_t &s);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list
-struct agg_trades_t {
-    struct agg_trade_t {
-        std::size_t id;
-        double_type price;
-        double_type qty;
-        std::size_t first_id;
-        std::size_t last_id;
-        std::size_t time;
-        bool isBuyerMaker;
-        bool isBestMatch;
-
-        static agg_trade_t construct(const flatjson::fjson &json);
-        friend std::ostream &operator<<(std::ostream &os, const agg_trade_t &s);
-    };
-
-    std::vector<agg_trade_t> trades;
-
-    static agg_trades_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const agg_trades_t &s);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-data
-struct klines_t {
-    struct kline_t {
-        std::size_t start_time;
-        std::size_t end_time;
+    struct candle_t {
         double_type open;
         double_type high;
         double_type low;
         double_type close;
-        double_type volume;
-        double_type quote_volume;
-        std::size_t num_trades;
-        double_type taker_buy_base_vol;
-        double_type taker_buy_quote_vol;
+        double_type quoteVol;
+        double_type baseVol;
+        double_type usdtVol;
+        std::size_t ts;
 
-        friend std::ostream &operator<<(std::ostream &os, const kline_t &s);
+        static candle_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const candle_t &f);
     };
 
-    std::vector<kline_t> klines;
+    struct depth_t {
+        std::map<double_type, double_type> asks;
+        std::map<double_type, double_type> bids;
+        std::size_t timestamp;
 
-    static klines_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const klines_t &s);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#query-order-user_data
-struct order_info_t {
-    std::string symbol;
-    std::size_t orderId;
-    std::string clientOrderId;
-    double_type price;
-    double_type origQty;
-    double_type executedQty;
-    double_type cummulativeQuoteQty;
-    std::string status;
-    std::string timeInForce;
-    std::string type;
-    std::string side;
-    double_type stopPrice;
-    double_type icebergQty;
-    std::size_t time;
-    std::size_t updateTime;
-    bool isWorking;
-
-    static order_info_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const order_info_t &o);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#current-open-orders-user_data
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#all-orders-user_data
-struct orders_info_t {
-    std::map<std::string, std::vector<order_info_t>> orders;
-
-    static orders_info_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const orders_info_t &o);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#new-order--trade
-struct new_order_info_ack_t {
-    std::string symbol;
-    std::size_t orderId;
-    std::string clientOrderId;
-    std::size_t transactTime;
-
-    static new_order_info_ack_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const new_order_info_ack_t &o);
-};
-
-struct new_order_info_result_t {
-    std::string symbol;
-    std::size_t orderId;
-    std::string clientOrderId;
-    std::size_t transactTime;
-    double_type price;
-    double_type origQty;
-    double_type executedQty;
-    double_type cummulativeQuoteQty;
-    std::string status;
-    std::string timeInForce;
-    std::string type;
-    std::string side;
-
-    static new_order_info_result_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const new_order_info_result_t &o);
-};
-
-struct new_order_info_full_t {
-    std::string symbol;
-    std::size_t orderId;
-    std::string clientOrderId;
-    std::size_t transactTime;
-    double_type price;
-    double_type origQty;
-    double_type executedQty;
-    double_type cummulativeQuoteQty;
-    std::string status;
-    std::string timeInForce;
-    std::string type;
-    std::string side;
-    struct fill_part {
-        double_type price;
-        double_type qty;
-        double_type commission;
-        std::string commissionAsset;
+        static depth_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const depth_t &f);
     };
-    std::vector<fill_part> fills;
 
-    static double_type avg_price(const std::vector<fill_part> &parts);
-    static double_type max_price(const std::vector<fill_part> &parts);
-    static double_type sum_amount(const std::vector<fill_part> &parts);
-    static double_type sum_commission(const std::vector<fill_part> &parts);
-
-    static new_order_info_full_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const new_order_info_full_t &o);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#test-new-order-trade
-struct new_test_order_info_t {
-    bool ok;
-
-    static new_test_order_info_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const new_test_order_info_t &o);
-};
-
-struct new_order_resp_type
-    :boost::variant<
-         new_order_info_ack_t
-        ,new_order_info_result_t
-        ,new_order_info_full_t
-        ,new_test_order_info_t
-    >
-{
-    // ctor inheritance
-    using boost::variant<
-         new_order_info_ack_t
-        ,new_order_info_result_t
-        ,new_order_info_full_t
-        ,new_test_order_info_t
-    >::variant;
-
-    std::pair<e_trade_resp_type, const void *>
-    get_responce_type() const {
-        if ( const auto *p = boost::get<new_order_info_ack_t>(this) ) {
-            return {e_trade_resp_type::ACK, p};
-        } else if ( const auto *p = boost::get<new_order_info_result_t>(this) ) {
-            return {e_trade_resp_type::RESULT, p};
-        } else if ( const auto *p = boost::get<new_order_info_full_t>(this) ) {
-            return {e_trade_resp_type::FULL, p};
-        } else if ( const auto *p = boost::get<new_test_order_info_t>(this) ) {
-            return {e_trade_resp_type::TEST, p};
-        }
-
-        return {e_trade_resp_type::UNKNOWN, nullptr};
-    }
-
-    bool is_valid_responce_type()  const { const auto r =  get_responce_type(); return r.first != e_trade_resp_type::UNKNOWN; }
-    bool is_ack_responce_type()    const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::ACK; }
-    bool is_result_responce_type() const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::RESULT; }
-    bool is_full_responce_type()   const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::FULL; }
-    bool is_test_responce_type()   const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::TEST; }
-
-    const new_order_info_ack_t& get_responce_ack() const {
-        const auto r =  get_responce_type();
-        assert(r.first == e_trade_resp_type::ACK);
-
-        return *static_cast<const new_order_info_ack_t *>(r.second);
-    }
-    const new_order_info_result_t& get_responce_result() const {
-        const auto r =  get_responce_type();
-        assert(r.first == e_trade_resp_type::RESULT);
-
-        return *static_cast<const new_order_info_result_t *>(r.second);
-    }
-    const new_order_info_full_t& get_responce_full() const {
-        const auto r =  get_responce_type();
-        assert(r.first == e_trade_resp_type::FULL);
-
-        return *static_cast<const new_order_info_full_t *>(r.second);
-    }
-    const new_test_order_info_t& get_responce_test() const {
-        const auto r =  get_responce_type();
-        assert(r.first == e_trade_resp_type::TEST);
-
-        return *static_cast<const new_test_order_info_t *>(r.second);
-    }
-
-    std::size_t get_order_id() const {
-        const auto r =  get_responce_type();
-        assert(
-            r.first == e_trade_resp_type::ACK ||
-            r.first == e_trade_resp_type::RESULT ||
-            r.first == e_trade_resp_type::FULL
-        );
-
-        switch ( r.first ) {
-            case e_trade_resp_type::ACK: return static_cast<const new_order_info_ack_t *>(r.second)->orderId;
-            case e_trade_resp_type::RESULT: return static_cast<const new_order_info_result_t *>(r.second)->orderId;
-            case e_trade_resp_type::FULL: return static_cast<const new_order_info_full_t *>(r.second)->orderId;;
-            default: break;
-        }
-
-        assert(!"unreachable");
-
-        return 0u;
-    }
-
-    static new_order_resp_type construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const new_order_resp_type &o);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#cancel-order-trade
-struct cancel_order_info_t {
-    std::string symbol;
-    std::size_t orderId;
-    std::string origClientOrderId;
-    std::string clientOrderId;
-    double_type price;
-    double_type origQty;
-    double_type executedQty;
-    double_type cummulativeQuoteQty;
-    std::string status;
-    std::string timeInForce;
-    std::string type;
-    std::string side;
-
-    static cancel_order_info_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o);
-};
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-trade-list-user_data
-struct my_trades_info_t {
-    struct my_trade_info_t {
+    struct contract_t {
+        std::string baseCoin;
+        double_type buyLimitPriceRatio;
+        double_type feeRateUpRatio;
+        double_type makerFeeRate;
+        double_type minTradeNum;
+        double_type openCostUpRatio;
+        int priceEndStep;
+        int pricePlace;
+        std::string quoteCoin;
+        double_type sellLimitPriceRatio;
+        double_type sizeMultiplier;
+        std::vector<std::string> supportMarginCoins;
         std::string symbol;
-        std::size_t id;
-        std::size_t orderId;
-        double_type price;
-        double_type qty;
-        double_type commission;
-        std::string commissionAsset;
-        std::size_t time;
-        bool isBuyer;
-        bool isMaker;
-        bool isBestMatch;
+        double_type takerFeeRate;
+        int volumePlace;
+        std::string symbolType;
 
-        static my_trade_info_t construct(const flatjson::fjson &json);
-        friend std::ostream &operator<<(std::ostream &os, const my_trade_info_t &o);
+        static contract_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const contract_t &f);
     };
 
-    std::vector<my_trade_info_t> trades;
+    struct fill_t {
+        std::string tradeId;
+        double_type price;
+        double_type size;
+        _side side;
+        std::size_t timestamp;
+        std::string symbol;
 
-    static my_trades_info_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const my_trades_info_t &o);
-};
+        static fill_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const fill_t &f);
+    };
 
-/*************************************************************************************************/
+    struct leverage_t {
+        std::string symbol;
+        int minLeverage;
+        int maxLeverage;
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#start-user-data-stream-user_stream
-struct start_user_data_stream_t {
-    std::string listenKey;
+        static leverage_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const leverage_t &f);
+    };
 
-    static start_user_data_stream_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const start_user_data_stream_t &o);
-};
+//------------------------------------------------------------------------------
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#keepalive-user-data-stream-user_stream
-struct ping_user_data_stream_t {
-    bool ok;
+    // Wallet endpoints
 
-    static ping_user_data_stream_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const ping_user_data_stream_t &o);
-};
+    struct address_t {
+        std::string address;
+        std::string chain;
+        std::string coin;
+        std::string tag;
+        std::string url;
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#close-user-data-stream-user_stream
-struct close_user_data_stream_t {
-    bool ok;
+        static address_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const address_t &f);
+    };
 
-    static close_user_data_stream_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const close_user_data_stream_t &o);
-};
+    struct deposit_withdrawal_t {
+        bool isDeposit;
+        std::string id;
+        std::string txId;
+        std::string coin;
+        std::string type;
+        std::string amount;
+        std::string status;
+        std::string toAddress;
+        double_type fee;         // Only for withdrawals. When called from getDeposit list set to -1.0
+        std::string chain;
+        int confirm;            // Only for withdrawals. When called from getDeposit list set to -1
+        std::size_t cTime;
+        std::size_t uTime;
 
-/*************************************************************************************************/
+        static deposit_withdrawal_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const deposit_withdrawal_t &f);
+    };
+
+//------------------------------------------------------------------------------
+
+    // Account endpoints
+    struct apikey_t {
+        std::string userId;
+        std::string inviterId;
+        std::string ips;
+        unsigned int auths;
+        std::string parentId;
+        bool trader;
+
+        static apikey_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const apikey_t &f);
+    };
+
+    struct spot_account_t {
+        std::size_t coinId;
+        std::string coinName;
+        int available;
+        int lock;
+        std::size_t uTime;
+
+        static spot_account_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const spot_account_t &f);
+    };
+
+    struct bill_t {
+        std::size_t cTime;
+        std::size_t coinId;
+        std::string coinName;
+        _group_type groupType;
+        _biz_type bizType;
+        double_type quantity;
+        double_type balance;
+        double_type fees;
+        std::size_t billId;
+
+        static bill_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const bill_t &f);
+    };
+
+    struct transfer_t {
+        std::string coinName;
+        std::string status;
+        std::string toType;
+        std::string toSymbol;
+        std::string fromType;
+        std::string fromSymbol;
+        double_type amount;
+        std::size_t tradeTime;
+
+        static transfer_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const transfer_t &f);
+    };
+
+    struct futures_account_t {
+        std::string marginCoin;
+        double_type locked;
+        double_type available;
+        double_type crossMaxAvailable;
+        double_type fixedMaxAvailable;
+        double_type maxTransferOut;
+        double_type equity;
+        double_type usdtEquity;
+        double_type btcEquity;
+        double_type crossRiskRate;
+        int crossMarginLeverage;
+        int fixedLongLeverage;
+        int fixedShortLeverage;
+        _margin_mode marginMode;
+        _hold_mode holdMode;
+
+        static futures_account_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const futures_account_t &f);
+    };
+
+    struct position_t {
+        std::string marginCoin;
+        std::string symbol;
+        _hold_side holdSide;
+        double_type openDelegateCount;
+        double_type margin;
+        double_type available;
+        double_type locked;
+        double_type total;
+        int leverage;
+        double_type achievedProfits;
+        double_type averageOpenPrice;
+        _margin_mode marginMode;
+        _hold_mode holdMode;
+        double_type unrealizedPL;
+        double_type keepMarginRate;
+        double_type marketPrice;
+        std::size_t cTime;
+
+        static position_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const position_t &f);
+    };
+
+    struct futures_bill_t {
+        std::string id;
+        std::string symbol;
+        std::string marginCoin;
+        double_type amount;
+        double_type fee;
+        double_type feeByCoupon;
+        std::string feeCoin;
+        _business business;
+        std::size_t cTime;
+
+        static futures_bill_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const futures_bill_t &f);
+    };
+
+    struct coin_leverage_t {
+        std::string symbol;
+        std::string marginCoin;
+        int longLeverage;
+        int shortLeverage;
+        _margin_mode marginMode;
+
+        static coin_leverage_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const coin_leverage_t &f);
+    };
+
+//------------------------------------------------------------------------------
+
+    // Trade endpoints
+    struct place_spot_order_t {
+        _side side;
+        _order_type orderType;
+        _force force;
+        double_type price;
+        double_type quantity;
+        std::string clientOrderId;
+
+        static place_spot_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const place_spot_order_t &f);
+    };
+
+    struct place_futures_order_t {
+        double_type size;
+        double_type price;                   // Place order only. When called from placeReversal set to -1.0
+        _mix_side side;
+        _order_type orderType;
+        _force force;
+        std::string clientOid;
+        double_type presetTP;                // Place order only. When called from placeReversal set to -1.0
+        double_type presetSL;                // Place order only. When called from placeReversal set to -1.0
+        bool reverse;                       // Reversal only. When called from placeOrder set to false
+
+        static place_futures_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const place_futures_order_t &f);
+    };
+
+    struct spot_order_t {
+        std::size_t accountId;
+        std::string symbol;
+        std::string orderId;
+        std::string clientOrderId;
+        double_type price;
+        double_type quantity;
+        _order_type orderType;
+        _side side;
+        _status status;
+        double_type fillPrice;
+        double_type fillQuantity;
+        double_type fillTotalAmount;
+        std::size_t cTime;
+
+        static spot_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const spot_order_t &f);
+    };
+
+    struct futures_order_t {
+        std::string symbol;
+        double_type size;
+        std::string orderId;
+        std::string cliendOid;
+        double_type filledQty;
+        double_type fee;
+        double_type price;
+        double_type priceAvg;                    // history only
+        _status state;
+        _side side;
+        _force timeInForce;
+        double_type totalProfits;
+        _hold_side posSide;
+        std::string marginCoin;
+        double_type presetTakeProfitPrice;       // details only
+        double_type presetStopLossPrice;         // details only
+        double_type filledAmount;                // history and details
+        int leverage;                       // productType and history
+        _order_type orderType;
+        _margin_mode marginMode;     // productType and history
+        std::size_t cTime;
+        std::size_t uTime;                  // history and details
+
+        static futures_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const futures_order_t &f);
+    };
+
+    struct transaction_t {
+        std::size_t accountId;
+        std::string symbol;
+        std::string orderId;
+        std::string fillId;
+        _order_type orderType;
+        _side side;
+        double_type fillPrice;
+        double_type fillQuantity;
+        double_type fillTotalAmount;
+        std::size_t cTime;
+        std::string feeCcy;
+        double_type fees;
+
+        static transaction_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const transaction_t &f);
+    };
+
+    struct place_plan_order_spot_t {
+        _side side;
+        double_type triggerPrice;
+        double_type executePrice;
+        double_type size;
+        _trigger_type triggerType;
+        _order_type orderType;
+        std::string clientOid;
+        _force force;
+
+        static place_plan_order_spot_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const place_plan_order_spot_t &f);
+    };
+
+    struct place_plan_order_futures_t {
+        double_type size;
+        double_type executePrice;
+        double_type triggerPrice;
+        _mix_side side;
+        _order_type orderType;
+        _force force;
+        _trigger_type triggerType;
+        std::string clientOid;
+        double_type presetTP;
+        double_type presetSL;
+
+        static place_plan_order_futures_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const place_plan_order_futures_t &f);
+    };
+
+    struct spot_plan_order_t {
+        std::string orderId;
+        std::string executeOrderId;         // Futures history only
+        std::string symbol;
+        std::string marginCoin;             // Futures only
+        double_type size;
+        double_type executePrice;
+        double_type triggerPrice;
+        _plan_status status;
+        _order_type orderType;
+        _side side;
+        _trigger_type triggerType;
+        double_type presetTakeProfitPrice;       // Futures only
+        double_type presetStopLossPrice;         // Futures only
+        std::size_t cTime;
+
+        static spot_plan_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const spot_plan_order_t &f);
+    };
+
+    struct futures_plan_order_t {
+        std::string orderId;
+        std::string executeOrderId;         // history only
+        std::string symbol;
+        std::string marginCoin;
+        double_type size;
+        double_type executePrice;
+        double_type triggerPrice;
+        _plan_status status;
+        _order_type orderType;
+        _mix_side side;
+        _trigger_type triggerType;
+        double_type presetTakeProfitPrice;
+        double_type presetStopLossPrice;
+
+        static futures_plan_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const spot_plan_order_t &f);
+    };
+
+    struct futures_fill_t {
+        std::string tradeId;
+        std::string symbol;
+        std::string orderId;
+        double_type price;
+        double_type sizeQty;
+        double_type fee;
+        _trade_side side;
+        std::size_t cTime;
+
+        static futures_fill_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const futures_fill_t &f);
+    };
+
+//------------------------------------------------------------------------------
+
+    // CopyTrade
+
+    struct trader_order_t {
+        std::string symbol;
+        std::string trackingNo;
+        std::string openOrderId;
+        _hold_side holdSide;
+        int openLeverage;
+        double_type openAvgPrice;
+        std::size_t openTime;
+        double_type openDealCount;
+        double_type stopProfitPrice;
+        double_type stopLossPrice;
+        double_type closeDealCount;
+        std::size_t closeTime;      // History only
+        double_type closeAvgPrice;       // History only
+        _stop_type stopType;   // History only
+        double_type achievedProfits;     // History only
+        double_type openFee;             // History only
+        double_type closeFee;            // History only
+
+        static trader_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const trader_order_t &f);
+    };
+
+    struct follower_order_t {
+        std::string trackingNo;
+        std::string openOrderId;
+        std::string closeOrderId;
+        std::string symbol;
+        _hold_side holdSide;
+        double_type openSize;            // History only
+        double_type closeSize;           // History only
+        int openLeverage;
+        double_type openAvgPrice;
+        std::size_t openTime;
+        double_type openDealCount;
+        double_type openMargin;
+        double_type avgClosePrice;
+        double_type closeDealCount;
+        std::size_t closeTime;
+        _stop_type stopType;   // History only
+        double_type achievedProfits;     // History only
+        double_type openFee;             // History only
+        double_type closeFee;            // History only
+        double_type profitRate;          // History only
+        double_type netProfit;           // History only
+
+        static follower_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const follower_order_t &f);
+    };
+
+    struct trader_profit_t {
+        double_type yesterdaySplitProfit;
+        double_type sumProfit;
+        double_type waitProfit;
+        std::size_t yesterdayTimestamp;
+
+        static trader_profit_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const trader_profit_t &f);
+    };
+
+    struct profit_token_t {
+        std::string tokenId;
+        double_type profit;
+        std::size_t date;       // profitDateGroupList only
+        std::string nickname;   // profitDateList only
+
+        static profit_token_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const profit_token_t &f);
+    };
+
+    struct trader_symbols_t {
+        std::string symbol;
+        double_type minOpenCount;
+        bool openTrader;
+
+        static trader_symbols_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const trader_symbols_t &f);
+    };
+
+//------------------------------------------------------------------------------
+
+    // Broker
+
+    struct subaccount_t {
+        std::string subUid;
+        std::string subName;
+        _account_status status;
+        std::set<std::string> auths;
+        std::string remark;
+        std::size_t cTime;
+
+        static subaccount_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const subaccount_t &f);
+    };
+
+    struct sub_spot_asset_t {
+        std::size_t coinId;
+        std::string coinName;
+        double_type available;
+        double_type frozen;
+        double_type lock;
+        std::size_t uTime;
+
+        static sub_spot_asset_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const sub_spot_asset_t &f);
+    };
+
+    struct sub_futures_asset_t {
+        std::string marginCoin;
+        double_type locked;
+        double_type available;
+        double_type crossMaxAvailable;
+        double_type fixedMaxAvailable;
+        double_type maxTransferOut;
+        double_type equity;
+        double_type usdtEquity;
+        double_type btcEquity;
+
+        static sub_futures_asset_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const sub_futures_asset_t &f);
+    };
+
+    struct sub_address_t {
+        std::string subUid;
+        std::string address;
+        std::string chain;
+        std::string coin;
+        std::string tag;
+        std::string url;
+
+        static sub_address_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const sub_address_t &f);
+    };
+
+    struct sub_apikey_t {
+        std::string subUid;
+        std::string label;
+        std::string apiKey;
+        unsigned int perms;
+        std::string ip;
+
+        static sub_apikey_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const sub_apikey_t &f);
+    };
+
+//------------------------------------------------------------------------------
 
 } // ns rest
 
@@ -670,291 +689,225 @@ struct close_user_data_stream_t {
 
 namespace ws {
 
-/*************************************************************************************************/
+//------------------------------------------------------------------------------
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams
-struct agg_trade_t {
-    std::string e; // Event type
-    std::size_t E; // Event time
-    std::string s; // Symbol
-    std::size_t a; // Aggregate trade ID
-    double_type p; // Price
-    double_type q; // Quantity
-    std::size_t f; // First trade ID
-    std::size_t l; // Last trade ID
-    std::size_t T; // Trade time
-    bool m; // Is the buyer the market maker?
-    bool M; // Ignore
+    // Public channels
 
-    static agg_trade_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const agg_trade_t &o);
-};
+    struct spot_ticker_t {
+        std::string instId;
+        double_type last;
+        double_type open24h;
+        double_type high24h;
+        double_type low24h;
+        double_type bestBid;
+        double_type bestAsk;
+        double_type baseVolume;
+        double_type quoteVolume;
+        std::size_t ts;
+        std::size_t labelId;
+        double_type openUtc;
+        double_type chgUtc;
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#trade-streams
-struct trade_t {
-    std::size_t E; // Event time
-    std::string s; // Symbol
-    std::size_t t; // Trade ID
-    double_type p; // Price
-    double_type q; // Quantity
-    std::size_t b; // Buyer order ID
-    std::size_t a; // Seller order ID
-    std::size_t T; // Trade time
-    bool m; // Is the buyer the market maker?
-    bool M; // Ignore
-
-    static trade_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const trade_t &o);
-};
-
-/*************************************************************************************************/
-
-// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams
-struct part_depths_t {
-    struct depth_t {
-        double_type price;
-        double_type amount;
-
-        friend std::ostream &operator<<(std::ostream &os, const depth_t &o);
+        static spot_ticker_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const spot_ticker_t &f);
     };
 
-    std::vector<depth_t> a;
-    std::vector<depth_t> b;
+    struct futures_ticker_t {
+        std::string instId;
+        double_type last;
+        double_type high24h;
+        double_type low24h;
+        double_type bestBid;
+        double_type bestAsk;
+        double_type priceChangePct;
+        double_type capitalRate;
+        std::size_t nextSettleTime;
+        std::size_t systemTime;
+        double_type markPrice;
+        double_type indexPrice;
+        double_type holding;
+        double_type baseVolume;
+        double_type quoteVolume;
 
-    static part_depths_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const part_depths_t &o);
-};
-
-/*************************************************************************************************/
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#diff-depth-stream
-struct diff_depths_t {
-    struct depth_t {
-        double_type price;
-        double_type amount;
-
-        friend std::ostream &operator<<(std::ostream &os, const depth_t &o);
+        static futures_ticker_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &is, const futures_ticker_t &f);
     };
 
-    std::size_t E;
-    std::string s;
-    std::size_t u;
-    std::size_t U;
-    std::vector<depth_t> a;
-    std::vector<depth_t> b;
+    struct candle_t {
+        std::size_t ts;
+        double_type open;
+        double_type high;
+        double_type low;
+        double_type close;
+        double_type volume;
 
-    static diff_depths_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const diff_depths_t &o);
-};
+        static candle_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const candle_t &f);
+    };
 
-/*************************************************************************************************/
+    struct depth_t {
+        std::map<double_type, double_type> asks;
+        std::map<double_type, double_type> bids;
+        std::size_t ts;
+        std::size_t checksum;
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams
-struct kline_t {
-    std::size_t E; // Event time
-    std::string s; // Symbol
-    std::size_t t; // Kline start time
-    std::size_t T; // Kline close time
-    std::string i; // Interval
-    std::size_t f; // First trade ID
-    std::size_t L; // Last trade ID
-    double_type o; // Open price
-    double_type c; // Close price
-    double_type h; // High price
-    double_type l; // Low price
-    double_type v; // Base asset volume
-    std::size_t n; // Number of trades
-    bool        x; // Is this kline closed?
-    double_type q; // Quote asset volume
-    double_type V; // Taker buy base asset volume
-    double_type Q; // Taker buy quote asset volume
+        static depth_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const depth_t &f);
+    };
 
-    static kline_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const kline_t &o);
-    friend bool ohlc_equal(const kline_t &l, const kline_t &r);
-};
+    struct trade_t {
+        std::size_t ts;
+        double_type price;
+        double_type size;
+        _side side;
 
-std::ostream& ohlc(std::ostream &os, const kline_t &o);
+        static trade_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const trade_t &f);
+    };
 
-/*************************************************************************************************/
+//------------------------------------------------------------------------------
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-mini-ticker-stream
-struct mini_ticker_t {
-    std::size_t E; // Event time
-    std::string s; // Symbol
-    double_type c; // Close price
-    double_type o; // Open price
-    double_type h; // High price
-    double_type l; // Low price
-    double_type v; // Total traded base asset volume
-    double_type q; // Total traded quote asset volume
+    // Private channels
 
-    static mini_ticker_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const mini_ticker_t &o);
-};
+    struct spot_account_t {
+        struct coin_t {
+            std::size_t coinId;
+            std::string coinName;
+            double_type available;
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-market-mini-tickers-stream
-struct mini_tickers_t {
-    std::map<std::string, mini_ticker_t> tickers;
+            friend std::ostream &operator<<(std::ostream &os, const coin_t &f);
+        };
+        std::vector<coin_t> coins;
 
-    static mini_tickers_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const mini_tickers_t &o);
-};
+        static spot_account_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const spot_account_t &f);
+    };
 
-/*************************************************************************************************/
+    struct futures_account_t {
+        std::string marginCoin;
+        double_type locked;
+        double_type available;
+        double_type crossMaxAvailable;
+        double_type fixedMaxAvailable;
+        double_type maxTransferOut;
+        double_type equity;
+        double_type usdtEquity;
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams
-struct market_ticker_t {
-    std::size_t E; // Event time
-    std::string s; // Symbol
-    double_type p; // Price change
-    double_type P; // Price change percent
-    double_type w; // Weighted average price
-    double_type x; // First trade(F)-1 price (first trade before the 24hr rolling window)
-    double_type c; // Last price
-    double_type Q; // Last quantity
-    double_type b; // Best bid price
-    double_type B; // Best bid quantity
-    double_type a; // Best ask price
-    double_type A; // Best ask quantity
-    double_type o; // Open price
-    double_type h; // High price
-    double_type l; // Low price
-    double_type v; // Total traded base asset volume
-    double_type q; // Total traded quote asset volume
-    std::size_t O; // Statistics open time
-    std::size_t C; // Statistics close time
-    std::size_t F; // First trade ID
-    std::size_t L; // Last trade Id
-    std::size_t n; // Total number of trades
+        static futures_account_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const futures_account_t &f);
+    };
 
-    static market_ticker_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const market_ticker_t &o);
-};
+    struct position_t {
+        std::string posId;
+        std::string instId;
+        std::string instName;
+        std::string marginCoin;
+        double_type margin;
+        _margin_mode marginMode;
+        _hold_side holdSide;
+        _hold_mode holdMode;
+        double_type total;
+        double_type available;
+        double_type locked;
+        double_type avgOpenPrice;
+        int leverage;
+        double_type achievedProfits;
+        double_type uPL;
+        double_type uPLRate;
+        double_type liqPrice;
+        double_type keepMarginRate;
+        double_type fixedMarginRate;
+        double_type marginRate;
+        std::size_t cTime;
+        std::size_t uTime;
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream
-struct markets_tickers_t {
-    std::map<std::string, market_ticker_t> tickers;
+        static position_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const position_t &f);
+    };
 
-    static markets_tickers_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const markets_tickers_t &o);
-};
+    struct spot_order_t {
+        std::string instId;
+        std::string orderId;
+        std::string clientOrderId;
+        double_type price;
+        double_type size;
+        double_type notional;
+        _force force;
+        _side side;
+        double_type fillPrice;
+        std::string tradeId;
+        double_type fillSize;
+        std::size_t fillTime;
+        double_type fillFee;
+        std::string fillFeeCcy;
+        std::string execType;   // Look at turning this into a bool where Maker is 0 and Taker is 1
+        double_type accFillSize;
+        double_type avgPrice;
+        _status status;
+        std::size_t cTime;
+        std::size_t uTime;
+        std::map<std::string, double_type> feeList;
 
-/*************************************************************************************************/
+        static spot_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const spot_order_t &f);
+    };
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-book-ticker-streams
-struct book_ticker_t {
-    std::size_t u;
-    std::string s;
-    double_type b;
-    double_type B;
-    double_type a;
-    double_type A;
+    struct futures_order_t {
+        std::string instId;
+        std::string orderId;
+        std::string clientOrderId;
+        double_type price;
+        double_type size;
+        double_type notional;
+        _order_type orderType;
+        _force force;
+        _hold_side posSide;
+        _margin_mode tdMode;
+        std::string tgtCcy;
+        double_type fillPrice;
+        std::string tradeId;
+        double_type fillSize;
+        std::size_t fillTime;
+        double_type fillFee;
+        std::string fillFeeCcy;
+        std::string execType;
+        double_type accFillSize;
+        double_type fillNotional;
+        _status status;
+        int leverage;
+        std::map<std::string, double_type> feeList;
+        double_type pnl;
+        std::size_t uTime;
+        std::size_t cTime;
 
-    static book_ticker_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const book_ticker_t &o);
-};
+        static futures_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const futures_order_t &f);
+    };
 
-/*************************************************************************************************/
+    struct plan_order_t {
+        std::string instId;
+        std::string orderId;
+        std::string clientOrderId;
+        double_type triggerPrice;
+        _ws_plan_type planType;
+        double_type orderPrice;
+        double_type size;
+        double_type actualSize;
+        _order_type orderType;
+        _side side;
+        _hold_side posSide;
+        std::string tgtCcy;
+        _plan_status status;
+        std::size_t uTime;
+        std::size_t cTime;
+
+        static plan_order_t construct(const flatjson::fjson &json);
+        friend std::ostream &operator<<(std::ostream &os, const plan_order_t &f);
+    };
+
+//------------------------------------------------------------------------------
 
 } // ns ws
-
-/*************************************************************************************************/
-/*************************************************************************************************/
-/*************************************************************************************************/
-
-namespace userdata {
-
-/*************************************************************************************************/
-
-// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#account-update
-struct account_update_t {
-    struct balance_t {
-        std::string a;
-        double_type f;
-        double_type l;
-
-        friend std::ostream& operator<<(std::ostream &os, const balance_t &o);
-    };
-
-    std::string e;
-    std::size_t E;
-    std::size_t u;
-    std::map<std::string, balance_t> B;
-
-    static account_update_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const account_update_t &o);
-};
-
-/*************************************************************************************************/
-
-// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#balance-update
-struct balance_update_t {
-    std::string e;
-    std::size_t E;
-    std::string a;
-    double_type d;
-    std::size_t T;
-
-    static balance_update_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const balance_update_t &o);
-};
-
-/*************************************************************************************************/
-
-// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#order-update
-struct order_update_t {
-    std::string e;
-    std::size_t E;
-    std::string s;
-    std::string c;
-    std::string S;
-    std::string o;
-    std::string f;
-    double_type q;
-    double_type p;
-    double_type P;
-    double_type F;
-    std::string C;
-    std::string x;
-    std::string X;
-    std::string r;
-    std::size_t i;
-    double_type l;
-    double_type z;
-    double_type L;
-    double_type n;
-    std::string N;
-    std::size_t T;
-    std::size_t t;
-    std::size_t I;
-    bool        w;
-    bool        m;
-    bool        M;
-    std::size_t O;
-    double_type Z;
-
-    static order_update_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const order_update_t &o);
-};
-
-/*************************************************************************************************/
-
-// wrapper for account_update_t and order_update_t
-struct userdata_stream_t {
-    std::string data;
-
-    static userdata_stream_t construct(const flatjson::fjson &json);
-    friend std::ostream& operator<<(std::ostream &os, const userdata_stream_t &o);
-};
-
-/*************************************************************************************************/
-
-} // ns userdata
-
-/*************************************************************************************************/
-/*************************************************************************************************/
-/*************************************************************************************************/
 
 } // ns bg_api
 

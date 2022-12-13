@@ -20,7 +20,7 @@
 namespace bg_api {
 
 using double_type = boost::multiprecision::number<
-     boost::multiprecision::cpp_dec_float<8>
+     boost::multiprecision::cpp_dec_float<20>
     ,boost::multiprecision::et_off
 >;
 

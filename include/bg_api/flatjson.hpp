@@ -9,6 +9,8 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
+#pragma warning(disable : 4146 4267)
+
 #ifndef __FLATJSON__FLATJSON_HPP
 #define __FLATJSON__FLATJSON_HPP
 
