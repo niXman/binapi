@@ -65,9 +65,10 @@ namespace rest {
             double_type minWithdrawAmount;
             std::string browseUrl;
 
+            static chain_t construct(const flatjson::fjson &json);
             friend std::ostream &operator<<(std::ostream &os, const chain_t &f);
         };
-        std::vector<chain_t> chainList;
+        std::vector<chain_t> chains;
 
         static coin_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const coin_t &f);
