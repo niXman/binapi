@@ -108,9 +108,11 @@ namespace rest {
         std::size_t ts;
         double_type buyOne;
         double_type sellOne;
+        double_type bidSz;
+        double_type askSz;
         double_type openUtc0;
-        double_type priceChangePct;  // Futures only. When called from spot, set to -1.0
-        double_type chgUtc;          // Futures only. When called from spot, set to -1.0
+        double_type priceChangePercent;     // Futures only. When called from spot, set to -1.0
+        double_type chgUtc;                 // Futures only. When called from spot, set to -1.0
 
         static ticker_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const ticker_t &f);
@@ -220,7 +222,7 @@ namespace rest {
         std::string toAddress;
         double_type fee;         // Only for withdrawals. When called from getDeposit list set to -1.0
         std::string chain;
-        int confirm;            // Only for withdrawals. When called from getDeposit list set to -1
+        int confirm;            // Only for withdrawals. When called from getDeposit list set to -1.0
         std::size_t cTime;
         std::size_t uTime;
 
@@ -406,7 +408,7 @@ namespace rest {
         std::string symbol;
         double_type size;
         std::string orderId;
-        std::string cliendOid;
+        std::string clientOid;
         double_type filledQty;
         double_type fee;
         double_type price;
@@ -417,14 +419,14 @@ namespace rest {
         double_type totalProfits;
         _hold_side posSide;
         std::string marginCoin;
-        double_type presetTakeProfitPrice;       // details only
-        double_type presetStopLossPrice;         // details only
-        double_type filledAmount;                // history and details
-        int leverage;                       // productType and history
+        double_type presetTakeProfitPrice;      // details only
+        double_type presetStopLossPrice;        // details only
+        double_type filledAmount;               // history and details
+        int leverage;                           // productType and history
         _order_type orderType;
-        _margin_mode marginMode;     // productType and history
+        _margin_mode marginMode;                // productType and history. Set to "crossed" by default
         std::size_t cTime;
-        std::size_t uTime;                  // history and details
+        std::size_t uTime;                      // history and details
 
         static futures_order_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const futures_order_t &f);
@@ -547,12 +549,12 @@ namespace rest {
         double_type stopProfitPrice;
         double_type stopLossPrice;
         double_type closeDealCount;
-        std::size_t closeTime;      // History only
-        double_type closeAvgPrice;       // History only
-        _stop_type stopType;   // History only
-        double_type achievedProfits;     // History only
-        double_type openFee;             // History only
-        double_type closeFee;            // History only
+        std::size_t closeTime;          // History only. Set to 0 by default
+        double_type closeAvgPrice;      // History only. Set to -1.0 by default
+        _stop_type stopType;            // History only. Set to "profit" by default
+        double_type achievedProfits;    // History only. Set to -1.0 by default
+        double_type openFee;            // History only. Set to -1.0 by default
+        double_type closeFee;           // History only. Set to -1.0 by default
 
         static trader_order_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const trader_order_t &f);
@@ -564,8 +566,8 @@ namespace rest {
         std::string closeOrderId;
         std::string symbol;
         _hold_side holdSide;
-        double_type openSize;            // History only
-        double_type closeSize;           // History only
+        double_type openSize;           // History only. Set to -1.0 by default
+        double_type closeSize;          // History only. Set to -1.0 by default
         int openLeverage;
         double_type openAvgPrice;
         std::size_t openTime;
@@ -574,12 +576,12 @@ namespace rest {
         double_type avgClosePrice;
         double_type closeDealCount;
         std::size_t closeTime;
-        _stop_type stopType;   // History only
-        double_type achievedProfits;     // History only
-        double_type openFee;             // History only
-        double_type closeFee;            // History only
-        double_type profitRate;          // History only
-        double_type netProfit;           // History only
+        _stop_type stopType;            // History only. Set to "profit" by default
+        double_type achievedProfits;    // History only. Set to -1.0 by default
+        double_type openFee;            // History only. Set to -1.0 by default
+        double_type closeFee;           // History only. Set to -1.0 by default
+        double_type profitRate;         // History only. Set to -1.0 by default
+        double_type netProfit;          // History only. Set to -1.0 by default
 
         static follower_order_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const follower_order_t &f);
@@ -598,8 +600,8 @@ namespace rest {
     struct profit_token_t {
         std::string tokenId;
         double_type profit;
-        std::size_t date;       // profitDateGroupList only
-        std::string nickname;   // profitDateList only
+        std::size_t date;       // profitDateGroupList only. Set to 0 by default
+        std::string nickname;   // profitDateList only. Set to "" by default
 
         static profit_token_t construct(const flatjson::fjson &json);
         friend std::ostream &operator<<(std::ostream &os, const profit_token_t &f);
@@ -673,7 +675,7 @@ namespace rest {
         std::string subUid;
         std::string label;
         std::string apiKey;
-        unsigned int perms;
+        std::set<std::string> perms;
         std::string ip;
 
         static sub_apikey_t construct(const flatjson::fjson &json);
