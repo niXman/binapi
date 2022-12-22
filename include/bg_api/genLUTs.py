@@ -76,12 +76,12 @@ with open('LUTs.cpp', 'w') as fp:
     for coin in spot_msg['data'][:-1]: # Loop through spot pairs
         fp.write("\t{")
         fp.write(f"\"{coin['symbol']}\", \"{coin['symbolName']}\", \"{coin['baseCoin']}\", \"{coin['quoteCoin']}\", {coin['minTradeAmount']}, {coin['maxTradeAmount']}, ")
-        fp.write(f"{coin['takerFeeRate']}, {coin['makerFeeRate']}, {coin['priceScale']}, {coin['makerFeeRate']}, {coin['minTradeUSDT']}")
+        fp.write(f"{coin['takerFeeRate']}, {coin['makerFeeRate']}, {coin['priceScale']}, {coin['quantityScale']}, {coin['minTradeUSDT']}")
         fp.write("},\n")
     spot_coin = spot_msg['data'][len(spot_msg['data']) - 1]
     fp.write("\t{")
     fp.write(f"\"{coin['symbol']}\", \"{coin['symbolName']}\", \"{coin['baseCoin']}\", \"{coin['quoteCoin']}\", {coin['minTradeAmount']}, {coin['maxTradeAmount']}, ")
-    fp.write(f"{coin['takerFeeRate']}, {coin['makerFeeRate']}, {coin['priceScale']}, {coin['makerFeeRate']}, {coin['minTradeUSDT']}")
+    fp.write(f"{coin['takerFeeRate']}, {coin['makerFeeRate']}, {coin['priceScale']}, {coin['quantityScale']}, {coin['minTradeUSDT']}")
     fp.write("}\n};\n\n")
 
     # Create the futures LUTs
