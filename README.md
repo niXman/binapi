@@ -1,7 +1,7 @@
 # bg_api
 Bitget API implemented in C++ for both synchronous and asynchronous way. Based on niXman's Binance C++ API.
 
-Note: This project is currently a work in progress. The expected date of completion is January 31, 2023.
+Note: This project is currently a work in progress. The expected date of completion is January 15, 2023.
 
 ## TODO:
 
@@ -11,7 +11,7 @@ Here are the files that need to be implemented before I get started on the REST 
 - [x] enums.cpp
 - [x] errors.hpp
 - [x] errors.cpp
-- [ ] types.hpp
+- [x] types.hpp
 - [ ] types.cpp
 
 
