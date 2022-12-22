@@ -56,7 +56,6 @@ struct api {
         std::string passphrase,
         std::string sk,
         std::size_t timeout,
-        std::string content_type = "application/json",
         std::string locale = "en-US",
         std::string client_api_string = "bg_api-0.0.1"
     );

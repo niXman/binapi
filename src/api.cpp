@@ -132,7 +132,6 @@ struct api::impl {
         std::string passphrase,
         std::string sk,
         std::size_t timeout,
-        std::string content_type,
         std::string locale,
         std::string client_api_string
     ) :
@@ -143,7 +142,6 @@ struct api::impl {
         m_passphrase{std::move(passphrase)},
         m_sk{std::move(sk)},
         m_timeout{timeout},
-        m_content_type{std::move(content_type)},
         m_locale{std::move(locale)},
         m_client_api_string{std::move(client_api_string)},
         m_write_in_process{},
@@ -350,7 +348,7 @@ struct api::impl {
         req.insert("X-MBX-APIKEY", m_pk);
         req.set(boost::beast::http::field::host, m_host);
         req.set(boost::beast::http::field::user_agent, m_client_api_string);
-        req.set(boost::beast::http::field::content_type, "application/x-www-form-urlencoded");
+        req.set(boost::beast::http::field::content_type, "application/json");
 
         boost::beast::http::write(ssl_stream, req, ec);
         if ( ec ) {
@@ -411,7 +409,7 @@ struct api::impl {
         req->insert("X-MBX-APIKEY", m_pk);
         req->set(boost::beast::http::field::host, m_host);
         req->set(boost::beast::http::field::user_agent, m_client_api_string);
-        req->set(boost::beast::http::field::content_type, "application/x-www-form-urlencoded");
+        req->set(boost::beast::http::field::content_type, "application/json");
 
         //std::cout << target << " REQUEST:\n" << m_req << std::endl;
 
@@ -576,7 +574,6 @@ struct api::impl {
     const std::string m_passphrase;
     const std::string m_sk;
     const std::size_t m_timeout;
-    const std::string m_content_type;
     const std::string m_locale;
     const std::string m_client_api_string;
 
@@ -603,7 +600,6 @@ api::api(
     std::string passphrase,
     std::string sk,
     std::size_t timeout,
-    std::string content_type,
     std::string locale,
     std::string client_api_string
 )
@@ -615,7 +611,6 @@ api::api(
         std::move(passphrase),
         std::move(sk),
         timeout,
-        std::move(content_type),
         std::move(locale),
         std::move(client_api_string)
     )}

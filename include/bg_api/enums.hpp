@@ -28,6 +28,7 @@ namespace bg_api {
     };
 
     _side side_from_string(const char* str);
+    _side side_from_string(const std::string& str);
     const char* side_to_string(_side s);
 
 //------------------------------------------------------------------------------
@@ -39,6 +40,7 @@ namespace bg_api {
     };
 
     _order_type order_type_from_string(const char* str);
+    _order_type order_type_from_string(const std::string& str);
     const char* order_type_to_string(_order_type o);
 
 //------------------------------------------------------------------------------
@@ -52,6 +54,7 @@ namespace bg_api {
     };
 
     _force force_from_string(const char* str);
+    _force force_from_string(const std::string& str);
     const char* force_to_string(_force f);
 
 //------------------------------------------------------------------------------
@@ -66,6 +69,7 @@ namespace bg_api {
     };
 
     _status status_from_string(const char* str);
+    _status status_from_string(const std::string& str);
     const char* status_to_string(_status s);
 
 //------------------------------------------------------------------------------
@@ -80,21 +84,30 @@ namespace bg_api {
     };
 
     _group_type group_type_from_string(const char* str);
+    _group_type group_type_from_string(const std::string& str);
     const char* group_type_to_string(_group_type g);
 
 //------------------------------------------------------------------------------
 
     // Business type
     enum class _biz_type : size_t {
-        _deposit,        // Deposit
-        _withdraw,       // Withdrawal
-        _buy,            // Buy
-        _sell,           // Sell
-        _transfer_in,    // Transfer in
-        _transfer_out    // Transfer out
+        _deposit,       // Deposit
+        _withdraw,      // Withdrawal
+        _buy,           // Buy
+        _sell,          // Sell
+        _deduct_hand,   // Deduction of handling fee
+        _transfer_in,   // Transfer in
+        _transfer_out,  // Transfer out
+        _rebate_rwd,    // Rebate rewards  
+        _airdrop_rwd,   // Airdrop rewards
+        _USDT_rwd,      // USDT contract rewards
+        _mix_rwd,       // Mix contract rewards
+        _system_lock,   // System lock
+        _user_lock      // User lock 
     };
 
     _biz_type biz_type_from_string(const char* str);
+    _biz_type biz_type_from_string(const std::string& str);
     const char* biz_type_to_string(_biz_type b);
 
 //------------------------------------------------------------------------------
@@ -113,6 +126,7 @@ namespace bg_api {
     };
 
     _dwos dwos_from_string(const char* str);
+    _dwos dwos_from_string(const std::string& str);
     const char* dwos_to_string(_dwos d);
 
 //------------------------------------------------------------------------------
@@ -124,6 +138,7 @@ namespace bg_api {
     };
 
     _withdraw_type withdraw_type_from_string(const char* str);
+    _withdraw_type withdraw_type_from_string(const std::string& str);
     const char* withdraw_type_to_string(_withdraw_type w);
 
 //------------------------------------------------------------------------------
@@ -139,6 +154,7 @@ namespace bg_api {
     };
 
     _depth_type depth_type_from_string(const char* str);
+    _depth_type depth_type_from_string(const std::string& str);
     const char* depth_type_to_string(_depth_type d);
 
 //------------------------------------------------------------------------------
@@ -153,6 +169,7 @@ namespace bg_api {
     };
 
     _account_type account_type_from_string(const char* str);
+    _account_type account_type_from_string(const std::string& str);
     const char* account_type_to_string(_account_type a);
 
 //------------------------------------------------------------------------------
@@ -180,6 +197,7 @@ namespace bg_api {
     };
 
     _candle_gran candle_gran_from_string(const char* str);
+    _candle_gran candle_gran_from_string(const std::string& str);
     const char* candle_gran_to_string(_candle_gran c);
 
 //------------------------------------------------------------------------------
@@ -193,6 +211,7 @@ namespace bg_api {
     };
 
     _from_to_type from_to_type_from_string(const char* str);
+    _from_to_type from_to_type_from_string(const std::string& str);
     const char* from_to_type_to_string(_from_to_type f);
 
 //------------------------------------------------------------------------------
@@ -208,6 +227,7 @@ namespace bg_api {
     };
 
     _product_type product_type_from_string(const char* str);
+    _product_type product_type_from_string(const std::string& str);
     const char* product_type_to_string(_product_type p);
 
 //------------------------------------------------------------------------------
@@ -219,6 +239,7 @@ namespace bg_api {
     };
 
     _margin_mode margin_mode_from_string(const char* str);
+    _margin_mode margin_mode_from_string(const std::string& str);
     const char* margin_mode_to_string(_margin_mode m);
 
 //------------------------------------------------------------------------------
@@ -230,6 +251,7 @@ namespace bg_api {
     };
 
     _hold_mode hold_mode_from_string(const char* str);
+    _hold_mode hold_mode_from_string(const std::string& str);
     const char* hold_mode_to_string(_hold_mode h);
 
 //------------------------------------------------------------------------------
@@ -241,6 +263,7 @@ namespace bg_api {
     };
 
     _hold_side hold_side_from_string(const char* str);
+    _hold_side hold_side_from_string(const std::string& str);
     const char* hold_side_to_string(_hold_side h);
 
 //------------------------------------------------------------------------------
@@ -258,6 +281,7 @@ namespace bg_api {
     };
 
     _business business_from_string(const char* str);
+    _business business_from_string(const std::string& str);
     const char* business_to_string(_business b);
 
 //------------------------------------------------------------------------------
@@ -272,6 +296,7 @@ namespace bg_api {
     };
 
     _mix_side mix_side_from_string(const char* str);
+    _mix_side mix_side_from_string(const std::string& str);
     const char* mix_side_to_string(_mix_side s);
 
 //------------------------------------------------------------------------------
@@ -303,6 +328,7 @@ namespace bg_api {
     };
 
     _trade_side trade_side_from_string(const char* str);
+    _trade_side trade_side_from_string(const std::string& str);
     const char* trade_side_to_string(_trade_side t);
 
 //------------------------------------------------------------------------------
@@ -316,6 +342,7 @@ namespace bg_api {
     };
 
     _state state_from_string(const char* str);
+    _state state_from_string(const std::string& str);
     const char* state_to_string(_state s);
 
 //------------------------------------------------------------------------------
@@ -326,6 +353,7 @@ namespace bg_api {
     };
 
     _trigger_type trigger_type_from_string(const char* str);
+    _trigger_type trigger_type_from_string(const std::string& str);
     const char* trigger_type_to_string(_trigger_type t);
 
 //------------------------------------------------------------------------------
@@ -341,6 +369,7 @@ namespace bg_api {
     };
 
     _plan_type plan_type_from_string(const char* str);
+    _plan_type plan_type_from_string(const std::string& str);
     const char* plan_type_to_string(_plan_type p);
 
 //------------------------------------------------------------------------------
@@ -351,6 +380,7 @@ namespace bg_api {
     };
 
     _is_plan is_plan_from_string(const char* str);
+    _is_plan is_plan_from_string(const std::string& str);
     const char* is_plan_to_string(_is_plan p);
 
 //------------------------------------------------------------------------------
@@ -363,6 +393,7 @@ namespace bg_api {
     };
 
     _plan_status plan_status_from_string(const char* str);
+    _plan_status plan_status_from_string(const std::string& str);
     const char* plan_status_to_string(_plan_status p);
 
 //------------------------------------------------------------------------------
@@ -373,6 +404,7 @@ namespace bg_api {
     };
 
     _stop_type stop_type_from_string(const char* str);
+    _stop_type stop_type_from_string(const std::string& str);
     const char* stop_type_to_string(_stop_type s);
 
 //------------------------------------------------------------------------------
@@ -387,6 +419,7 @@ namespace bg_api {
     };
 
     _ws_plan_type ws_plan_type_from_string(const char* str);
+    _ws_plan_type ws_plan_type_from_string(const std::string& str);
     const char* ws_plan_type_to_string(_ws_plan_type p);
 
 //------------------------------------------------------------------------------
@@ -398,6 +431,7 @@ namespace bg_api {
     };
 
     _account_status account_status_from_string(const char* str);
+    _account_status account_status_from_string(const std::string& str);
     const char* account_status_to_string(_account_status a);
 
 //------------------------------------------------------------------------------

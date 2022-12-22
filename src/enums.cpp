@@ -10,6 +10,8 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
+#pragma warning(disable : 4715)
+
 #include <bg_api/enums.hpp>
 #include <bg_api/fnv1a.hpp>
 
@@ -28,6 +30,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _side side_from_string(const std::string &str) {
+        return side_from_string(str.c_str());
     }
 
     const char* side_to_string(_side s) {
@@ -52,6 +58,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _order_type order_type_from_string(const std::string &str) {
+        return order_type_from_string(str.c_str());
+    }
+
     const char* order_type_to_string(_order_type o) {
         switch(o) {
             case _order_type::_limit: return "limit";
@@ -74,6 +84,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _force force_from_string(const std::string &str) {
+        return force_from_string(str.c_str());
     }
 
     const char* force_to_string(_force f) {
@@ -101,6 +115,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _status status_from_string(const std::string &str) {
+        return status_from_string(str.c_str());
     }
 
     const char* status_to_string(_status s) {
@@ -131,6 +149,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _group_type group_type_from_string(const std::string &str) {
+        return group_type_from_string(str.c_str());
+    }
+
     const char* group_type_to_string(_group_type g) {
         switch(g) {
             case _group_type::_deposit: return "deposit";
@@ -153,11 +175,22 @@ namespace bg_api {
             case fnv1a("withdraw"): return _biz_type::_withdraw;
             case fnv1a("buy"): return _biz_type::_buy;
             case fnv1a("sell"): return _biz_type::_sell;
+            case fnv1a("deduction of handling fee"): return _biz_type::_deduct_hand;
             case fnv1a("transfer-in"): return _biz_type::_transfer_in;
             case fnv1a("transfer-out"): return _biz_type::_transfer_out;
+            case fnv1a("rebate rewards"): return _biz_type::_rebate_rwd;
+            case fnv1a("airdrop rewards"): return _biz_type::_airdrop_rwd;
+            case fnv1a("USDT contract rewards"): return _biz_type::_USDT_rwd;
+            case fnv1a("mix contract rewards"): return _biz_type::_mix_rwd;
+            case fnv1a("System lock"): return _biz_type::_system_lock;
+            case fnv1a("User lock"): return _biz_type::_user_lock;
         }
         
         assert(!"unreachable");
+    }
+
+    _biz_type biz_type_from_string(const std::string &str) {
+        return biz_type_from_string(str.c_str());
     }
 
     const char* biz_type_to_string(_biz_type b) {
@@ -166,8 +199,15 @@ namespace bg_api {
             case _biz_type::_withdraw: return "withdraw";
             case _biz_type::_buy: return "buy";
             case _biz_type::_sell: return "sell";
+            case _biz_type::_deduct_hand: return "deduction of handling fee";
             case _biz_type::_transfer_in: return "transfer-in";
             case _biz_type::_transfer_out: return "transfer-out";
+            case _biz_type::_rebate_rwd: return "rebate rewards";
+            case _biz_type::_airdrop_rwd: return "airdrop rewards";
+            case _biz_type::_USDT_rwd: return "USDT contract rewards";
+            case _biz_type::_mix_rwd: return "mix contract rewards";
+            case _biz_type::_system_lock: return "System lock";
+            case _biz_type::_user_lock: return "User lock";
         }
 
         assert(!"unreachable");
@@ -191,6 +231,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _dwos dwos_from_string(const std::string &str) {
+        return dwos_from_string(str.c_str());
     }
 
     const char* dwos_to_string(_dwos d) {
@@ -222,6 +266,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _withdraw_type withdraw_type_from_string(const std::string &str) {
+        return withdraw_type_from_string(str.c_str());
+    }
+
     const char* withdraw_type_to_string(_withdraw_type w) {
         switch(w) {
             case _withdraw_type::_chain: return "chain-on";
@@ -245,6 +293,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _account_type account_type_from_string(const std::string &str) {
+        return account_type_from_string(str.c_str());
     }
 
     const char* account_type_to_string(_account_type a) {
@@ -288,6 +340,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _candle_gran candle_gran_from_string(const std::string &str) {
+        return candle_gran_from_string(str.c_str());
+    }
+
     const char* candle_gran_to_string(_candle_gran c) {
         switch (c) {
             case _candle_gran::_1m: return "1min";
@@ -328,6 +384,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _from_to_type from_to_type_from_string(const std::string &str) {
+        return from_to_type_from_string(str.c_str());
+    }
+
     const char* from_to_type_to_string(_from_to_type f) {
         switch(f) {
             case _from_to_type::_spot: return "spot";
@@ -356,6 +416,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _product_type product_type_from_string(const std::string &str) {
+        return product_type_from_string(str.c_str());
+    }
+
     const char* product_type_to_string(_product_type p) {
         switch (p) {
             case _product_type::_umcbl: return "umcbl";
@@ -382,6 +446,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _margin_mode margin_mode_from_string(const std::string &str) {
+        return margin_mode_from_string(str.c_str());
+    }
+
     const char* margin_mode_to_string(_margin_mode m) {
         switch (m) {
             case _margin_mode::_fixed: return "fixed";
@@ -404,6 +472,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _hold_mode hold_mode_from_string(const std::string &str) {
+        return hold_mode_from_string(str.c_str());
+    }
+
     const char* hold_mode_to_string(_hold_mode h) {
         switch (h) {
             case _hold_mode::_single: return "single_hold";
@@ -424,6 +496,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _hold_side hold_side_from_string(const std::string &str) {
+        return hold_side_from_string(str.c_str());
     }
 
     const char* hold_side_to_string(_hold_side h) {
@@ -453,6 +529,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _business business_from_string(const std::string &str) {
+        return business_from_string(str.c_str());
     }
 
     const char* business_to_string(_business b) {
@@ -486,6 +566,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _mix_side mix_side_from_string(const std::string &str) {
+        return mix_side_from_string(str.c_str());
     }
 
     const char* mix_side_to_string(_mix_side s) {
@@ -532,6 +616,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _trade_side trade_side_from_string(const std::string &str) {
+        return trade_side_from_string(str.c_str());
+    }
+
     const char* trade_side_to_string(_trade_side t) {
         switch (t) {
             case _trade_side::_open_long: return "open_long";
@@ -575,6 +663,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _state state_from_string(const std::string &str) {
+        return state_from_string(str.c_str());
+    }
+
     const char* state_to_string(_state s) {
         switch(s) {
             case _state::_init: return "init";
@@ -598,6 +690,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _trigger_type trigger_type_from_string(const std::string &str) {
+        return trigger_type_from_string(str.c_str());
     }
 
     const char* trigger_type_to_string(_trigger_type t) {
@@ -627,6 +723,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _plan_type plan_type_from_string(const std::string &str) {
+        return plan_type_from_string(str.c_str());
+    }
+
     const char* plan_type_to_string(_plan_type p) {
         switch (p) {
             case _plan_type::_profit_plan: return "profit_plan";
@@ -654,6 +754,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _is_plan is_plan_from_string(const std::string &str) {
+        return is_plan_from_string(str.c_str());
+    }
+
     const char* is_plan_to_string(_is_plan p) {
         switch (p) {
             case _is_plan::_plan: return "plan";
@@ -678,6 +782,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _plan_status plan_status_from_string(const std::string &str) {
+        return plan_status_from_string(str.c_str());
+    }
+
     const char* plan_status_to_string(_plan_status p) {
         switch (p) {
             case _plan_status::_not_trigger: return "not_trigger";
@@ -700,6 +808,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _stop_type stop_type_from_string(const std::string &str) {
+        return stop_type_from_string(str.c_str());
     }
 
     const char* stop_type_to_string(_stop_type s) {
@@ -727,6 +839,10 @@ namespace bg_api {
         assert(!"unreachable");
     }
 
+    _ws_plan_type ws_plan_type_from_string(const std::string &str) {
+        return ws_plan_type_from_string(str.c_str());
+    }
+
     const char* ws_plan_type_to_string(_ws_plan_type p) {
         switch (p) {
             case _ws_plan_type::_pl: return "pl";
@@ -750,6 +866,10 @@ namespace bg_api {
         }
 
         assert(!"unreachable");
+    }
+
+    _account_status account_status_from_string(const std::string &str) {
+        return account_status_from_string(str.c_str());
     }
 
     const char* account_status_to_string(_account_status a) {
