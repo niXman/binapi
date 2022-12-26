@@ -12,7 +12,7 @@ Here are the files that need to be implemented before I get started on the REST 
 - [x] errors.hpp
 - [x] errors.cpp
 - [x] types.hpp
-- [ ] types.cpp
+- [x] types.cpp
 
 
 ## REST API
