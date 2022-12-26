@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <string_view>
 
 namespace bg_api {
 
@@ -34,6 +35,10 @@ namespace bg_api {
 
     _side side_from_string(const std::string &str) {
         return side_from_string(str.c_str());
+    }
+
+    _side side_from_string(const std::string_view str) {
+        return side_from_string(static_cast<std::string>(str));
     }
 
     const char* side_to_string(_side s) {
@@ -62,6 +67,10 @@ namespace bg_api {
         return order_type_from_string(str.c_str());
     }
 
+    _order_type order_type_from_string(const std::string_view str) {
+        return order_type_from_string(static_cast<std::string>(str));
+    }
+
     const char* order_type_to_string(_order_type o) {
         switch(o) {
             case _order_type::_limit: return "limit";
@@ -88,6 +97,10 @@ namespace bg_api {
 
     _force force_from_string(const std::string &str) {
         return force_from_string(str.c_str());
+    }
+
+    _force force_from_string(const std::string_view str) {
+        return force_from_string(static_cast<std::string>(str));
     }
 
     const char* force_to_string(_force f) {
@@ -121,6 +134,10 @@ namespace bg_api {
         return status_from_string(str.c_str());
     }
 
+    _status status_from_string(const std::string_view str) {
+        return status_from_string(static_cast<std::string>(str));
+    }
+
     const char* status_to_string(_status s) {
         switch(s) {
             case _status::_init: return "init";
@@ -151,6 +168,10 @@ namespace bg_api {
 
     _group_type group_type_from_string(const std::string &str) {
         return group_type_from_string(str.c_str());
+    }
+
+    _group_type group_type_from_string(const std::string_view str) {
+        return group_type_from_string(static_cast<std::string>(str));
     }
 
     const char* group_type_to_string(_group_type g) {
@@ -191,6 +212,10 @@ namespace bg_api {
 
     _biz_type biz_type_from_string(const std::string &str) {
         return biz_type_from_string(str.c_str());
+    }
+
+    _biz_type biz_type_from_string(const std::string_view str) {
+        return biz_type_from_string(static_cast<std::string>(str));
     }
 
     const char* biz_type_to_string(_biz_type b) {
@@ -237,6 +262,10 @@ namespace bg_api {
         return dwos_from_string(str.c_str());
     }
 
+    _dwos dwos_from_string(const std::string_view str) {
+        return dwos_from_string(static_cast<std::string>(str));
+    }
+
     const char* dwos_to_string(_dwos d) {
         switch(d) {
             case _dwos::_cancel: return "cancel";
@@ -270,6 +299,10 @@ namespace bg_api {
         return withdraw_type_from_string(str.c_str());
     }
 
+    _withdraw_type withdraw_type_from_string(const std::string_view str) {
+        return withdraw_type_from_string(static_cast<std::string>(str));
+    }
+
     const char* withdraw_type_to_string(_withdraw_type w) {
         switch(w) {
             case _withdraw_type::_chain: return "chain-on";
@@ -297,6 +330,10 @@ namespace bg_api {
 
     _account_type account_type_from_string(const std::string &str) {
         return account_type_from_string(str.c_str());
+    }
+
+    _account_type account_type_from_string(const std::string_view str) {
+        return account_type_from_string(static_cast<std::string>(str));
     }
 
     const char* account_type_to_string(_account_type a) {
@@ -344,6 +381,10 @@ namespace bg_api {
         return candle_gran_from_string(str.c_str());
     }
 
+    _candle_gran candle_gran_from_string(const std::string_view str) {
+        return candle_gran_from_string(static_cast<std::string>(str));
+    }
+
     const char* candle_gran_to_string(_candle_gran c) {
         switch (c) {
             case _candle_gran::_1m: return "1min";
@@ -388,6 +429,10 @@ namespace bg_api {
         return from_to_type_from_string(str.c_str());
     }
 
+    _from_to_type from_to_type_from_string(const std::string_view str) {
+        return from_to_type_from_string(static_cast<std::string>(str));
+    }
+
     const char* from_to_type_to_string(_from_to_type f) {
         switch(f) {
             case _from_to_type::_spot: return "spot";
@@ -420,6 +465,10 @@ namespace bg_api {
         return product_type_from_string(str.c_str());
     }
 
+    _product_type product_type_from_string(const std::string_view str) {
+        return product_type_from_string(static_cast<std::string>(str));
+    }
+
     const char* product_type_to_string(_product_type p) {
         switch (p) {
             case _product_type::_umcbl: return "umcbl";
@@ -450,6 +499,10 @@ namespace bg_api {
         return margin_mode_from_string(str.c_str());
     }
 
+    _margin_mode margin_mode_from_string(const std::string_view str) {
+        return margin_mode_from_string(static_cast<std::string>(str));
+    }
+
     const char* margin_mode_to_string(_margin_mode m) {
         switch (m) {
             case _margin_mode::_fixed: return "fixed";
@@ -476,6 +529,10 @@ namespace bg_api {
         return hold_mode_from_string(str.c_str());
     }
 
+    _hold_mode hold_mode_from_string(const std::string_view str) {
+        return hold_mode_from_string(static_cast<std::string>(str));
+    }
+
     const char* hold_mode_to_string(_hold_mode h) {
         switch (h) {
             case _hold_mode::_single: return "single_hold";
@@ -500,6 +557,10 @@ namespace bg_api {
 
     _hold_side hold_side_from_string(const std::string &str) {
         return hold_side_from_string(str.c_str());
+    }
+
+    _hold_side hold_side_from_string(const std::string_view str) {
+        return hold_side_from_string(static_cast<std::string>(str));
     }
 
     const char* hold_side_to_string(_hold_side h) {
@@ -533,6 +594,10 @@ namespace bg_api {
 
     _business business_from_string(const std::string &str) {
         return business_from_string(str.c_str());
+    }
+
+    _business business_from_string(const std::string_view str) {
+        return business_from_string(static_cast<std::string>(str));
     }
 
     const char* business_to_string(_business b) {
@@ -570,6 +635,10 @@ namespace bg_api {
 
     _mix_side mix_side_from_string(const std::string &str) {
         return mix_side_from_string(str.c_str());
+    }
+
+    _mix_side mix_side_from_string(const std::string_view str) {
+        return mix_side_from_string(static_cast<std::string>(str));
     }
 
     const char* mix_side_to_string(_mix_side s) {
@@ -620,6 +689,10 @@ namespace bg_api {
         return trade_side_from_string(str.c_str());
     }
 
+    _trade_side trade_side_from_string(const std::string_view str) {
+        return trade_side_from_string(static_cast<std::string>(str));
+    }
+
     const char* trade_side_to_string(_trade_side t) {
         switch (t) {
             case _trade_side::_open_long: return "open_long";
@@ -667,6 +740,10 @@ namespace bg_api {
         return state_from_string(str.c_str());
     }
 
+    _state state_from_string(const std::string_view str) {
+        return state_from_string(static_cast<std::string>(str));
+    }
+
     const char* state_to_string(_state s) {
         switch(s) {
             case _state::_init: return "init";
@@ -694,6 +771,10 @@ namespace bg_api {
 
     _trigger_type trigger_type_from_string(const std::string &str) {
         return trigger_type_from_string(str.c_str());
+    }
+
+    _trigger_type trigger_type_from_string(const std::string_view str) {
+        return trigger_type_from_string(static_cast<std::string>(str));
     }
 
     const char* trigger_type_to_string(_trigger_type t) {
@@ -727,6 +808,10 @@ namespace bg_api {
         return plan_type_from_string(str.c_str());
     }
 
+    _plan_type plan_type_from_string(const std::string_view str) {
+        return plan_type_from_string(static_cast<std::string>(str));
+    }
+
     const char* plan_type_to_string(_plan_type p) {
         switch (p) {
             case _plan_type::_profit_plan: return "profit_plan";
@@ -758,6 +843,10 @@ namespace bg_api {
         return is_plan_from_string(str.c_str());
     }
 
+    _is_plan is_plan_from_string(const std::string_view str) {
+        return is_plan_from_string(static_cast<std::string>(str));
+    }
+
     const char* is_plan_to_string(_is_plan p) {
         switch (p) {
             case _is_plan::_plan: return "plan";
@@ -786,6 +875,10 @@ namespace bg_api {
         return plan_status_from_string(str.c_str());
     }
 
+    _plan_status plan_status_from_string(const std::string_view str) {
+        return plan_status_from_string(static_cast<std::string>(str));
+    }
+
     const char* plan_status_to_string(_plan_status p) {
         switch (p) {
             case _plan_status::_not_trigger: return "not_trigger";
@@ -812,6 +905,10 @@ namespace bg_api {
 
     _stop_type stop_type_from_string(const std::string &str) {
         return stop_type_from_string(str.c_str());
+    }
+
+    _stop_type stop_type_from_string(const std::string_view str) {
+        return stop_type_from_string(static_cast<std::string>(str));
     }
 
     const char* stop_type_to_string(_stop_type s) {
@@ -843,6 +940,10 @@ namespace bg_api {
         return ws_plan_type_from_string(str.c_str());
     }
 
+    _ws_plan_type ws_plan_type_from_string(const std::string_view str) {
+        return ws_plan_type_from_string(static_cast<std::string>(str));
+    }
+
     const char* ws_plan_type_to_string(_ws_plan_type p) {
         switch (p) {
             case _ws_plan_type::_pl: return "pl";
@@ -870,6 +971,10 @@ namespace bg_api {
 
     _account_status account_status_from_string(const std::string &str) {
         return account_status_from_string(str.c_str());
+    }
+
+    _account_status account_status_from_string(const std::string_view str) {
+        return account_status_from_string(static_cast<std::string>(str));
     }
 
     const char* account_status_to_string(_account_status a) {

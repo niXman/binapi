@@ -34,7 +34,7 @@ namespace rest {
 
 struct api {
     template<typename T>
-    struct result {
+    struct response {
         result()
             :ec{0}
         {}
