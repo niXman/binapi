@@ -11,7 +11,7 @@ execute_process(
 )
 
 #set(Boost_DEBUG 1)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address /O2")
 
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
@@ -32,6 +32,7 @@ set(BG_API_HEADERS
     include/bg_api/types.hpp
     include/bg_api/websocket.hpp
     include/bg_api/LUTs.hpp
+    include/bg_api/simdjson.h
 )
 
 set(BG_API_SOURCES
@@ -41,6 +42,7 @@ set(BG_API_SOURCES
     src/types.cpp
     src/websocket.cpp
     include/bg_api/LUTs.cpp
+    include/bg_api/simdjson.cpp
 )
 
 add_executable(
