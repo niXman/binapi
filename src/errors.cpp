@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <bg_api/errors.hpp>
-#include <bg_api/flatjson.hpp>
+#include <iostream>
 
 namespace bg_api {
 namespace rest {
@@ -67,18 +67,22 @@ namespace rest {
 
 /*************************************************************************************************/
 
-    bool is_api_error(const flatjson::fjson &json) {
-        return json.contains("code") && json.contains("msg");
+    bool is_api_error(simdjson::ondemand::document &doc) {
+        return doc["code"].get_string().take_value() != "00000";
     }
 
 /*************************************************************************************************/
 
     std::pair<int, std::string>
-    construct_error(const flatjson::fjson &json) {
-        auto ec = json.at("code").to_int();
-        auto msg = json.at("msg").to_string();
+    construct_error(simdjson::ondemand::document &doc) {
+        auto ec = static_cast<std::string>(doc["code"].get_string().take_value());
+        int err = 0;
+        if (ec != "00000") {
+            err = std::stoi(ec);
+        }
+        auto msg = static_cast<std::string>(doc["msg"].get_string().take_value());
 
-        return std::make_pair(ec, std::move(msg));
+        return std::make_pair(err, std::move(msg));
     }
 
 /*************************************************************************************************/
@@ -113,16 +117,16 @@ namespace ws {
 
 /*************************************************************************************************/
 
-    bool is_api_error(const flatjson::fjson &json) {
-        return json.contains("code") && json.contains("msg");
+    bool is_api_error(simdjson::ondemand::document &doc) {
+        return doc["code"].get_int64_in_string().take_value() != 0;
     }
 
 /*************************************************************************************************/
 
     std::pair<int, std::string>
-    construct_error(const flatjson::fjson &json) {
-        auto ec = json.at("code").to_int();
-        auto msg = json.at("msg").to_string();
+    construct_error(simdjson::ondemand::document &doc) {
+        auto ec = (int)doc["code"].get_int64_in_string().take_value();
+        auto msg = static_cast<std::string>(doc["msg"].get_string().take_value());
 
         return std::make_pair(ec, std::move(msg));
     }

@@ -16,9 +16,7 @@
 #include <string>
 #include <utility>
 
-namespace flatjson {
-struct fjson;
-} // ns flatjson
+#include "bg_api/simdjson.h"
 
 namespace bg_api {
 namespace rest {
@@ -70,10 +68,10 @@ namespace rest {
 
 /*************************************************************************************************/
 
-    bool is_api_error(const flatjson::fjson &json);
+    bool is_api_error(simdjson::ondemand::document &doc);
 
     std::pair<int, std::string>
-    construct_error(const flatjson::fjson &json);
+    construct_error(simdjson::ondemand::document &doc);
 
 /*************************************************************************************************/
 
@@ -99,10 +97,10 @@ namespace ws {
 
 /*************************************************************************************************/
 
-    bool is_api_error(const flatjson::fjson &json);
+    bool is_api_error(simdjson::ondemand::document &doc);
 
     std::pair<int, std::string>
-    construct_error(const flatjson::fjson &json);
+    construct_error(simdjson::ondemand::document &doc);
 
 /*************************************************************************************************/
 

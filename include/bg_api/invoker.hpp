@@ -19,8 +19,8 @@
 #include <cstdio>
 
 #include "message.hpp"
-#include "flatjson.hpp"
 #include "errors.hpp"
+#include "simdjson.h"
 
 namespace bg_api {
 namespace detail {
@@ -48,18 +48,23 @@ struct invoker: invoker_base {
                 T arg{};
                 return m_cb(fl, ec, std::move(errmsg), std::move(arg));
             } else {
-                const flatjson::fjson json{ptr, size};
-                if ( json.error() != flatjson::FJ_EC_OK ) {
+                simdjson::padded_string json = simdjson::padded_string(ptr, size);
+                simdjson::ondemand::parser parser;
+                simdjson::ondemand::document doc;
+                auto error = parser.iterate(json).get(doc);
+
+                if (error) {
                     T arg{};
-                    return m_cb(__MAKE_FILELINE, json.error(), json.error_string(), std::move(arg));
+                    std::cerr << error << std::endl;
+                    return m_cb(__MAKE_FILELINE, error, "", std::move(arg));
                 }
 
-                if ( json.is_object() && bg_api::rest::is_api_error(json) ) {
-                    auto error = bg_api::rest::construct_error(json);
+                if (bg_api::rest::is_api_error(doc)) {
+                    auto error = bg_api::rest::construct_error(doc);
                     T arg{};
                     return m_cb(__MAKE_FILELINE, error.first, std::move(error.second), std::move(arg));
                 } else {
-                    T arg = T::construct(json);
+                    T arg = T::construct(doc);
                     return m_cb(__MAKE_FILELINE, 0, std::move(errmsg), std::move(arg));
                 }
             }
