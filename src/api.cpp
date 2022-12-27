@@ -214,6 +214,7 @@ struct api::impl {
         }
 
         if ( _signed ) {
+            /*
             assert(!m_pk.empty() && !m_sk.empty());
 
             if ( !data.empty() ) {
@@ -225,7 +226,7 @@ struct api::impl {
 
             data += "&recvWindow=";
             data += to_string(buf, sizeof(buf), m_timeout);
-
+            
             std::string signature = hmac_sha256(
                  m_sk.c_str()
                 ,m_sk.length()
@@ -235,6 +236,7 @@ struct api::impl {
 
             data += "&signature=";
             data += signature;
+            */
         }
 
         bool get_delete =
@@ -254,25 +256,27 @@ struct api::impl {
                 if ( !r.v.empty() && is_html(r.v.c_str()) ) {
                     r.errmsg = std::move(r.v);
                 } else {
-                    std::string strbuf = std::move(r.v);
-                    const flatjson::fjson json{strbuf.c_str(), strbuf.length()};
-                    if ( json.error() != flatjson::FJ_EC_OK ) {
-                        res.ec = json.error();
-                        __MAKE_ERRMSG(res, json.error_string())
+                    simdjson::padded_string json = simdjson::padded_string(r.v);
+                    simdjson::ondemand::parser parser;
+                    simdjson::ondemand::document doc;
+                    auto error = parser.iterate(json).get(doc);
+
+                    if (error) {
+                        std::cerr << error << std::endl;
                         res.reply.clear();
 
                         return res;
                     }
 
-                    if ( json.is_object() && bg_api::rest::is_api_error(json) ) {
-                        auto error = bg_api::rest::construct_error(json);
+                    if (bg_api::rest::is_api_error(doc)) {
+                        auto error = bg_api::rest::construct_error(doc);
                         res.ec = error.first;
                         __MAKE_ERRMSG(res, error.second)
                         res.reply.clear();
 
                         return res;
                     } else {
-                        res.v = R::construct(json);
+                        res.v = R::construct(doc);
                     }
                 }
             } catch (const std::exception &ex) {
@@ -560,6 +564,9 @@ struct api::impl {
             m_async_requests.pop();
 
             //std::cout << "process_reply(): target=" << item.target << std::endl;
+            //std::cout << "process_reply(): ec=" << ec << std::endl;
+            //std::cout << "process_reply(): errmsg=" << errmsg << std::endl;
+            //std::cout << "process_reply(): body=" << body << std::endl;
             item.invoker->invoke(fl, ec, std::move(errmsg), body.c_str(), body.size());
         } __CATCH_BLOCK(
             std::cout,
@@ -593,7 +600,7 @@ struct api::impl {
 /*************************************************************************************************/
 
 api::api(
-     boost::asio::io_context &ioctx,
+    boost::asio::io_context &ioctx,
     std::string host,
     std::string port,
     std::string pk,
@@ -618,6 +625,21 @@ api::api(
 
 api::~api()
 {}
+
+/*************************************************************************************************/
+
+api::result<server_time_t> api::getServerTime(server_time_cb cb) {
+    return pimpl->post(false, "/api/spot/v1/public/time", boost::beast::http::verb::get, {}, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<coin_list_t> api::getCoinList(coin_list_cb cb) {
+    return pimpl->post(false, "/api/spot/v1/public/currencies", boost::beast::http::verb::get, {}, std::move(cb));
+}
+
+/*************************************************************************************************/
+
 
 
 } // ns rest
