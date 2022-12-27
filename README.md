@@ -20,8 +20,8 @@ Here are the files that need to be implemented before I get started on the REST 
 Here is a breakdown of what needs to be done for the REST API:
 
 - **Spot methods**:
-    - [ ] getServerTime()
-    - [ ] getCoinList()
+    - [x] getServerTime()
+    - [x] getCoinList()
     - [ ] getSymbol()
     - [ ] getSymbols()
     - [ ] getAllSymbols()
