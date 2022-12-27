@@ -45,34 +45,41 @@ namespace rest {
         time_t requestTime;
         time_t serverTime;
         
-        static server_time_t construct(const simdjson::padded_string json);
+        static server_time_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const server_time_t &f);
     };
 
     struct coin_t {
         std::size_t coinId;
         std::string_view coinName;
-        bool transfer;
+        std::string_view transfer;
 
         struct chain_t {
             std::string_view chain;
-            bool needTag;
-            bool withdrawAble;
-            bool rechargeAble;
+            std::string_view needTag;
+            std::string_view withdrawable;
+            std::string_view rechargeable;
             double_type withdrawFee;
+            double_type extraWithDrawFee;
             std::size_t depositConfirm;
             std::size_t withdrawConfirm;
             double_type minDepositAmount;
             double_type minWithdrawAmount;
-            std::string_view browseUrl;
+            std::string_view browserUrl;
 
-            static chain_t construct(const simdjson::padded_string json);
             friend std::ostream &operator<<(std::ostream &os, const chain_t &f);
         };
         std::vector<chain_t> chains;
 
-        static coin_t construct(const simdjson::padded_string json);
+        static coin_t construct(simdjson::ondemand::value &doc);
         friend std::ostream &operator<<(std::ostream &os, const coin_t &f);
+    };
+
+    struct coin_list_t {
+        std::vector<coin_t> coins;
+
+        static coin_list_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const coin_list_t &f);
     };
 
     struct symbol_t {
@@ -84,12 +91,20 @@ namespace rest {
         double_type maxTradeAmount;
         double_type takerFeeRate;
         double_type makerFeeRate;
-        int priceScale;
-        int quantityScale;
+        std::size_t priceScale;
+        std::size_t quantityScale;
         std::string_view status;
 
-        static symbol_t construct(const simdjson::padded_string json);
+        static symbol_t construct(simdjson::ondemand::document &doc);
+        static symbol_t construct(simdjson::ondemand::value &doc);
         friend std::ostream &operator<<(std::ostream &os, const symbol_t &f);
+    };
+
+    struct symbols_t {
+        std::vector<symbol_t> symbols;
+
+        static symbols_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const symbols_t &f);
     };
     
     struct spot_ticker_t {
@@ -107,22 +122,35 @@ namespace rest {
         double_type askSz;
         double_type openUtc0;
         
-        static spot_ticker_t construct(const simdjson::padded_string json);
+        static spot_ticker_t construct(simdjson::ondemand::document &doc);
+        static spot_ticker_t construct(simdjson::ondemand::value &doc);
         friend std::ostream &operator<<(std::ostream &os, const spot_ticker_t &f);
     };
 
-    struct trade_t {
-        std::string_view symbol;
-        std::string_view tradeId;
-        _side side;
-        double_type fillPrice;
-        double_type fillQuantity;
-        std::size_t fillTime;
+    struct spot_tickers_t {
+        std::vector<spot_ticker_t> tickers;
 
-        static trade_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const trade_t &f);
+        static spot_tickers_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const spot_tickers_t &f);
     };
-    
+
+    struct trades_t {
+        struct trade_t {
+            std::string_view symbol;
+            std::string_view tradeId;
+            _side side;
+            double_type fillPrice;
+            double_type fillQuantity;
+            std::size_t fillTime;
+
+            friend std::ostream &operator<<(std::ostream &os, const trade_t &f);
+        };
+        std::vector<trade_t> trades;
+
+        static trades_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const trades_t &f);
+    };
+
     struct candle_t {
         double_type open;
         double_type high;
@@ -132,9 +160,17 @@ namespace rest {
         double_type baseVol;
         std::size_t ts;
 
-        static candle_t construct_spot(const simdjson::padded_string json);
-        static candle_t construct_futures(const simdjson::padded_string json);
+        static candle_t construct_spot(simdjson::ondemand::value &doc);
+        static candle_t construct_futures(simdjson::ondemand::value &doc);
         friend std::ostream &operator<<(std::ostream &os, const candle_t &f);
+    };
+
+    struct candles_t {
+        std::vector<candle_t> candles;
+
+        static candles_t construct_spot(simdjson::ondemand::document &doc);
+        static candles_t construct_futures(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const candles_t &f);
     };
 
     struct depth_t {
@@ -142,7 +178,7 @@ namespace rest {
         std::map<double_type, double_type> bids;
         std::size_t timestamp;
 
-        static depth_t construct(const simdjson::padded_string json);
+        static depth_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const depth_t &f);
     };
 
@@ -153,7 +189,7 @@ namespace rest {
         std::string_view tag;
         std::string_view url;
 
-        static address_t construct(const simdjson::padded_string json);
+        static address_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const address_t &f);
     };
 
@@ -169,7 +205,7 @@ namespace rest {
         std::size_t cTime;
         std::size_t uTime;
 
-        static deposit_withdrawal_t construct(const simdjson::padded_string json);
+        static deposit_withdrawal_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const deposit_withdrawal_t &f);
     };
 
@@ -179,7 +215,7 @@ namespace rest {
         std::string_view ips;
         std::set<std::string> auths;
         std::string_view parentId;
-        bool trader;
+        std::string_view trader;
 
         static apikey_t construct(const simdjson::padded_string json);
         friend std::ostream &operator<<(std::ostream &os, const apikey_t &f);
@@ -294,9 +330,9 @@ namespace rest {
         double_type makerFeeRate;
         double_type takerFeeRate;
         double_type minTradeNum;
-        int priceEndStep;
-        int pricePlace;
-        int volumePlace;
+        std::size_t priceEndStep;
+        std::size_t pricePlace;
+        std::size_t volumePlace;
         std::string_view symbolType;
         std::vector<std::string> supportMarginCoins;
 
@@ -318,8 +354,8 @@ namespace rest {
 
     struct symbol_leverage_t {
         std::string_view symbol;
-        int minLeverage;
-        int maxLeverage;
+        std::size_t minLeverage;
+        std::size_t maxLeverage;
 
         static symbol_leverage_t construct(const simdjson::padded_string json);
         friend std::ostream &operator<<(std::ostream &os, const symbol_leverage_t &f);
@@ -336,9 +372,9 @@ namespace rest {
         double_type usdtEquity;
         double_type btcEquity;
         double_type crossRiskRate;
-        int crossMarginLeverage;
-        int fixedLongLeverage;
-        int fixedShortLeverage;
+        std::size_t crossMarginLeverage;
+        std::size_t fixedLongLeverage;
+        std::size_t fixedShortLeverage;
         _margin_mode marginMode;
         _hold_mode holdMode;
 
@@ -370,7 +406,7 @@ namespace rest {
         double_type available;
         double_type locked;
         double_type total;
-        int leverage;
+        std::size_t leverage;
         double_type achievedProfits;
         double_type averageOpenPrice;
         _margin_mode marginMode;
@@ -402,8 +438,8 @@ namespace rest {
     struct coin_leverage_t {
         std::string_view symbol;
         std::string_view marginCoin;
-        int longLeverage;
-        int shortLeverage;
+        std::size_t longLeverage;
+        std::size_t shortLeverage;
         _margin_mode marginMode;
 
         static coin_leverage_t construct(const simdjson::padded_string json);
@@ -448,7 +484,7 @@ namespace rest {
         std::string_view marginCoin;
         double_type filledAmount;
         _order_type orderType;
-        int leverage;
+        std::size_t leverage;
         _margin_mode marginMode;
         std::size_t cTime;
         std::size_t uTime;
@@ -471,7 +507,7 @@ namespace rest {
         double_type totalProfits;
         _hold_side posSide;
         std::string_view marginCoin;
-        int leverage;
+        std::size_t leverage;
         _margin_mode marginMode;
         _order_type orderType;
         std::size_t cTime;
@@ -582,8 +618,6 @@ namespace ws {
         double_type open24h;
         double_type high24h;
         double_type low24h;
-        double_type bestBid;
-        double_type bestAsk;
         double_type baseVolume;
         double_type quoteVolume;
         std::size_t ts;
