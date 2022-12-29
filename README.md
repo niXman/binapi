@@ -22,20 +22,17 @@ Here is a breakdown of what needs to be done for the REST API:
 - **Spot methods**:
     - [x] getServerTime()
     - [x] getCoinList()
-    - [ ] getSymbol()
-    - [ ] getSymbols()
-    - [ ] getAllSymbols()
-    - [ ] getTicker()
-    - [ ] getTickers()
-    - [ ] getAllTickers()
-    - [ ] getFills()
-    - [ ] getCandleData()
-    - [ ] getDepth()
-    - [ ] transfer()
-    - [ ] subtransfer()
-    - [ ] getCoinAddress()
-    - [ ] withdraw()
-    - [ ] innerWithdraw()
+    - [x] getSymbol()
+    - [x] getSymbols()
+    - [x] getSpotTicker()
+    - [x] getSpotTickers()
+    - [x] getSpotTrades()
+    - [x] getSpotCandles()
+    - [x] getSpotDepth()
+    - [x] transfer()
+    - [x] getAddress()
+    - [x] withdraw()
+    - [x] innerWithdraw()
     - [ ] getWithdrawalList()
     - [ ] getDepositList()
     - [ ] getInfo()
@@ -104,31 +101,6 @@ Here is a breakdown of what needs to be done for the REST API:
     - [ ] Cancel All Trigger Order (TPSL)
     - [ ] Get Plan Order (TPSL) List
     - [ ] Get History Plan Orders (TPSL)
-    - [ ] Get Trader Open Order
-    - [ ] Get Follower Open Orders
-    - [ ] Get Follower History Orders
-    - [ ] Trader Close Position
-    - [ ] Trader Modify TPSL
-    - [ ] Get Traders History Orders
-    - [ ] Get Trader Profit Summary
-    - [ ] Get Trader History Profit Summary (according to settlement currency)
-    - [ ] Get Trader History Profit Summary (according to settlement currency and date)
-    - [ ] Get Trader History Profit Detail
-    - [ ] Get Trader Profits Details
-    - [ ] Get CopyTrade Symbols
-    - [ ] Trader Change CopyTrade Symbol
-- **Broker methods**:
-    - [ ] Get broker info
-    - [ ] Create sub account
-    - [ ] Get sub list
-    - [ ] Modify sub account
-    - [ ] Modify sub email
-    - [ ] Get sub email
-    - [ ] Get sub spot assets
-    - [ ] Get sub future assets
-    - [ ] Get sub deposit address only broker
-    - [ ] Sub withdrawal only broker
-    - [ ] Sub deposit auto transfer only broker
 
 ## WebSocket API
 

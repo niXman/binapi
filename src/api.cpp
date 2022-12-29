@@ -13,6 +13,7 @@
 #include <bg_api/api.hpp>
 #include <bg_api/invoker.hpp>
 #include <bg_api/errors.hpp>
+#include <bg_api/LUTs.hpp>
 
 #include <boost/preprocessor.hpp>
 #include <boost/callable_traits.hpp>
@@ -31,13 +32,13 @@
 #include <boost/asio/ssl/stream.hpp>
 
 #include <chrono>
+#include <charconv>
 #include <queue>
 #include <type_traits>
 #include <iostream>
 
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
-#include <bg_api/flatjson.hpp>
 
 namespace bg_api {
 namespace rest {
@@ -640,7 +641,133 @@ api::result<coin_list_t> api::getCoinList(coin_list_cb cb) {
 
 /*************************************************************************************************/
 
+api::result<symbols_t> api::getSymbols(symbols_cb cb) {
+    return pimpl->post(false, "/api/spot/v1/public/products", boost::beast::http::verb::get, {}, std::move(cb));
+}
 
+/*************************************************************************************************/
+
+api::result<symbol_t> api::getSymbol(const char* symbol, symbol_cb cb) {
+    const char* sym = getSpotSymbol(symbol);
+    const impl::init_list_type params = {
+        {"symbol", sym}
+    };
+
+    return pimpl->post(false, "/api/spot/v1/public/product", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_ticker_t> api::getSpotTicker(const char* symbol, spot_ticker_cb cb) {
+    const char* sym = getSpotSymbol(symbol);
+    const impl::init_list_type params = {
+        {"symbol", sym}
+    };
+
+    return pimpl->post(false, "/api/spot/v1/market/ticker", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_tickers_t> api::getSpotTickers(spot_tickers_cb cb) {
+    return pimpl->post(false, "/api/spot/v1/market/tickers", boost::beast::http::verb::get, {}, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<trades_t> api::getSpotTrades(const char* symbol, spot_trades_cb cb, uint16_t limit) {
+    const char* sym = getSpotSymbol(symbol);
+    const impl::init_list_type params = {
+        {"symbol", sym},
+        {"limit", std::to_string(limit).c_str()}
+    };
+
+    return pimpl->post(false, "/api/spot/v1/market/fills", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<candles_t> api::getSpotCandles(const char* symbol, _candle_gran period, spot_candles_cb cb, std::size_t startTime, std::size_t endTime, uint16_t limit) {
+    const char* sym = getSpotSymbol(symbol);
+    const char* per = candle_gran_to_string(period);
+    const impl::init_list_type params = {
+        {"symbol", sym},
+        {"period", per},
+        {"startTime", std::to_string(startTime).c_str()},
+        {"endTime", std::to_string(endTime).c_str()},
+        {"limit", std::to_string(limit).c_str()}
+    };
+
+    return pimpl->post(false, "/api/spot/v1/market/candles", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<depth_t> api::getSpotDepth(const char* symbol, spot_depth_cb cb, uint16_t limit) {
+    const char* sym = getSpotSymbol(symbol);
+    const impl::init_list_type params = {
+        {"symbol", sym},
+        {"limit", std::to_string(limit).c_str()}
+    };
+
+    return pimpl->post(false, "/api/spot/v1/market/depth", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<transfer_res_t> api::transfer(_from_to_type from, _from_to_type to, double_type amount, const char* coin, transfer_cb cb, const char* clientOid) {
+    const char* from_str = from_to_type_to_string(from);
+    const char* to_str = from_to_type_to_string(to);
+    const impl::init_list_type params = {
+        {"from", from_str},
+        {"to", to_str},
+        {"amount", amount},
+        {"coin", coin}
+    };
+
+    return pimpl->post(true, "/api/spot/v1/wallet/transfer", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<address_t> api::getAddress(const char* coin, address_cb cb, const char* chain) {
+    const impl::init_list_type params = {
+        {"coin", coin},
+        {"chain", chain}
+    };
+
+    return pimpl->post(true, "/api/spot/v1/wallet/deposit-address", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<withdraw_res_t> api::withdraw(const char* coin, const char* address, const char* chain, double_type amount, withdraw_cb cb = {}, const char* tag = "", const char* remark = "", const char* clientOid = "") {
+    const impl::init_list_type params = {
+        {"coin", coin},
+        {"address", address},
+        {"chain", chain},
+        {"amount", amount},
+        {"tag", tag},
+        {"remark", remark},
+        {"clientOid", clientOid}
+    };
+
+    return pimpl->post(true, "/api/spot/v1/wallet/withdraw", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<withdraw_res_t> api::innerWithdraw(const char* coin, const char* address, const char* chain, double_type amount, withdraw_cb cb = {}, const char* clientOid) {
+    const impl::init_list_type params = {
+        {"coin", coin},
+        {"address", address},
+        {"chain", chain},
+        {"amount", amount},
+        {"clientOid", clientOid}
+    };
+
+    return pimpl->post(true, "/api/spot/v1/wallet/withdrawal-inner", boost::beast::http::verb::post, params, std::move(cb));
+}
 
 } // ns rest
 } // ns bg_api

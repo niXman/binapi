@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
             return true;
         }
     );
-
+    
     api.getCoinList(
         [](const char *fl, int ec, std::string errmsg, bg_api::rest::coin_list_t res) {
             if (ec) {
@@ -99,13 +99,168 @@ int main(int argc, char **argv) {
                 return false;
             }
 
-            for (const auto &coin: res.coins) {
-                std::cout << coin << std::endl;
-            }
+            std::cout << "coin list" << std::endl;
+            
             return true;
         }
     );
     
+    api.getSymbols(
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::symbols_t res) {
+            if (ec) {
+                std::cerr << "get symbols error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "symbols" << std::endl;
+
+            return true;
+        }
+    );
+    
+    api.getSymbol("BTCUSDT",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::symbol_t res) {
+            if (ec) {
+                std::cerr << "get symbol error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "symbol BTCUSDT" << std::endl;
+            
+            return true;
+        }
+    );
+
+    api.getSymbol("BTCUSDT_SPBL",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::symbol_t res) {
+            if (ec) {
+                std::cerr << "get symbol error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "symbol BTCUSDT_SPBL" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotTicker("BTCUSDT",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::spot_ticker_t res) {
+            if (ec) {
+                std::cerr << "get spot ticker error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot ticker BTCUSDT" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotTicker("BTCUSDT_SPBL",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::spot_ticker_t res) {
+            if (ec) {
+                std::cerr << "get spot ticker error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot ticker BTCUSDT_SPBL" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotTickers(
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::spot_tickers_t res) {
+            if (ec) {
+                std::cerr << "get spot tickers error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot tickers" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotTrades("BTCUSDT",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::trades_t res) {
+            if (ec) {
+                std::cerr << "get spot trades error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot trades BTCUSDT" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotTrades("BTCUSDT_SPBL",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::trades_t res) {
+            if (ec) {
+                std::cerr << "get spot trades error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot trades BTCUSDT_SPBL" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotCandles("BTCUSDT", 60,
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::candles_t res) {
+            if (ec) {
+                std::cerr << "get spot candles error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot candles BTCUSDT" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotCandles("BTCUSDT_SPBL", 60,
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::candles_t res) {
+            if (ec) {
+                std::cerr << "get spot candles error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot candles BTCUSDT_SPBL" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotDepth("BTCUSDT",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::depth_t res) {
+            if (ec) {
+                std::cerr << "get spot depth error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot depth BTCUSDT" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getSpotDepth("BTCUSDT_SPBL",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::depth_t res) {
+            if (ec) {
+                std::cerr << "get spot depth error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "spot depth BTCUSDT_SPBL" << std::endl;
+
+            return true;
+        }
+    );
+
     ioctx.run();
 
     return 0;
