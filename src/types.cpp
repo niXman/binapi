@@ -22,6 +22,7 @@
 
 namespace bg_api {
 
+
 //------------------------------------------------------------------------------
 
 namespace rest {
@@ -45,12 +46,58 @@ std::ostream &operator<<(std::ostream &os, const server_time_t &f) {
 
 //------------------------------------------------------------------------------
 
+coin_t::chain_t coin_t::chain_t::construct(simdjson::ondemand::object &obj) {
+    chain_t res{};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "chain") {
+            res.chain = field.value().get_string();
+        } else if (name == "needTag") {
+            std::string_view value = field.value().get_string();
+            const char* val = std::string(value).c_str();
+            res.needTag = val == "true";
+        } else if (name == "withdrawable") {
+            std::string_view value = field.value().get_string();
+            const char* val = std::string(value).c_str();
+            res.withdrawable = val == "true";
+        } else if (name == "rechargeable") {
+            std::string_view value = field.value().get_string();
+            const char* val = std::string(value).c_str();
+            res.rechargeable = val == "true";
+        } else if (name == "withdrawFee") {
+            double_type withdrawFee(static_cast<std::string>(field.value().get_string().value()));
+            res.withdrawFee = withdrawFee;
+        } else if (name == "extraWithDrawFee") {
+            double_type extraWithDrawFee(static_cast<std::string>(field.value().get_string().value()));
+            res.extraWithDrawFee = extraWithDrawFee;
+        } else if (name == "depositConfirm") {
+            res.depositConfirm = field.value().get_uint64_in_string();
+        } else if (name == "withdrawConfirm") {
+            res.withdrawConfirm = field.value().get_uint64_in_string();
+        } else if (name == "minDepositAmount") {
+            double_type minDepositAmount(static_cast<std::string>(field.value().get_string().value()));
+            res.minDepositAmount = minDepositAmount;
+        } else if (name == "minWithdrawAmount") {
+            double_type minWithdrawAmount(static_cast<std::string>(field.value().get_string().value()));
+            res.minWithdrawAmount = minWithdrawAmount;
+        } else if (name == "browserUrl") {
+            res.browserUrl = field.value().get_string();
+        }
+    }
+
+    return res;
+}
+
 std::ostream &operator<<(std::ostream &os, const coin_t::chain_t &f) {
     os << "\t\t{\n"
     << "\t\t\t\"chain\":" << f.chain << ",\n"
-    << "\t\t\t\"needTag\":" << f.needTag << ",\n"
-    << "\t\t\t\"withdrawable\":" << f.withdrawable << ",\n"
-    << "\t\t\t\"rechargeable\":" << f.rechargeable << ",\n"
+    << "\t\t\t\"needTag\":" << std::boolalpha << f.needTag << ",\n"
+    << "\t\t\t\"withdrawable\":" << std::boolalpha << f.withdrawable << ",\n"
+    << "\t\t\t\"rechargeable\":" << std::boolalpha << f.rechargeable << ",\n"
     << "\t\t\t\"withdrawFee\":" << f.withdrawFee << ",\n"
     << "\t\t\t\"extraWithDrawFee\":" << f.extraWithDrawFee << ",\n"
     << "\t\t\t\"depositConfirm\":" << f.depositConfirm << ",\n"
@@ -62,30 +109,28 @@ std::ostream &operator<<(std::ostream &os, const coin_t::chain_t &f) {
     return os;
 }
 
-coin_t coin_t::construct(simdjson::ondemand::value &doc) {
+coin_t coin_t::construct(simdjson::ondemand::object &obj) {
     coin_t res{};
-    res.coinId = doc["coinId"].get_uint64_in_string();
-    res.coinName = doc["coinName"].get_string();
-    res.transfer = doc["transfer"].get_string();
-    simdjson::ondemand::array chains(doc["chains"].get_array());
-    for (auto x : chains) {
-        coin_t::chain_t chain{};
-        chain.chain = x["chain"].get_string();
-        chain.needTag = x["needTag"].get_string();
-        chain.withdrawable = x["withdrawable"].get_string();
-        chain.rechargeable = x["rechargeable"].get_string();
-        double_type withdrawFee(static_cast<std::string>(x["withdrawFee"].get_string().take_value()));
-        chain.withdrawFee = withdrawFee;
-        double_type extraWithDrawFee(static_cast<std::string>(x["extraWithDrawFee"].get_string().take_value()));
-        chain.extraWithDrawFee = extraWithDrawFee;
-        chain.depositConfirm = x["depositConfirm"].get_uint64_in_string();
-        chain.withdrawConfirm = x["withdrawConfirm"].get_uint64_in_string();
-        double_type minDepositAmount(static_cast<std::string>(x["minDepositAmount"].get_string().take_value()));
-        chain.minDepositAmount = minDepositAmount;
-        double_type minWithdrawAmount(static_cast<std::string>(x["minWithdrawAmount"].get_string().take_value()));
-        chain.minWithdrawAmount = minWithdrawAmount;
-        chain.browserUrl = x["browserUrl"].get_string();
-        res.chains.emplace_back(std::move(chain));
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "coinId") {
+            res.coinId = field.value().get_uint64_in_string();
+        } else if (name == "coinName") {
+            res.coinName = field.value().get_string();
+        } else if (name == "transfer") {
+            std::string_view value = field.value().get_string();
+            const char* val = std::string(value).c_str();
+            res.transfer = val == "true";
+        } else if (name == "chains") {
+            simdjson::ondemand::array chains(field.value().get_array());
+            for (auto x : chains) {
+                res.chains.push_back(chain_t::construct(x.get_object().value()));
+            }
+        }
     }
     return res;
 }
@@ -111,7 +156,7 @@ coin_list_t coin_list_t::construct(simdjson::ondemand::document &doc) {
     coin_list_t res{};
     simdjson::ondemand::array coins(doc["data"].get_array());
     for (auto x : coins) {
-        res.coins.emplace_back(coin_t::construct(x.value()));
+        res.coins.emplace_back(coin_t::construct(x.get_object().value()));
     }
     return res;
 }
@@ -130,44 +175,45 @@ std::ostream &operator<<(std::ostream &os, const coin_list_t &f) {
 //------------------------------------------------------------------------------
 
 symbol_t symbol_t::construct(simdjson::ondemand::document &doc) {
-    symbol_t res{};
-    res.symbol = doc["symbol"].get_string();
-    res.symbolName = doc["symbolName"].get_string();
-    res.baseCoin = doc["baseCoin"].get_string();
-    res.quoteCoin = doc["quoteCoin"].get_string();
-    double_type min_trade_amount(static_cast<std::string>(doc["minTradeAmount"].get_string().take_value()));
-    res.minTradeAmount = min_trade_amount;
-    double_type max_trade_amount(static_cast<std::string>(doc["maxTradeAmount"].get_string().take_value()));
-    res.maxTradeAmount = max_trade_amount;
-    double_type taker_fee_rate(static_cast<std::string>(doc["takerFeeRate"].get_string().take_value()));
-    res.takerFeeRate = taker_fee_rate;
-    double_type maker_fee_rate(static_cast<std::string>(doc["makerFeeRate"].get_string().take_value()));
-    res.makerFeeRate = maker_fee_rate;
-    res.priceScale = doc["priceScale"].get_int64_in_string();
-    res.quantityScale = doc["quantityScale"].get_int64_in_string();
-    res.status = doc["status"].get_string();
-
-    return res;
+    return construct(doc["data"].get_object().value());
 }
 
-symbol_t symbol_t::construct(simdjson::ondemand::value &doc) {
+symbol_t symbol_t::construct(simdjson::ondemand::object &obj) {
     symbol_t res{};
-    res.symbol = doc["symbol"].get_string();
-    res.symbolName = doc["symbolName"].get_string();
-    res.baseCoin = doc["baseCoin"].get_string();
-    res.quoteCoin = doc["quoteCoin"].get_string();
-    double_type min_trade_amount(static_cast<std::string>(doc["minTradeAmount"].get_string().take_value()));
-    res.minTradeAmount = min_trade_amount;
-    double_type max_trade_amount(static_cast<std::string>(doc["maxTradeAmount"].get_string().take_value()));
-    res.maxTradeAmount = max_trade_amount;
-    double_type taker_fee_rate(static_cast<std::string>(doc["takerFeeRate"].get_string().take_value()));
-    res.takerFeeRate = taker_fee_rate;
-    double_type maker_fee_rate(static_cast<std::string>(doc["makerFeeRate"].get_string().take_value()));
-    res.makerFeeRate = maker_fee_rate;
-    res.priceScale = doc["priceScale"].get_int64_in_string();
-    res.quantityScale = doc["quantityScale"].get_int64_in_string();
-    res.status = doc["status"].get_string();
-
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "symbolName") {
+            res.symbolName = field.value().get_string();
+        } else if (name == "baseCoin") {
+            res.baseCoin = field.value().get_string();
+        } else if (name == "quoteCoin") {
+            res.quoteCoin = field.value().get_string();
+        } else if (name == "minTradeAmount") {
+            double_type min_trade_amount(static_cast<std::string>(field.value().get_string().take_value()));
+            res.minTradeAmount = min_trade_amount;
+        } else if (name == "maxTradeAmount") {
+            double_type max_trade_amount(static_cast<std::string>(field.value().get_string().take_value()));
+            res.maxTradeAmount = max_trade_amount;
+        } else if (name == "takerFeeRate") {
+            double_type taker_fee_rate(static_cast<std::string>(field.value().get_string().take_value()));
+            res.takerFeeRate = taker_fee_rate;
+        } else if (name == "makerFeeRate") {
+            double_type maker_fee_rate(static_cast<std::string>(field.value().get_string().take_value()));
+            res.makerFeeRate = maker_fee_rate;
+        } else if (name == "priceScale") {
+            res.priceScale = field.value().get_uint64_in_string();
+        } else if (name == "quantityScale") {
+            res.quantityScale = field.value().get_uint64_in_string();
+        } else if (name == "status") {
+            res.status = field.value().get_string();
+        }
+    }
     return res;
 }
 
@@ -191,7 +237,7 @@ symbols_t symbols_t::construct(simdjson::ondemand::document &doc) {
     symbols_t res{};
     simdjson::ondemand::array symbols(doc["data"].get_array());
     for (auto x : symbols) {
-        res.symbols.emplace_back(symbol_t::construct(x.value()));
+        res.symbols.emplace_back(symbol_t::construct(x.get_object().value()));
     }
     return res;
 }
@@ -210,62 +256,62 @@ std::ostream &operator<<(std::ostream &os, const symbols_t &f) {
 //------------------------------------------------------------------------------
 
 spot_ticker_t spot_ticker_t::construct(simdjson::ondemand::document &doc) {
-    spot_ticker_t res{};
-    res.symbol = doc["symbol"].get_string();
-    double_type high24h(static_cast<std::string>(doc["high24h"].get_string().take_value()));
-    res.high24h = high24h;
-    double_type low24h(static_cast<std::string>(doc["low24h"].get_string().take_value()));
-    res.low24h = low24h;
-    double_type close(static_cast<std::string>(doc["close"].get_string().take_value()));
-    res.close = close;
-    double_type quoteVol(static_cast<std::string>(doc["quoteVol"].get_string().take_value()));
-    res.quoteVol = quoteVol;
-    double_type baseVol(static_cast<std::string>(doc["baseVol"].get_string().take_value()));
-    res.baseVol = baseVol;
-    double_type usdtVol(static_cast<std::string>(doc["usdtVol"].get_string().take_value()));
-    res.usdtVol = usdtVol;
-    res.ts = doc["ts"].get_uint64_in_string();
-    double_type buyOne(static_cast<std::string>(doc["buyOne"].get_string().take_value()));
-    res.buyOne = buyOne;
-    double_type sellOne(static_cast<std::string>(doc["sellOne"].get_string().take_value()));
-    res.sellOne = sellOne;
-    double_type bidSz(static_cast<std::string>(doc["bidSz"].get_string().take_value()));
-    res.bidSz = bidSz;
-    double_type askSz(static_cast<std::string>(doc["askSz"].get_string().take_value()));
-    res.askSz = askSz;
-    double_type openUtc0(static_cast<std::string>(doc["openUtc0"].get_string().take_value()));
-    res.openUtc0 = openUtc0;
-
-    return res;
+    return construct(doc["data"].get_object().value());
 }
 
-spot_ticker_t spot_ticker_t::construct(simdjson::ondemand::value &doc) {
+spot_ticker_t spot_ticker_t::construct(simdjson::ondemand::object &obj) {
     spot_ticker_t res{};
-    res.symbol = doc["symbol"].get_string();
-    double_type high24h(static_cast<std::string>(doc["high24h"].get_string().take_value()));
-    res.high24h = high24h;
-    double_type low24h(static_cast<std::string>(doc["low24h"].get_string().take_value()));
-    res.low24h = low24h;
-    double_type close(static_cast<std::string>(doc["close"].get_string().take_value()));
-    res.close = close;
-    double_type quoteVol(static_cast<std::string>(doc["quoteVol"].get_string().take_value()));
-    res.quoteVol = quoteVol;
-    double_type baseVol(static_cast<std::string>(doc["baseVol"].get_string().take_value()));
-    res.baseVol = baseVol;
-    double_type usdtVol(static_cast<std::string>(doc["usdtVol"].get_string().take_value()));
-    res.usdtVol = usdtVol;
-    res.ts = doc["ts"].get_uint64_in_string();
-    double_type buyOne(static_cast<std::string>(doc["buyOne"].get_string().take_value()));
-    res.buyOne = buyOne;
-    double_type sellOne(static_cast<std::string>(doc["sellOne"].get_string().take_value()));
-    res.sellOne = sellOne;
-    double_type bidSz(static_cast<std::string>(doc["bidSz"].get_string().take_value()));
-    res.bidSz = bidSz;
-    double_type askSz(static_cast<std::string>(doc["askSz"].get_string().take_value()));
-    res.askSz = askSz;
-    double_type openUtc0(static_cast<std::string>(doc["openUtc0"].get_string().take_value()));
-    res.openUtc0 = openUtc0;
-
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str(); // This makes the comparisons WAY faster
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "high24h") {
+            double_type high24h(static_cast<std::string>(field.value().get_string().take_value()));
+            res.high24h = high24h;
+        } else if (name == "low24h") {
+            double_type low24h(static_cast<std::string>(field.value().get_string().take_value()));
+            res.low24h = low24h;
+        } else if (name == "close") {
+            double_type close(static_cast<std::string>(field.value().get_string().take_value()));
+            res.close = close;
+        } else if (name == "quoteVol") {
+            double_type quoteVol(static_cast<std::string>(field.value().get_string().take_value()));
+            res.quoteVol = quoteVol;
+        } else if (name == "baseVol") {
+            double_type baseVol(static_cast<std::string>(field.value().get_string().take_value()));
+            res.baseVol = baseVol;
+        } else if (name == "usdtVol") {
+            double_type usdtVol(static_cast<std::string>(field.value().get_string().take_value()));
+            res.usdtVol = usdtVol;
+        } else if (name == "ts") {
+            res.ts = field.value().get_uint64_in_string();
+        } else if (name == "buyOne") {
+            double_type buyOne(static_cast<std::string>(field.value().get_string().take_value()));
+            res.buyOne = buyOne;
+        } else if (name == "sellOne") {
+            double_type sellOne(static_cast<std::string>(field.value().get_string().take_value()));
+            res.sellOne = sellOne;
+        } else if (name == "bidSz") {
+            double_type bidSz(static_cast<std::string>(field.value().get_string().take_value()));
+            res.bidSz = bidSz;
+        } else if (name == "askSz") {
+            double_type askSz(static_cast<std::string>(field.value().get_string().take_value()));
+            res.askSz = askSz;
+        } else if (name == "openUtc0") {
+            double_type openUtc0(static_cast<std::string>(field.value().get_string().take_value()));
+            res.openUtc0 = openUtc0;
+        } else if (name == "changeUtc") {
+            double_type changeUtc(static_cast<std::string>(field.value().get_string().take_value()));
+            res.changeUtc = changeUtc;
+        } else if (name == "change") {
+            double_type change(static_cast<std::string>(field.value().get_string().take_value()));
+            res.change = change;
+        }
+    }
     return res;
 }
 
@@ -283,7 +329,9 @@ std::ostream &operator<<(std::ostream &os, const spot_ticker_t &f) {
     << "\t\"sellOne\":" << f.sellOne << ",\n"
     << "\t\"bidSz\":" << f.bidSz << ",\n"
     << "\t\"askSz\":" << f.askSz << ",\n"
-    << "\t\"openUtc0\":" << f.openUtc0 << "\n}";
+    << "\t\"openUtc0\":" << f.openUtc0 << ",\n"
+    << "\t\"changeUtc\":" << f.changeUtc << ",\n"
+    << "\t\"change\":" << f.change << "\n}";
 
     return os;
 }
@@ -292,7 +340,7 @@ spot_tickers_t spot_tickers_t::construct(simdjson::ondemand::document &doc) {
     spot_tickers_t res{};
     simdjson::ondemand::array tickers(doc["data"].get_array());
     for (auto x : tickers) {
-        res.tickers.emplace_back(spot_ticker_t::construct(x.value()));
+        res.tickers.emplace_back(spot_ticker_t::construct(x.get_object().value()));
     }
     return res;
 }
@@ -310,26 +358,44 @@ std::ostream &operator<<(std::ostream &os, const spot_tickers_t &f) {
 
 //------------------------------------------------------------------------------
 
+trade_t trade_t::construct(simdjson::ondemand::object &obj) {
+    trade_t res{};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "tradeId") {
+            res.tradeId = field.value().get_string();
+        } else if (name == "side") {
+            res.side = side_from_string(field.value().get_string());
+        } else if (name == "fillPrice") {
+            double_type fillPrice(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fillPrice = fillPrice;
+        } else if (name == "fillQuantity") {
+            double_type fillQuantity(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fillQuantity = fillQuantity;
+        } else if (name == "fillTime") {
+            res.fillTime = field.value().get_uint64_in_string();
+        }
+    }
+    return res;
+}
+
 trades_t trades_t::construct(simdjson::ondemand::document &doc) {
     trades_t res{};
     simdjson::ondemand::array trades(doc["data"].get_array());
     for (auto x : trades) {
-        trades_t::trade_t trade{};
-        trade.symbol = x["symbol"].get_string();
-        trade.tradeId = x["tradeId"].get_string();
-        trade.side = side_from_string(x["side"].get_string());
-        double_type fillPrice(static_cast<std::string>(doc["fillPrice"].get_string().take_value()));
-        trade.fillPrice = fillPrice;
-        double_type fillQuantity(static_cast<std::string>(doc["fillQuantity"].get_string().take_value()));
-        trade.fillQuantity = fillQuantity;
-        trade.fillTime = doc["fillTime"].get_uint64_in_string();
-        res.trades.emplace_back(trade);
+        res.trades.emplace_back(trade_t::construct(x.get_object().value()));
     }
 
     return res;
 }
 
-std::ostream &operator<<(std::ostream &os, const trades_t::trade_t &f) {
+std::ostream &operator<<(std::ostream &os, const trade_t &f) {
     os << "{\n"
     << "\t\"symbol\":" << f.symbol << ",\n"
     << "\t\"tradeId\":" << f.tradeId << ",\n"
@@ -354,39 +420,54 @@ std::ostream &operator<<(std::ostream &os, const trades_t &f) {
 
 //------------------------------------------------------------------------------
 
-candle_t candle_t::construct_spot(simdjson::ondemand::value &doc) {
+candle_t candle_t::construct(simdjson::ondemand::object &obj) {
     candle_t res{};
-    double_type open(static_cast<std::string>(doc["open"].get_string().take_value()));
-    res.open = open;
-    double_type high(static_cast<std::string>(doc["high"].get_string().take_value()));
-    res.high = high;
-    double_type low(static_cast<std::string>(doc["low"].get_string().take_value()));
-    res.low = low;
-    double_type close(static_cast<std::string>(doc["close"].get_string().take_value()));
-    res.close = close;
-    double_type baseVol(static_cast<std::string>(doc["baseVol"].get_string().take_value()));
-    res.baseVol = baseVol;
-    double_type quoteVol(static_cast<std::string>(doc["quoteVol"].get_string().take_value()));
-    res.quoteVol = quoteVol;
-    res.ts = doc["ts"].get_uint64_in_string();
-
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "open") {
+            double_type open(static_cast<std::string>(field.value().get_string().take_value()));
+            res.open = open;
+        } else if (name == "high") {
+            double_type high(static_cast<std::string>(field.value().get_string().take_value()));
+            res.high = high;
+        } else if (name == "low") {
+            double_type low(static_cast<std::string>(field.value().get_string().take_value()));
+            res.low = low;
+        } else if (name == "close") {
+            double_type close(static_cast<std::string>(field.value().get_string().take_value()));
+            res.close = close;
+        } else if (name == "baseVol") {
+            double_type baseVol(static_cast<std::string>(field.value().get_string().take_value()));
+            res.baseVol = baseVol;
+        } else if (name == "quoteVol") {
+            double_type quoteVol(static_cast<std::string>(field.value().get_string().take_value()));
+            res.quoteVol = quoteVol;
+        } else if (name == "ts") {
+            res.ts = field.value().get_uint64_in_string();
+        }
+    }
+    
     return res;
 }
 
-candle_t candle_t::construct_futures(simdjson::ondemand::value &doc) {
+candle_t candle_t::construct(simdjson::ondemand::array &arr) {
     candle_t res{};
-    res.ts = doc[0].get_uint64_in_string();
-    double_type open(static_cast<std::string>(doc.at(1).get_string().take_value()));
+    res.ts = arr.at(0).get_uint64_in_string();
+    double_type open(static_cast<std::string>(arr.at(1).get_string().take_value()));
     res.open = open;
-    double_type high(static_cast<std::string>(doc.at(2).get_string().take_value()));
+    double_type high(static_cast<std::string>(arr.at(2).get_string().take_value()));
     res.high = high;
-    double_type low(static_cast<std::string>(doc.at(3).get_string().take_value()));
+    double_type low(static_cast<std::string>(arr.at(3).get_string().take_value()));
     res.low = low;
-    double_type close(static_cast<std::string>(doc.at(4).get_string().take_value()));
+    double_type close(static_cast<std::string>(arr.at(4).get_string().take_value()));
     res.close = close;
-    double_type baseVol(static_cast<std::string>(doc.at(5).get_string().take_value()));
+    double_type baseVol(static_cast<std::string>(arr.at(5).get_string().take_value()));
     res.baseVol = baseVol;
-    double_type quoteVol(static_cast<std::string>(doc.at(6).get_string().take_value()));
+    double_type quoteVol(static_cast<std::string>(arr.at(6).get_string().take_value()));
     res.quoteVol = quoteVol;
 
     return res;
@@ -405,21 +486,18 @@ std::ostream &operator<<(std::ostream &os, const candle_t &f) {
     return os;
 }
 
-candles_t candles_t::construct_spot(simdjson::ondemand::document &doc) {
+candles_t candles_t::construct(simdjson::ondemand::document &doc) {
     candles_t res{};
-    simdjson::ondemand::array candles(doc["candles"].get_array());
-    for (auto candle : candles) {
-        res.candles.emplace_back(candle_t::construct_spot(candle.value()));
-    }
-
-    return res;
-}
-
-candles_t candles_t::construct_futures(simdjson::ondemand::document &doc) {
-    candles_t res{};
-    simdjson::ondemand::array candles(doc["data"].get_array());
-    for (auto candle : candles) {
-        res.candles.emplace_back(candle_t::construct_futures(candle.value()));
+    if (doc.type() == simdjson::ondemand::json_type::array) {
+        simdjson::ondemand::array candles(doc.get_array());
+        for (auto candle : candles) {
+            res.candles.emplace_back(candle_t::construct(candle.get_array().value()));
+        }
+    } else {
+        simdjson::ondemand::array candles(doc["data"].get_array());
+        for (auto candle : candles) {
+            res.candles.emplace_back(candle_t::construct(candle.get_object().value()));
+        }
     }
 
     return res;
@@ -440,18 +518,30 @@ std::ostream &operator<<(std::ostream &os, const candles_t &f) {
 
 depth_t depth_t::construct(simdjson::ondemand::document &doc) {
     depth_t res = {};
-    res.timestamp = doc["timestamp"].get_uint64_in_string();
-    simdjson::ondemand::array asks(doc["asks"].get_array());
-    for (auto ask : asks) {
-        double_type price(static_cast<std::string>(ask.at(0).get_string().take_value()));
-        double_type quantity(static_cast<std::string>(ask.at(1).get_string().take_value()));
-        res.asks.emplace(std::move(price), std::move(quantity));
-    }
-    simdjson::ondemand::array bids(doc["bids"].get_array());
-    for (auto bid : doc["bids"].get_array()) {
-        double_type price(static_cast<std::string>(bid.at(0).get_string().take_value()));
-        double_type quantity(static_cast<std::string>(bid.at(1).get_string().take_value()));
-        res.bids.emplace(std::move(price), std::move(quantity));
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "asks") {
+            simdjson::ondemand::array asks(field.value().get_array());
+            for (auto ask : asks) {
+                double_type price(static_cast<std::string>(ask.at(0).get_string().take_value()));
+                double_type quantity(static_cast<std::string>(ask.at(1).get_string().take_value()));
+                res.asks.emplace(std::move(price), std::move(quantity));
+            }
+        } else if (name == "bids") {
+            simdjson::ondemand::array bids(field.value().get_array());
+            for (auto bid : bids) {
+                double_type price(static_cast<std::string>(bid.at(0).get_string().take_value()));
+                double_type quantity(static_cast<std::string>(bid.at(1).get_string().take_value()));
+                res.bids.emplace(std::move(price), std::move(quantity));
+            }
+        } else if (name == "timestamp") {
+            res.timestamp = field.value().get_uint64_in_string();
+        }
     }
 
     return res;
@@ -474,13 +564,50 @@ std::ostream &operator<<(std::ostream &os, const depth_t &f) {
 
 //------------------------------------------------------------------------------
 
+transfer_res_t transfer_res_t::construct(simdjson::ondemand::document &doc) {
+    transfer_res_t res = {};
+    simdjson::ondemand::object obj(doc.get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "msg") {
+            res.msg = field.value().get_string().value();
+        }
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, const transfer_res_t &f) {
+    os << "Transfer: " << f.msg;
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
 address_t address_t::construct(simdjson::ondemand::document &doc) {
     address_t res = {};
-    res.address = doc["address"].get_string();
-    res.coin = doc["coin"].get_string();
-    res.chain = doc["chain"].get_string();
-    res.tag = doc["tag"].get_string();
-    res.url = doc["url"].get_string();
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "address") {
+            res.address = field.value().get_string().value();
+        } else if (name == "chain") {
+            res.chain = field.value().get_string().value();
+        } else if (name == "coin") {
+            res.coin = field.value().get_string().value();
+        } else if (name == "tag") {
+            res.tag = field.value().get_string().value();
+        } else if (name == "url") {
+            res.url = field.value().get_string().value();
+        }
+    }
 
     return res;
 }
@@ -488,10 +615,33 @@ address_t address_t::construct(simdjson::ondemand::document &doc) {
 std::ostream &operator<<(std::ostream &os, const address_t &f) {
     os << "{\n"
     << "\t\"address\":" << f.address << ",\n"
-    << "\t\"coin\":" << f.coin << ",\n"
     << "\t\"chain\":" << f.chain << ",\n"
+    << "\t\"coin\":" << f.coin << ",\n"
     << "\t\"tag\":" << f.tag << ",\n"
     << "\t\"url\":" << f.url << "\n}";
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+withdraw_res_t withdraw_res_t::construct(simdjson::ondemand::document &doc) {
+    withdraw_res_t res = {};
+    simdjson::ondemand::object obj(doc.get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "data") {
+            res.data = field.value().get_string().value();
+        }
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, const withdraw_res_t &f) {
+    os << "Withdraw order ID: " << f.data;
 
     return os;
 }

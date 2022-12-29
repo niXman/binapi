@@ -15,6 +15,7 @@
 
 #include "double_type.hpp"
 #include "enums.hpp"
+#include "fnv1a.hpp"
 
 #include <bg_api/simdjson.h>
 #include <boost/variant.hpp>
@@ -52,13 +53,13 @@ namespace rest {
     struct coin_t {
         std::size_t coinId;
         std::string_view coinName;
-        std::string_view transfer;
+        bool transfer;
 
         struct chain_t {
             std::string_view chain;
-            std::string_view needTag;
-            std::string_view withdrawable;
-            std::string_view rechargeable;
+            bool needTag;
+            bool withdrawable;
+            bool rechargeable;
             double_type withdrawFee;
             double_type extraWithDrawFee;
             std::size_t depositConfirm;
@@ -67,11 +68,12 @@ namespace rest {
             double_type minWithdrawAmount;
             std::string_view browserUrl;
 
+            static chain_t construct(simdjson::ondemand::object &obj);
             friend std::ostream &operator<<(std::ostream &os, const chain_t &f);
         };
         std::vector<chain_t> chains;
 
-        static coin_t construct(simdjson::ondemand::value &doc);
+        static coin_t construct(simdjson::ondemand::object &obj);
         friend std::ostream &operator<<(std::ostream &os, const coin_t &f);
     };
 
@@ -96,7 +98,7 @@ namespace rest {
         std::string_view status;
 
         static symbol_t construct(simdjson::ondemand::document &doc);
-        static symbol_t construct(simdjson::ondemand::value &doc);
+        static symbol_t construct(simdjson::ondemand::object &obj);
         friend std::ostream &operator<<(std::ostream &os, const symbol_t &f);
     };
 
@@ -121,10 +123,13 @@ namespace rest {
         double_type bidSz;
         double_type askSz;
         double_type openUtc0;
+        double_type changeUtc;
+        double_type change;
         
         static spot_ticker_t construct(simdjson::ondemand::document &doc);
-        static spot_ticker_t construct(simdjson::ondemand::value &doc);
+        static spot_ticker_t construct(simdjson::ondemand::object &obj);
         friend std::ostream &operator<<(std::ostream &os, const spot_ticker_t &f);
+
     };
 
     struct spot_tickers_t {
@@ -134,17 +139,20 @@ namespace rest {
         friend std::ostream &operator<<(std::ostream &os, const spot_tickers_t &f);
     };
 
-    struct trades_t {
-        struct trade_t {
-            std::string_view symbol;
-            std::string_view tradeId;
-            _side side;
-            double_type fillPrice;
-            double_type fillQuantity;
-            std::size_t fillTime;
+    struct trade_t {
+        std::string_view symbol;
+        std::string_view tradeId;
+        _side side;
+        double_type fillPrice;
+        double_type fillQuantity;
+        std::size_t fillTime;
 
-            friend std::ostream &operator<<(std::ostream &os, const trade_t &f);
-        };
+        //static trade_t construct(simdjson::ondemand::document &doc);
+        static trade_t construct(simdjson::ondemand::object &obj);
+        friend std::ostream &operator<<(std::ostream &os, const trade_t &f);
+    };
+    
+    struct trades_t {
         std::vector<trade_t> trades;
 
         static trades_t construct(simdjson::ondemand::document &doc);
@@ -160,19 +168,18 @@ namespace rest {
         double_type baseVol;
         std::size_t ts;
 
-        static candle_t construct_spot(simdjson::ondemand::value &doc);
-        static candle_t construct_futures(simdjson::ondemand::value &doc);
+        static candle_t construct(simdjson::ondemand::object &obj);
+        static candle_t construct(simdjson::ondemand::array &arr);
         friend std::ostream &operator<<(std::ostream &os, const candle_t &f);
     };
 
     struct candles_t {
         std::vector<candle_t> candles;
 
-        static candles_t construct_spot(simdjson::ondemand::document &doc);
-        static candles_t construct_futures(simdjson::ondemand::document &doc);
+        static candles_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const candles_t &f);
     };
-
+    
     struct depth_t {
         std::map<double_type, double_type> asks;
         std::map<double_type, double_type> bids;
@@ -180,6 +187,13 @@ namespace rest {
 
         static depth_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const depth_t &f);
+    };
+
+    struct transfer_res_t {
+        std::string_view msg;
+
+        static transfer_res_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const transfer_res_t &f);
     };
 
     struct address_t {
@@ -191,6 +205,13 @@ namespace rest {
 
         static address_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const address_t &f);
+    };
+    
+    struct withdraw_res_t {
+        std::string_view data;
+
+        static withdraw_res_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const withdraw_res_t &f);
     };
 
     struct deposit_withdrawal_t {
