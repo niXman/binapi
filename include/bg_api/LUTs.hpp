@@ -18,6 +18,12 @@ namespace bg_api {
         double_type minTradeUSDT;
     };
 
+    const char* getSpotSymbol(const char* const sym);
+    const char* getSpotSymbol(const char* const base, const char* const quote);
+
+    const char* getSpotSymbolName(const char* const sym);
+    const char* getSpotSymbolName(const char* const base, const char* const quote);
+
     int getSpotSymbolIndex(const char* const sym);
     int getSpotSymbolIndex(const char* const base, const char* const quote);
 
@@ -68,6 +74,7 @@ namespace bg_api {
     unsigned int getFuturesVolumePlace(const char* const sym);
     unsigned int getFuturesPricePlace(const char* const sym);
     double_type getFuturesSizeMultiplier(const char* const sym);
-}
+
+} // ns bg_api
 
 #endif

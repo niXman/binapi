@@ -25,6 +25,8 @@ num_sdmcbl = len(sdmcbl_msg['data'])
 num_scmcbl = len(scmcbl_msg['data'])
 
 spot_func_to_prop = {
+    'getSpotSymbol':('const char*','symbol'),
+    'getSpotSymbolName':('const char*','symbolName'),
     'getSpotMinTradeAmt':('double_type','minTradeAmount'),
     'getSpotMaxTradeAmt':('double_type','maxTradeAmount'),
     'getSpotTakerFeeRate':('double_type','takerFeeRate'),
