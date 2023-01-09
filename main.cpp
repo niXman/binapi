@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
             return true;
         }
     );
-    
+
     api.getSymbol("BTCUSDT",
         [](const char *fl, int ec, std::string errmsg, bg_api::rest::symbol_t res) {
             if (ec) {
@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
             return true;
         }
     );
-
+    
     api.getSpotTicker("BTCUSDT",
         [](const char *fl, int ec, std::string errmsg, bg_api::rest::spot_ticker_t res) {
             if (ec) {
@@ -256,6 +256,97 @@ int main(int argc, char **argv) {
             }
 
             std::cout << "spot depth BTCUSDT_SPBL" << std::endl;
+
+            return true;
+        }
+    );
+    
+    api.withdrawList("USDT", 1640995200000, 1672531200000,
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::deposit_withdrawals_t res) {
+            if (ec) {
+                std::cerr << "get withdraw list error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "withdraw list USDT" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.depositList("USDT", 1640995200000, 1672531200000,
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::deposit_withdrawals_t res) {
+            if (ec) {
+                std::cerr << "get deposit list error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "deposit list USDT" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getApiKeyInfo(
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::apikey_t res) {
+            if (ec) {
+                std::cerr << "get api key info error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "api key info" << std::endl;
+            
+            return true;
+        }
+    );
+
+    api.getSpotAccount("USDT",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::spot_account_t res) {
+            if (ec) {
+                std::cerr << "get account error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "account" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getBills(1, bg_api::_group_type::_deposit, bg_api::_biz_type::_deposit,
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::bills_t res) {
+            if (ec) {
+                std::cerr << "get bills error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "bills" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.getTransferList(1, "exchange",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::transfers_t res) {
+            if (ec) {
+                std::cerr << "get transfer list error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "transfer list" << std::endl;
+
+            return true;
+        }
+    );
+
+    api.orderHistory("BTCUSDT",
+        [](const char *fl, int ec, std::string errmsg, bg_api::rest::spot_orders_t res) {
+            if (ec) {
+                std::cerr << "get order history error: fl=" << fl << ", ec=" << ec << ", errmsg=" << errmsg << std::endl;
+                return false;
+            }
+
+            std::cout << "order history BTCUSDT" << std::endl;
 
             return true;
         }

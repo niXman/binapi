@@ -577,6 +577,8 @@ transfer_res_t transfer_res_t::construct(simdjson::ondemand::document &doc) {
             res.msg = field.value().get_string().value();
         }
     }
+
+    return res;
 }
 
 std::ostream &operator<<(std::ostream &os, const transfer_res_t &f) {
@@ -638,6 +640,8 @@ withdraw_res_t withdraw_res_t::construct(simdjson::ondemand::document &doc) {
             res.data = field.value().get_string().value();
         }
     }
+
+    return res;
 }
 
 std::ostream &operator<<(std::ostream &os, const withdraw_res_t &f) {
@@ -648,19 +652,42 @@ std::ostream &operator<<(std::ostream &os, const withdraw_res_t &f) {
 
 //------------------------------------------------------------------------------
 
-deposit_withdrawal_t deposit_withdrawal_t::construct(simdjson::ondemand::document &doc) {
+deposit_withdrawal_t deposit_withdrawal_t::construct(simdjson::ondemand::object &obj) {
     deposit_withdrawal_t res = {};
-    res.id = doc["id"].get_string();
-    res.txId = doc["txId"].get_string();
-    res.coin = doc["coin"].get_string();
-    res.type = doc["type"].get_string();
-    double_type amount(static_cast<std::string>(doc["amount"].get_string().take_value()));
-    res.amount = amount;
-    res.status = doc["status"].get_string();
-    res.toAddress = doc["toAddress"].get_string();
-    res.chain = doc["chain"].get_string();
-    res.cTime = doc["cTime"].get_uint64_in_string();
-    res.uTime = doc["uTime"].get_uint64_in_string();
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "id") {
+            res.id = field.value().get_string().value();
+        } else if (name == "txId") {
+            res.txId = field.value().get_string().value();
+        } else if (name == "coin") {
+            res.coin = field.value().get_string().value();
+        } else if (name == "type") {
+            res.type = field.value().get_string().value();
+        } else if (name == "amount") {
+            double_type amount(static_cast<std::string>(field.value().get_string().take_value()));
+            res.amount = amount;
+        } else if (name == "status") {
+            res.status = field.value().get_string().value();
+        } else if (name == "toAddress") {
+            res.toAddress = field.value().get_string().value();
+        } else if (name == "fee") {
+            double_type fee(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fee = fee;
+        } else if (name == "chain") {
+            res.chain = field.value().get_string().value();
+        } else if (name == "confirm") {
+            res.confirm = field.value().get_uint64_in_string();
+        } else if (name == "cTime") {
+            res.cTime = field.value().get_uint64_in_string();
+        } else if (name == "uTime") {
+            res.uTime = field.value().get_uint64_in_string();
+        }
+    }
 
     return res;
 }
@@ -681,22 +708,56 @@ std::ostream &operator<<(std::ostream &os, const deposit_withdrawal_t &f) {
     return os;
 }
 
+deposit_withdrawals_t deposit_withdrawals_t::construct(simdjson::ondemand::document &doc) {
+    deposit_withdrawals_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto item : arr) {
+        res.deposit_withdrawals.emplace_back(deposit_withdrawal_t::construct(item.get_object().value()));
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const deposit_withdrawals_t &f) {
+    for (auto item : f.deposit_withdrawals) {
+        os << item << ",\n";
+    }
+
+    return os;
+}
+
 //------------------------------------------------------------------------------
 
-apikey_t apikey_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-
+apikey_t apikey_t::construct(simdjson::ondemand::document &doc) {
     apikey_t res = {};
-    res.userId = doc["userId"].get_string();
-    res.inviterId = doc["inviterId"].get_string();
-    res.ips = doc["ips"].get_string();
-    simdjson::ondemand::array auths(doc["auths"].get_array());
-    for (auto auth : doc["auths"].get_array()) {
-        res.auths.emplace(static_cast<std::string>(auth.get_string().take_value()));
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "user_id") {
+            res.userId = field.value().get_string().value();
+        } else if (name == "inviter_id") {
+            res.inviterId = field.value().get_string().value();
+        } else if (name == "agent_inviter_code") {
+            res.agentInviterCode = field.value().get_string().value();
+        } else if (name == "channel") {
+            res.channel = field.value().get_string().value();  
+        } else if (name == "ips") {
+            res.ips = field.value().get_string().value();
+        } else if (name == "auths") {
+            simdjson::ondemand::array arr(field.value().get_array());
+            for (auto item : arr) {
+                res.auths.emplace(item.get_string().value());
+            }
+        } else if (name == "parentId") {
+            res.parentId = field.value().get_uint64();
+        } else if (name == "trader") {
+            res.trader = field.value().get_bool();
+        }
     }
-    res.parentId = doc["parentId"].get_string();
-    res.trader = doc["trader"].get_string();
 
     return res;
 }
@@ -705,6 +766,8 @@ std::ostream &operator<<(std::ostream &os, const apikey_t &f) {
     os << "{\n"
     << "\t\"userId\":" << f.userId << ",\n"
     << "\t\"inviterId\":" << f.inviterId << ",\n"
+    << "\t\"agentInviterCode\":" << f.agentInviterCode << ",\n"
+    << "\t\"channel\":" << f.channel << ",\n"
     << "\t\"ips\":" << f.ips << ",\n"
     << "\t\"auths\":[\n";
     for (const auto &a : f.auths) {
@@ -719,22 +782,33 @@ std::ostream &operator<<(std::ostream &os, const apikey_t &f) {
 
 //------------------------------------------------------------------------------
 
-spot_account_t spot_account_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-
-    spot_account_t res = {};
-    res.coinId = doc["coinId"].get_uint64_in_string();
-    res.coinName = doc["coinName"].get_string();
-    double_type available(static_cast<std::string>(doc["available"].get_string().take_value()));
-    res.available = available;
-    double_type lock(static_cast<std::string>(doc["lock"].get_string().take_value()));
-    res.lock = lock;
+spot_account_t::coin_t spot_account_t::coin_t::construct(simdjson::ondemand::object &obj) {
+    spot_account_t::coin_t res = {};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "coinId") {
+            res.coinId = field.value().get_uint64().value();
+        } else if (name == "coinName") {
+            res.coinName = field.value().get_string().value();
+        } else if (name == "available") {
+            double_type available(static_cast<std::string>(field.value().get_string().take_value()));
+            res.available = available;
+        } else if (name == "lock") {
+            double_type lock(static_cast<std::string>(field.value().get_string().take_value()));
+            res.lock = lock;
+        } else if (name == "uTime") {
+            res.uTime = field.value().get_uint64_in_string();
+        }
+    }
 
     return res;
 }
 
-std::ostream &operator<<(std::ostream &os, const spot_account_t &f) {
+std::ostream &operator<<(std::ostream &os, const spot_account_t::coin_t &f) {
     os << "{\n"
     << "\t\"coinId\":" << f.coinId << ",\n"
     << "\t\"coinName\":" << f.coinName << ",\n"
@@ -745,30 +819,60 @@ std::ostream &operator<<(std::ostream &os, const spot_account_t &f) {
     return os;
 }
 
-//------------------------------------------------------------------------------
-
-bill_t bill_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-
-    bill_t res = {};
-    res.cTime = doc["cTime"].get_uint64_in_string();
-    res.coinId = doc["coinId"].get_uint64_in_string();
-    res.coinName = doc["coinName"].get_string();
-    res.groupType = group_type_from_string(doc["groupType"].get_string());
-    res.bizType = biz_type_from_string(doc["bizType"].get_string());
-    double_type quantity(static_cast<std::string>(doc["quantity"].get_string().take_value()));
-    res.quantity = quantity;
-    double_type balance(static_cast<std::string>(doc["balance"].get_string().take_value()));
-    res.balance = balance;
-    double_type fees(static_cast<std::string>(doc["fees"].get_string().take_value()));
-    res.fees = fees;
-    res.billId = doc["billId"].get_uint64_in_string();
+spot_account_t spot_account_t::construct(simdjson::ondemand::document &doc) {
+    spot_account_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto item : arr) {
+        res.coins.emplace_back(spot_account_t::coin_t::construct(item.get_object().value()));
+    }
 
     return res;
 }
 
-std::ostream &operator<<(std::ostream &os, const bill_t &f) {
+std::ostream &operator<<(std::ostream &os, const spot_account_t &f) {
+    for (auto item : f.coins) {
+        os << item << ",\n";
+    }
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+bills_t::bill_t bills_t::bill_t::construct(simdjson::ondemand::object &obj) {
+    bill_t res = {};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "cTime") {
+            res.cTime = field.value().get_uint64_in_string();
+        } else if (name == "coinId") {
+            res.coinId = field.value().get_uint64();
+        } else if (name == "coinName") {
+            res.coinName = field.value().get_string().value();
+        } else if (name == "groupType") {
+            res.groupType = group_type_from_string(field.value().get_string().value());
+        } else if (name == "bizType") {
+            res.bizType = biz_type_from_string(field.value().get_string().value());
+        } else if (name == "quantity") {
+            double_type quantity(static_cast<std::string>(field.value().get_string().take_value()));
+            res.quantity = quantity;
+        } else if (name == "balance") {
+            double_type balance(static_cast<std::string>(field.value().get_string().take_value()));
+            res.balance = balance;
+        } else if (name == "fees") {
+            double_type fees(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fees = fees;
+        }
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const bills_t::bill_t &f) {
     os << "{\n"
     << "\t\"cTime\":" << f.cTime << ",\n"
     << "\t\"coinId\":" << f.coinId << ",\n"
@@ -783,27 +887,58 @@ std::ostream &operator<<(std::ostream &os, const bill_t &f) {
     return os;
 }
 
-//------------------------------------------------------------------------------
-
-transfer_t transfer_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-
-    transfer_t res = {};
-    res.coinName = doc["coinName"].get_string();
-    res.status = doc["status"].get_string();
-    res.toType = doc["toType"].get_string();
-    res.toSymbol = doc["toSymbol"].get_string();
-    res.fromType = doc["fromType"].get_string();
-    res.fromSymbol = doc["fromSymbol"].get_string();
-    double_type amount(static_cast<std::string>(doc["amount"].get_string().take_value()));
-    res.amount = amount;
-    res.tradeTime = doc["tradeTime"].get_uint64_in_string();
+bills_t bills_t::construct(simdjson::ondemand::document &doc) {
+    bills_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto item : arr) {
+        res.bills.emplace_back(bills_t::bill_t::construct(item.get_object().value()));
+    }
 
     return res;
 }
 
-std::ostream &operator<<(std::ostream &os, const transfer_t &f) {
+std::ostream &operator<<(std::ostream &os, const bills_t &f) {
+    for (auto item : f.bills) {
+        os << item << ",\n";
+    }
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+transfers_t::transfer_t transfers_t::transfer_t::construct(simdjson::ondemand::object &obj) {
+    transfer_t res = {};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "coinName") {
+            res.coinName = field.value().get_string().value();
+        } else if (name == "status") {
+            res.status = field.value().get_string().value();
+        } else if (name == "toType") {
+            res.toType = field.value().get_string().value();
+        } else if (name == "toSymbol") {
+            res.toSymbol = field.value().get_string().value();
+        } else if (name == "fromType") {
+            res.fromType = field.value().get_string().value();
+        } else if (name == "fromSymbol") {
+            res.fromSymbol = field.value().get_string().value();
+        } else if (name == "amount") {
+            double_type amount(static_cast<std::string>(field.value().get_string().take_value()));
+            res.amount = amount;
+        } else if (name == "tradeTime") {
+            res.tradeTime = field.value().get_uint64_in_string();
+        }
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const transfers_t::transfer_t &f) {
     os << "{\n"
     << "\t\"coinName\":" << f.coinName << ",\n"
     << "\t\"status\":" << f.status << ",\n"
@@ -817,31 +952,180 @@ std::ostream &operator<<(std::ostream &os, const transfer_t &f) {
     return os;
 }
 
+transfers_t transfers_t::construct(simdjson::ondemand::document &doc) {
+    transfers_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto item : arr) {
+        res.transfers.emplace_back(transfers_t::transfer_t::construct(item.get_object().value()));
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const transfers_t &f) {
+    for (auto item : f.transfers) {
+        os << item << ",\n";
+    }
+
+    return os;
+}
+
 //------------------------------------------------------------------------------
 
-spot_order_t spot_order_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
+spot_order_res_t spot_order_res_t::construct(simdjson::ondemand::document &doc) {
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    return construct(obj);
+}
 
+spot_order_res_t spot_order_res_t::construct(simdjson::ondemand::object &obj) {
+    spot_order_res_t res = {};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "orderId") {
+            res.orderId = field.value().get_string();
+        } else if (name == "clientOrderId") {
+            res.clientOrderId = field.value().get_string();
+        } else if (name == "errorMsg") {
+            res.errorMsg = field.value().get_string();
+        }
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const spot_order_res_t &f) {
+    os << "{\n"
+    << "\t\"orderId\":" << f.orderId << ",\n"
+    << "\t\"clientOrderId\":" << f.clientOrderId << ",\n"
+    << "\t\"errorMsg\":" << f.errorMsg << "\n}";
+
+    return os;
+}
+
+spot_orders_res_t spot_orders_res_t::construct(simdjson::ondemand::document &doc) {
+    spot_orders_res_t res = {};
+    simdjson::ondemand::object obj(doc["data"].get_object());
+
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "resultList") {
+            simdjson::ondemand::array arr(field.value().get_array());
+            for (auto item : arr) {
+                res.success.emplace_back(spot_order_res_t::construct(item.get_object().value()));
+            }
+        } else if (name == "failure") {
+            simdjson::ondemand::array arr(field.value().get_array());
+            for (auto item : arr) {
+                res.fail.emplace_back(spot_order_res_t::construct(item.get_object().value()));
+            }
+        }
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const spot_orders_res_t &f) {
+    os << "{\n"
+    << "\t\"Successful orders\":[\n";
+    for (auto &item : f.success) {
+        os << "\t\t" << item << ",\n";
+    }
+    os << "\t],\n"
+    << "\t\"Failed orders\":[\n";
+    for (auto &item : f.fail) {
+        os << "\t\t" << item << ",\n";
+    }
+    os << "\t]\n}";
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+// This section might be rewritten depending on what the actual response from bitget is for
+// canceling multiple vs. single orders
+spot_cancel_res_t spot_cancel_res_t::construct(simdjson::ondemand::document &doc) {
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    return construct(obj);
+}
+
+spot_cancel_res_t spot_cancel_res_t::construct(simdjson::ondemand::object &obj) {
+    spot_cancel_res_t res = {};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "data") {
+            
+            if (field.value().type() == simdjson::ondemand::json_type::array) {
+                simdjson::ondemand::array arr(field.value().get_array());
+                for (auto item : arr) {
+                    res.orderId.emplace_back(item.get_string());
+                }
+            } else {
+                res.orderId.emplace_back(field.value().get_string());
+            }
+        }
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const spot_cancel_res_t &f) {
+    os << "{\n"
+    << "\t\"orderId\":[\n";
+    for (auto &item : f.orderId) {
+        os << "\t\t" << item << ",\n";
+    }
+    os << "\t]\n}";
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+spot_order_t spot_order_t::construct(simdjson::ondemand::object &obj) {
     spot_order_t res = {};
-    res.accountId = doc["accountId"].get_uint64_in_string();
-    res.symbol = doc["symbol"].get_string();
-    res.orderId = doc["orderId"].get_string();
-    res.clientOrderId = doc["clientOrderId"].get_string();
-    double_type price(static_cast<std::string>(doc["price"].get_string().take_value()));
-    res.price = price;
-    double_type quantity(static_cast<std::string>(doc["quantity"].get_string().take_value()));
-    res.quantity = quantity;
-    res.orderType = order_type_from_string(doc["orderType"].get_string());
-    res.side = side_from_string(doc["side"].get_string());
-    res.status = status_from_string(doc["status"].get_string());
-    double_type fillPrice(static_cast<std::string>(doc["fillPrice"].get_string().take_value()));
-    res.fillPrice = fillPrice;
-    double_type fillQuantity(static_cast<std::string>(doc["fillQuantity"].get_string().take_value()));
-    res.fillQuantity = fillQuantity;
-    double_type fillTotalAmount(static_cast<std::string>(doc["fillTotalAmount"].get_string().take_value()));
-    res.fillTotalAmount = fillTotalAmount;
-    res.cTime = doc["cTime"].get_uint64_in_string();
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "accountId") {
+            res.accountId = field.value().get_uint64_in_string();
+        } else if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "orderId") {
+            res.orderId = field.value().get_string();
+        } else if (name == "clientOrderId") {
+            res.clientOrderId = field.value().get_string();
+        } else if (name == "price") {
+            double_type price(static_cast<std::string>(field.value().get_string().take_value()));
+            res.price = price;
+        } else if (name == "quantity") {
+            double_type quantity(static_cast<std::string>(field.value().get_string().take_value()));
+            res.quantity = quantity;
+        } else if (name == "orderType") {
+            res.orderType = order_type_from_string(field.value().get_string());
+        } else if (name == "side") {
+            res.side = side_from_string(field.value().get_string());
+        } else if (name == "status") {
+            res.status = status_from_string(field.value().get_string());
+        } else if (name == "cTime") {
+            res.cTime = field.value().get_uint64_in_string();
+        }
+    }
 
     return res;
 }
@@ -861,6 +1145,24 @@ std::ostream &operator<<(std::ostream &os, const spot_order_t &f) {
     << "\t\"fillQuantity\":" << f.fillQuantity << ",\n"
     << "\t\"fillTotalAmount\":" << f.fillTotalAmount << ",\n"
     << "\t\"cTime\":" << f.cTime << "\n}";
+
+    return os;
+}
+
+spot_orders_t spot_orders_t::construct(simdjson::ondemand::document &doc) {
+    spot_orders_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto item : arr) {
+        res.spot_orders.emplace_back(spot_order_t::construct(item.get_object().value()));
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const spot_orders_t &f) {
+    for (auto &item : f.spot_orders) {
+        os << item << ",\n";
+    }
 
     return os;
 }

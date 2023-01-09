@@ -122,11 +122,17 @@ std::string base64_encode(std::string &msg) {
     return tmp.append((3 - msg.size() % 3) % 3, '=');
 }
 
+std::string sign(const std::string timestamp, const std::string method, const std::string requestPath, const std::string data, const std::string secret) {
+    std::string prehash = timestamp + method + requestPath + data;
+    //std::cout << "\nprehash: " << prehash << "\n" << std::endl;
+    return base64_encode(hmacSHA256(secret, prehash));
+}
+
 /*************************************************************************************************/
 
 struct api::impl {
     impl(
-         boost::asio::io_context &ioctx,
+        boost::asio::io_context &ioctx,
         std::string host,
         std::string port,
         std::string pk,
@@ -147,13 +153,14 @@ struct api::impl {
         m_client_api_string{std::move(client_api_string)},
         m_write_in_process{},
         m_async_requests{},
-        m_ssl_ctx{boost::asio::ssl::context::sslv23_client},
+        m_ssl_ctx{boost::asio::ssl::context::tlsv13},
         m_resolver{m_ioctx}
     {}
 
     using val_type = boost::variant<std::size_t, const char *>;
     using kv_type = std::pair<const char *, val_type>;
     using init_list_type = std::initializer_list<kv_type>;
+    bool signed_request = false;
 
     template<
          typename CB
@@ -161,36 +168,8 @@ struct api::impl {
         ,typename R = typename std::tuple_element<3, Args>::type
     >
     api::result<R>
-    post(bool _signed, const char *target, boost::beast::http::verb action, const std::initializer_list<kv_type> &map, CB cb) {
+    post(bool _signed, const char *target, boost::beast::http::verb action, std::string data, CB cb) {
         static_assert(std::tuple_size<Args>::value == 4, "callback signature is wrong!");
-
-        auto is_valid_value = [](const val_type &v) -> bool {
-            if ( const auto *p = boost::get<const char *>(&v) ) {
-                return *p != nullptr;
-            }
-            if ( const auto *p = boost::get<std::size_t>(&v) ) {
-                return *p != 0u;
-            }
-
-            assert(!"unreachable");
-
-            return false;
-        };
-
-        auto to_string = [](char *buf, std::size_t bufsize, const val_type &v) -> const char* {
-            if ( const auto *p = boost::get<const char *>(&v) ) {
-                return *p;
-            }
-            if ( const auto *p = boost::get<std::size_t>(&v) ) {
-                std::snprintf(buf, bufsize, "%zu", *p);
-
-                return buf;
-            }
-
-            assert(!"unreachable");
-
-            return buf;
-        };
 
         auto is_html = [](const char *str) -> bool {
             return std::strstr(str, "<HTML>")
@@ -200,55 +179,17 @@ struct api::impl {
         };
 
         std::string starget = target;
-        std::string data;
-        for ( const auto &it: map ) {
-            if ( is_valid_value(it.second) ) {
-                if ( !data.empty() ) {
-                    data += "&";
-                }
-                data += it.first;
-                data += "=";
-
-                char buf[32];
-                data += to_string(buf, sizeof(buf), it.second);
-            }
-        }
-
-        if ( _signed ) {
-            /*
-            assert(!m_pk.empty() && !m_sk.empty());
-
-            if ( !data.empty() ) {
-                data += "&";
-            }
-            data += "timestamp=";
-            char buf[32];
-            data += to_string(buf, sizeof(buf), get_current_ms_epoch());
-
-            data += "&recvWindow=";
-            data += to_string(buf, sizeof(buf), m_timeout);
-            
-            std::string signature = hmac_sha256(
-                 m_sk.c_str()
-                ,m_sk.length()
-                ,data.c_str()
-                ,data.length()
-            );
-
-            data += "&signature=";
-            data += signature;
-            */
-        }
-
-        bool get_delete =
+        
+        bool get_delete = 
             action == boost::beast::http::verb::get ||
             action == boost::beast::http::verb::delete_
         ;
         if ( get_delete && !data.empty() ) {
-            starget += "?";
             starget += data;
             data.clear();
         }
+
+        signed_request = _signed;
 
         api::result<R> res{};
         if ( !cb ) {
@@ -294,7 +235,6 @@ struct api::impl {
                 ,std::make_shared<invoker_type>(std::move(cb))
             };
             m_async_requests.push(std::move(item));
-
             async_post();
         }
 
@@ -341,19 +281,27 @@ struct api::impl {
         }
 
         boost::beast::http::request<boost::beast::http::string_body> req;
-        req.target(target);
         req.version(11);
-
         req.method(action);
+
+        req.target(target);
+        req.set(boost::beast::http::field::host, m_host);
+        req.set(boost::beast::http::field::user_agent, m_client_api_string);
+        req.set(boost::beast::http::field::accept, "*/*");
+        if (signed_request) {
+            std::string timestamp = std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+            std::string signature = sign(timestamp, boost::beast::http::to_string(action).to_string(), target, data, m_sk);
+            req.set("ACCESS-KEY", m_pk);
+            req.set("ACCESS-SIGN", signature);
+            req.set("ACCESS-PASSPHRASE", m_passphrase);
+            req.set("ACCESS-TIMESTAMP", timestamp);
+        }
+        req.set("locale", m_locale);
+        req.set(boost::beast::http::field::content_type, "application/json");
         if ( action != boost::beast::http::verb::get ) {
             req.body() = std::move(data);
             req.set(boost::beast::http::field::content_length, std::to_string(req.body().length()));
         }
-
-        req.insert("X-MBX-APIKEY", m_pk);
-        req.set(boost::beast::http::field::host, m_host);
-        req.set(boost::beast::http::field::user_agent, m_client_api_string);
-        req.set(boost::beast::http::field::content_type, "application/json");
 
         boost::beast::http::write(ssl_stream, req, ec);
         if ( ec ) {
@@ -400,21 +348,39 @@ struct api::impl {
         auto action = front.action;
         std::string data = std::move(front.data);
         std::string target = front.target;
+        //std::cout << "async_post(): data=" << data << std::endl;
         //std::cout << "async_post(): target=" << target << std::endl;
 
         auto req = std::make_unique<request_type>();
+        
         req->version(11);
         req->method(action);
+
+        req->target(target);
+        req->set(boost::beast::http::field::host, m_host);
+        req->set(boost::beast::http::field::user_agent, m_client_api_string);
+        req->set(boost::beast::http::field::accept, "*/*");
+        if (signed_request) {
+            std::string timestamp = std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+            std::string signature = sign(timestamp, boost::beast::http::to_string(action).to_string(), target, data, m_sk);
+            req->set("ACCESS-KEY", m_pk);
+            req->set("ACCESS-SIGN", signature);
+            req->set("ACCESS-PASSPHRASE", m_passphrase);
+            req->set("ACCESS-TIMESTAMP", timestamp);
+        }
+        req->set("locale", m_locale);
+        req->set(boost::beast::http::field::content_type, "application/json");
         if ( action != boost::beast::http::verb::get ) {
             req->body() = std::move(data);
             req->set(boost::beast::http::field::content_length, std::to_string(req->body().length()));
         }
 
-        req->target(target);
-        req->insert("X-MBX-APIKEY", m_pk);
-        req->set(boost::beast::http::field::host, m_host);
-        req->set(boost::beast::http::field::user_agent, m_client_api_string);
-        req->set(boost::beast::http::field::content_type, "application/json");
+        //std::cout << "Request Headers:" << std::endl;
+        //for (auto &h : req->base()) {
+        //    std::cout << "Field: " << h.name() << "/text: " << h.name_string() << ", Value: " << h.value() << std::endl;
+        //}
+        //std::cout << "Request Body:" << req->body() << std::endl;
+        //std::cout << std::endl;
 
         //std::cout << target << " REQUEST:\n" << m_req << std::endl;
 
@@ -427,6 +393,7 @@ struct api::impl {
              { on_resolve(ec, std::move(req), std::move(res)); }
         );
     }
+
     void on_resolve(
          const boost::system::error_code &ec
         ,request_ptr req
@@ -546,6 +513,11 @@ struct api::impl {
     void on_shutdown(const boost::system::error_code &ec, response_ptr resp, ssl_socket_ptr ssl_socket) {
         boost::ignore_unused(ec);
         boost::ignore_unused(ssl_socket);
+        
+        //std::cout << "Response Headers:" << std::endl;
+        //for (auto &h : resp->base()) {
+        //    std::cout << "Field: " << h.name() << "/text: " << h.name_string() << ", Value: " << h.value() << std::endl;
+        //}
 
         std::string body = std::move(resp->body());
         process_reply(__MAKE_FILELINE, 0, std::string{}, std::move(body));
@@ -630,28 +602,26 @@ api::~api()
 /*************************************************************************************************/
 
 api::result<server_time_t> api::getServerTime(server_time_cb cb) {
-    return pimpl->post(false, "/api/spot/v1/public/time", boost::beast::http::verb::get, {}, std::move(cb));
+    return pimpl->post(false, "/api/spot/v1/public/time", boost::beast::http::verb::get, "", std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<coin_list_t> api::getCoinList(coin_list_cb cb) {
-    return pimpl->post(false, "/api/spot/v1/public/currencies", boost::beast::http::verb::get, {}, std::move(cb));
+    return pimpl->post(false, "/api/spot/v1/public/currencies", boost::beast::http::verb::get, "", std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<symbols_t> api::getSymbols(symbols_cb cb) {
-    return pimpl->post(false, "/api/spot/v1/public/products", boost::beast::http::verb::get, {}, std::move(cb));
+    return pimpl->post(false, "/api/spot/v1/public/products", boost::beast::http::verb::get, "", std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<symbol_t> api::getSymbol(const char* symbol, symbol_cb cb) {
-    const char* sym = getSpotSymbol(symbol);
-    const impl::init_list_type params = {
-        {"symbol", sym}
-    };
+    std::string params = "?symbol=";
+    params += getSpotSymbol(symbol);
 
     return pimpl->post(false, "/api/spot/v1/public/product", boost::beast::http::verb::get, params, std::move(cb));
 }
@@ -659,10 +629,8 @@ api::result<symbol_t> api::getSymbol(const char* symbol, symbol_cb cb) {
 /*************************************************************************************************/
 
 api::result<spot_ticker_t> api::getSpotTicker(const char* symbol, spot_ticker_cb cb) {
-    const char* sym = getSpotSymbol(symbol);
-    const impl::init_list_type params = {
-        {"symbol", sym}
-    };
+    std::string params = "?symbol=";
+    params += getSpotSymbol(symbol);
 
     return pimpl->post(false, "/api/spot/v1/market/ticker", boost::beast::http::verb::get, params, std::move(cb));
 }
@@ -670,17 +638,18 @@ api::result<spot_ticker_t> api::getSpotTicker(const char* symbol, spot_ticker_cb
 /*************************************************************************************************/
 
 api::result<spot_tickers_t> api::getSpotTickers(spot_tickers_cb cb) {
-    return pimpl->post(false, "/api/spot/v1/market/tickers", boost::beast::http::verb::get, {}, std::move(cb));
+    return pimpl->post(false, "/api/spot/v1/market/tickers", boost::beast::http::verb::get, "", std::move(cb));
 }
 
 /*************************************************************************************************/
 
 api::result<trades_t> api::getSpotTrades(const char* symbol, spot_trades_cb cb, uint16_t limit) {
-    const char* sym = getSpotSymbol(symbol);
-    const impl::init_list_type params = {
-        {"symbol", sym},
-        {"limit", std::to_string(limit).c_str()}
-    };
+    std::string params = "?symbol=";
+    params += getSpotSymbol(symbol);
+    if (limit) {
+        params += "&limit=";
+        params += std::to_string(limit);
+    }
 
     return pimpl->post(false, "/api/spot/v1/market/fills", boost::beast::http::verb::get, params, std::move(cb));
 }
@@ -688,15 +657,22 @@ api::result<trades_t> api::getSpotTrades(const char* symbol, spot_trades_cb cb, 
 /*************************************************************************************************/
 
 api::result<candles_t> api::getSpotCandles(const char* symbol, _candle_gran period, spot_candles_cb cb, std::size_t startTime, std::size_t endTime, uint16_t limit) {
-    const char* sym = getSpotSymbol(symbol);
-    const char* per = candle_gran_to_string(period);
-    const impl::init_list_type params = {
-        {"symbol", sym},
-        {"period", per},
-        {"startTime", std::to_string(startTime).c_str()},
-        {"endTime", std::to_string(endTime).c_str()},
-        {"limit", std::to_string(limit).c_str()}
-    };
+    std::string params = "?symbol=";
+    params += getSpotSymbol(symbol);
+    params += "&period=";
+    params += candle_gran_to_string(period);
+    if (startTime) {
+        params += "&start_time=";
+        params += std::to_string(startTime);
+    }
+    if (endTime) {
+        params += "&end_time=";
+        params += std::to_string(endTime);
+    }
+    if (limit) {
+        params += "&limit=";
+        params += std::to_string(limit);
+    }
 
     return pimpl->post(false, "/api/spot/v1/market/candles", boost::beast::http::verb::get, params, std::move(cb));
 }
@@ -704,11 +680,12 @@ api::result<candles_t> api::getSpotCandles(const char* symbol, _candle_gran peri
 /*************************************************************************************************/
 
 api::result<depth_t> api::getSpotDepth(const char* symbol, spot_depth_cb cb, uint16_t limit) {
-    const char* sym = getSpotSymbol(symbol);
-    const impl::init_list_type params = {
-        {"symbol", sym},
-        {"limit", std::to_string(limit).c_str()}
-    };
+    std::string params = "?symbol=";
+    params += getSpotSymbol(symbol);
+    if (limit) {
+        params += "&limit=";
+        params += std::to_string(limit);
+    }
 
     return pimpl->post(false, "/api/spot/v1/market/depth", boost::beast::http::verb::get, params, std::move(cb));
 }
@@ -716,14 +693,20 @@ api::result<depth_t> api::getSpotDepth(const char* symbol, spot_depth_cb cb, uin
 /*************************************************************************************************/
 
 api::result<transfer_res_t> api::transfer(_from_to_type from, _from_to_type to, double_type amount, const char* coin, transfer_cb cb, const char* clientOid) {
-    const char* from_str = from_to_type_to_string(from);
-    const char* to_str = from_to_type_to_string(to);
-    const impl::init_list_type params = {
-        {"from", from_str},
-        {"to", to_str},
-        {"amount", amount},
-        {"coin", coin}
-    };
+    std::string params = "{\"fromType\":\"";
+    params += from_to_type_to_string(from);
+    params += "\",\"toType\":\"";
+    params += from_to_type_to_string(to);
+    params += "\",\"amount\":\"";
+    params += amount.str();
+    params += "\",\"coin\":\"";
+    params += coin;
+    if (clientOid) {
+        params += "\",\"clientOid\":\"";
+        params += clientOid;
+    }
+    params += "\"}";
+
 
     return pimpl->post(true, "/api/spot/v1/wallet/transfer", boost::beast::http::verb::post, params, std::move(cb));
 }
@@ -731,42 +714,283 @@ api::result<transfer_res_t> api::transfer(_from_to_type from, _from_to_type to, 
 /*************************************************************************************************/
 
 api::result<address_t> api::getAddress(const char* coin, address_cb cb, const char* chain) {
-    const impl::init_list_type params = {
-        {"coin", coin},
-        {"chain", chain}
-    };
+    std::string params = "?coin=";
+    params += coin;
+    if (chain) {
+        params += "&chain=";
+        params += chain;
+    }
 
     return pimpl->post(true, "/api/spot/v1/wallet/deposit-address", boost::beast::http::verb::get, params, std::move(cb));
 }
 
 /*************************************************************************************************/
 
-api::result<withdraw_res_t> api::withdraw(const char* coin, const char* address, const char* chain, double_type amount, withdraw_cb cb = {}, const char* tag = "", const char* remark = "", const char* clientOid = "") {
-    const impl::init_list_type params = {
-        {"coin", coin},
-        {"address", address},
-        {"chain", chain},
-        {"amount", amount},
-        {"tag", tag},
-        {"remark", remark},
-        {"clientOid", clientOid}
-    };
+api::result<withdraw_res_t> api::withdraw(const char* coin, const char* address, const char* chain, double_type amount, withdraw_cb cb, const char* tag, const char* remark, const char* clientOid) {
+    std::string params = "{\"coin\":\"";
+    params += coin;
+    params += "\",\"address\":\"";
+    params += address;
+    params += "\",\"chain\":\"";
+    params += chain;
+    params += "\",\"amount\":\"";
+    params += amount.str();
+    if (tag) {
+        params += "\",\"tag\":\"";
+        params += tag;
+    }
+    if (remark) {
+        params += "\",\"remark\":\"";
+        params += remark;
+    }
+    if (clientOid) {
+        params += "\",\"clientOid\":\"";
+        params += clientOid;
+    }
+    params += "\"}";
 
     return pimpl->post(true, "/api/spot/v1/wallet/withdraw", boost::beast::http::verb::post, params, std::move(cb));
 }
 
 /*************************************************************************************************/
 
-api::result<withdraw_res_t> api::innerWithdraw(const char* coin, const char* address, const char* chain, double_type amount, withdraw_cb cb = {}, const char* clientOid) {
-    const impl::init_list_type params = {
-        {"coin", coin},
-        {"address", address},
-        {"chain", chain},
-        {"amount", amount},
-        {"clientOid", clientOid}
-    };
+api::result<withdraw_res_t> api::innerWithdraw(const char* coin, const char* toUid, double_type amount, withdraw_cb cb, const char* clientOid) {
+    std::string params = "{\"coin\":\"";
+    params += coin;
+    params += "\",\"toUid\":\"";
+    params += toUid;
+    params += "\",\"amount\":\"";
+    params += amount.str();
+    if (clientOid) {
+        params += "\",\"clientOid\":\"";
+        params += clientOid;
+    }
+    params += "\"}";
+
 
     return pimpl->post(true, "/api/spot/v1/wallet/withdrawal-inner", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<deposit_withdrawals_t> api::withdrawList(const char* coin, std::size_t startTime, std::size_t endTime, withdraw_list_cb cb, std::size_t pageNo, uint8_t pageSize) {
+    std::string params = "?coin=";
+    params += coin;
+    params += "&startTime=";
+    params += std::to_string(startTime);
+    params += "&endTime=";
+    params += std::to_string(endTime);
+    if (pageNo) {
+        params += "&pageNo=";
+        params += std::to_string(pageNo);
+    }
+    if (pageSize) {
+        params += "&pageSize=";
+        params += std::to_string(pageSize);
+    }
+
+    return pimpl->post(true, "/api/spot/v1/wallet/withdrawal-list", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<deposit_withdrawals_t> api::depositList(const char* coin, std::size_t startTime, std::size_t endTime, deposit_list_cb cb, std::size_t pageNo, uint8_t pageSize) {
+    std::string params = "?coin=";
+    params += coin;
+    params += "&startTime=";
+    params += std::to_string(startTime);
+    params += "&endTime=";
+    params += std::to_string(endTime);
+    if (pageNo) {
+        params += "&pageNo=";
+        params += std::to_string(pageNo);
+    }
+    if (pageSize) {
+        params += "&pageSize=";
+        params += std::to_string(pageSize);
+    }
+
+    return pimpl->post(true, "/api/spot/v1/wallet/deposit-list", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<apikey_t> api::getApiKeyInfo(apikey_cb cb) {
+    return pimpl->post(true, "/api/spot/v1/account/getInfo", boost::beast::http::verb::get, "", std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_account_t> api::getSpotAccount(const char* coin, account_cb cb) {
+    std::string params = "?coin=";
+    params += coin;
+
+    return pimpl->post(true, "/api/spot/v1/account/assets", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<bills_t> api::getBills(std::size_t coinId, _group_type groupType, _biz_type bizType, bills_cb cb, std::size_t after, std::size_t before, uint16_t limit) {
+    std::string params = "{\"coinId\":\"";
+    params += std::to_string(coinId);
+    params += "\",\"groupType\":\"";
+    params += group_type_to_string(groupType);
+    params += "\",\"bizType\":\"";
+    params += biz_type_to_string(bizType);
+    if (after) {
+        params += "\",\"after\":\"";
+        params += std::to_string(after);
+    }
+    if (before) {
+        params += "\",\"before\":\"";
+        params += std::to_string(before);
+    }
+    if (limit) {
+        params += "\",\"limit\":\"";
+        params += std::to_string(limit);
+    }
+    params += "\"}";
+
+    return pimpl->post(true, "/api/spot/v1/account/bills", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<transfers_t> api::getTransferList(std::size_t coinId, const char* fromType, transfers_cb cb, std::size_t after, std::size_t before, uint16_t limit) {
+    std::string params = "?coinId=";
+    params += std::to_string(coinId);
+    params += "&fromType=";
+    params += fromType;
+    if (after) {
+        params += "&after=";
+        params += std::to_string(after);
+    }
+    if (before) {
+        params += "&before=";
+        params += std::to_string(before);
+    }
+    if (limit) {
+        params += "&limit=";
+        params += std::to_string(limit);
+    }
+
+    return pimpl->post(true, "/api/spot/v1/account/transferRecords", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_order_res_t> api::placeSpotOrder(const char* symbol, _side side, _order_type type, _force force, double_type quantity, place_order_cb cb, double_type price, const char* clientOid) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\",\"side\":\"";
+    params += side_to_string(side);
+    params += "\",\"type\":\"";
+    params += order_type_to_string(type);
+    params += "\",\"force\":\"";
+    params += force_to_string(force);
+    params += "\",\"quantity\":\"";
+    params += quantity.str();
+    if (price) {
+        params += "\",\"price\":\"";
+        params += price.str();
+    }
+    if (clientOid) {
+        params += "\",\"clientOid\":\"";
+        params += clientOid;
+    }
+    params += "\"}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/orders", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_orders_res_t> api::placeSpotOrders(const char* symbol, std::vector<_side> sides, std::vector<_order_type> types, std::vector<_force> forces, std::vector<double_type> quantities, std::vector<double_type> prices, std::vector<std::string> clientOids, place_orders_cb cb) {
+    assert(sides.size() == types.size() && sides.size() == forces.size() && sides.size() == quantities.size() && sides.size() == prices.size() && sides.size() == clientOids.size());
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\",\"orderList\":[";
+    for (std::size_t i = 0; i < sides.size(); ++i) {
+        params += "{\"side\":\"";
+        params += side_to_string(sides[i]);
+        params += "\",\"type\":\"";
+        params += order_type_to_string(types[i]);
+        params += "\",\"force\":\"";
+        params += force_to_string(forces[i]);
+        params += "\",\"quantity\":\"";
+        params += quantities[i].str();
+        if (prices[i]) {
+            params += "\",\"price\":\"";
+            params += prices[i].str();
+        }
+        if (!clientOids[i].empty()) {
+            params += "\",\"clientOid\":\"";
+            params += clientOids[i];
+        }
+        params += "\"}";
+        if (i != sides.size() - 1) {
+            params += ",";
+        }
+    }
+    params += "]}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/batch-orders", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_cancel_res_t> api::cancelSpotOrder(const char* symbol, const char* orderId, cancel_order_cb cb) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\",\"orderId\":\"";
+    params += orderId;
+    params += "\"}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/cancel-order", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+
+/*************************************************************************************************/
+
+api::result<spot_cancel_res_t> api::cancelSpotOrders(const char* symbol, std::vector<std::string> orderIds, cancel_orders_cb cb) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\",\"orderIds\":[";
+    for (std::size_t i = 0; i < orderIds.size(); ++i) {
+        params += "\"";
+        params += orderIds[i];
+        params += "\"";
+        if (i != orderIds.size() - 1) {
+            params += ",";
+        }
+    }
+    params += "]}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/cancel-batch-orders", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_orders_t> api::orderHistory(const char* symbol, order_history_cb cb, std::size_t after, std::size_t before, uint32_t limit) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\"";
+    if (after) {
+        params += "\",\"after\":";
+        params += std::to_string(after);
+    }
+    if (before) {
+        params += ",\"before\":";
+        params += std::to_string(before);
+    }
+    if (limit) {
+        params += ",\"limit\":";
+        params += std::to_string(limit);
+    }
+    params += "}";
+
+
+    return pimpl->post(true, "/api/spot/v1/trade/history", boost::beast::http::verb::post, params, std::move(cb));
 }
 
 } // ns rest

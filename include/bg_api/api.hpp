@@ -196,48 +196,75 @@ struct api {
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#inner-withdraw
     using withdraw_cb = std::function<bool(const char *fl, int ec, std::string errmsg, withdraw_res_t res)>;
-    result<withdraw_res_t> innerWithdraw(const std::string &coin, const std::string &address, const std::string &chain, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return withdraw(coin.c_str(), address.c_str(), chain.c_str(), amount, cb, "", "", clientOid.c_str()); }
-    result<withdraw_res_t> innerWithdraw(const std::string &coin, const std::string &address, const std::string &chain, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return withdraw(coin.c_str(), address.c_str(), chain.c_str(), amount, cb, "", "", clientOid); }
-    result<withdraw_res_t> innerWithdraw(const std::string &coin, const std::string &address, const char* chain, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return withdraw(coin.c_str(), address.c_str(), chain, amount, cb, "", "", clientOid.c_str()); }
-    result<withdraw_res_t> innerWithdraw(const std::string &coin, const std::string &address, const char* chain, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return withdraw(coin.c_str(), address.c_str(), chain, amount, cb, "", "", clientOid); }
-    result<withdraw_res_t> innerWithdraw(const std::string &coin, const char* address, const std::string &chain, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return withdraw(coin.c_str(), address, chain.c_str(), amount, cb, "", "", clientOid.c_str()); }
-    result<withdraw_res_t> innerWithdraw(const std::string &coin, const char* address, const std::string &chain, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return withdraw(coin.c_str(), address, chain.c_str(), amount, cb, "", "", clientOid); }
-    result<withdraw_res_t> innerWithdraw(const std::string &coin, const char* address, const char* chain, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return withdraw(coin.c_str(), address, chain, amount, cb, "", "", clientOid.c_str()); }
-    result<withdraw_res_t> innerWithdraw(const std::string &coin, const char* address, const char* chain, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return withdraw(coin.c_str(), address, chain, amount, cb, "", "", clientOid); }
-    result<withdraw_res_t> innerWithdraw(const char* coin, const std::string &address, const std::string &chain, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return withdraw(coin, address.c_str(), chain.c_str(), amount, cb, "", "", clientOid.c_str()); }
-    result<withdraw_res_t> innerWithdraw(const char* coin, const std::string &address, const std::string &chain, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return withdraw(coin, address.c_str(), chain.c_str(), amount, cb, "", "", clientOid); }
-    result<withdraw_res_t> innerWithdraw(const char* coin, const std::string &address, const char* chain, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return withdraw(coin, address.c_str(), chain, amount, cb, "", "", clientOid.c_str()); }
-    result<withdraw_res_t> innerWithdraw(const char* coin, const std::string &address, const char* chain, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return withdraw(coin, address.c_str(), chain, amount, cb, "", "", clientOid); }
-    result<withdraw_res_t> innerWithdraw(const char* coin, const char* address, const std::string &chain, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return withdraw(coin, address, chain.c_str(), amount, cb, "", "", clientOid.c_str()); }
-    result<withdraw_res_t> innerWithdraw(const char* coin, const char* address, const std::string &chain, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return withdraw(coin, address, chain.c_str(), amount, cb, "", "", clientOid); }
-    result<withdraw_res_t> innerWithdraw(const char* coin, const char* address, const char* chain, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return withdraw(coin, address, chain, amount, cb, "", "", clientOid.c_str()); }
-    result<withdraw_res_t> innerWithdraw(const char* coin, const char* address, const char* chain, double_type amount, withdraw_cb cb = {}, const char* clientOid = "");
+    result<withdraw_res_t> innerWithdraw(const std::string &coin, const std::string &toUid, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return innerWithdraw(coin.c_str(), toUid.c_str(), amount, cb, clientOid.c_str()); }
+    result<withdraw_res_t> innerWithdraw(const std::string &coin, const std::string &toUid, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return innerWithdraw(coin.c_str(), toUid.c_str(), amount, cb, clientOid); }
+    result<withdraw_res_t> innerWithdraw(const std::string &coin, const char* toUid, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return innerWithdraw(coin.c_str(), toUid, amount, cb, clientOid.c_str()); }
+    result<withdraw_res_t> innerWithdraw(const std::string &coin, const char* toUid, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return innerWithdraw(coin.c_str(), toUid, amount, cb, clientOid); }
+    result<withdraw_res_t> innerWithdraw(const char* coin, const std::string &toUid, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return innerWithdraw(coin, toUid.c_str(), amount, cb, clientOid.c_str()); }
+    result<withdraw_res_t> innerWithdraw(const char* coin, const std::string &toUid, double_type amount, withdraw_cb cb = {}, const char* clientOid = "") { return innerWithdraw(coin, toUid.c_str(), amount, cb, clientOid); }
+    result<withdraw_res_t> innerWithdraw(const char* coin, const char* toUid, double_type amount, withdraw_cb cb = {}, std::string clientOid = "") { return innerWithdraw(coin, toUid, amount, cb, clientOid.c_str()); }
+    result<withdraw_res_t> innerWithdraw(const char* coin, const char* toUid, double_type amount, withdraw_cb cb = {}, const char* clientOid = "");
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-withdraw-list
+    using withdraw_list_cb = std::function<bool(const char *fl, int ec, std::string errmsg, deposit_withdrawals_t res)>;
+    result<deposit_withdrawals_t> withdrawList(const std::string &coin, std::size_t startTime, std::size_t endTime, withdraw_list_cb cb = {}, std::size_t pageNo = 1, uint8_t pageSize = 20) { return withdrawList(coin.c_str(), startTime, endTime, cb, pageNo, pageSize); }
+    result<deposit_withdrawals_t> withdrawList(const char* coin, std::size_t startTime, std::size_t endTime, withdraw_list_cb cb = {}, std::size_t pageNo = 1, uint8_t pageSize = 20);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-deposit-list
+    using deposit_list_cb = std::function<bool(const char *fl, int ec, std::string errmsg, deposit_withdrawals_t res)>;
+    result<deposit_withdrawals_t> depositList(const std::string &coin, std::size_t startTime, std::size_t endTime, deposit_list_cb cb = {}, std::size_t pageNo = 1, uint8_t pageSize = 20) { return depositList(coin.c_str(), startTime, endTime, cb, pageNo, pageSize); }
+    result<deposit_withdrawals_t> depositList(const char* coin, std::size_t startTime, std::size_t endTime, deposit_list_cb cb = {}, std::size_t pageNo = 1, uint8_t pageSize = 20);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-apikey-info
+    using apikey_cb = std::function<bool(const char *fl, int ec, std::string errmsg, apikey_t res)>;
+    result<apikey_t> getApiKeyInfo(apikey_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-account
+    using account_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_account_t res)>;
+    result<spot_account_t> getSpotAccount(std::string coin, account_cb cb = {}) { return getSpotAccount(coin.c_str(), cb); }
+    result<spot_account_t> getSpotAccount(const char* coin, account_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-bills
+    using bills_cb = std::function<bool(const char *fl, int ec, std::string errmsg, bills_t res)>;
+    result<bills_t> getBills(std::size_t coinId, _group_type groupType, _biz_type bizType, bills_cb cb = {}, std::size_t after = 0, std::size_t before = 0, uint16_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-transfer-list
+    using transfers_cb = std::function<bool(const char *fl, int ec, std::string errmsg, transfers_t res)>;
+    result<transfers_t> getTransferList(std::size_t coinId, std::string &fromType, transfers_cb cb = {}, std::size_t after = 0, std::size_t before = 0, uint16_t limit = 100) { return getTransferList(coinId, fromType.c_str(), cb, after, before, limit); }
+    result<transfers_t> getTransferList(std::size_t coinId, const char* fromType, transfers_cb cb = {}, std::size_t after = 0, std::size_t before = 0, uint16_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#place-order
+    using place_order_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_order_res_t res)>;
+    result<spot_order_res_t> placeSpotOrder(const std::string &symbol, _side side, _order_type type, _force force, double_type quantity, place_order_cb cb = {}, double_type price = 0, std::string clientOid = "") { return placeSpotOrder(symbol.c_str(), side, type, force, quantity, cb, price, clientOid.c_str()); }
+    result<spot_order_res_t> placeSpotOrder(const std::string &symbol, _side side, _order_type type, _force force, double_type quantity, place_order_cb cb = {}, double_type price = 0, const char* clientOid = "") { return placeSpotOrder(symbol.c_str(), side, type, force, quantity, cb, price, clientOid); }
+    result<spot_order_res_t> placeSpotOrder(const char* symbol, _side side, _order_type type, _force force, double_type quantity, place_order_cb cb = {}, double_type price = 0, std::string clientOid = "") { return placeSpotOrder(symbol, side, type, force, quantity, cb, price, clientOid.c_str()); }
+    result<spot_order_res_t> placeSpotOrder(const char* symbol, _side side, _order_type type, _force force, double_type quantity, place_order_cb cb = {}, double_type price = 0, const char* clientOid = "");
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#batch-order
+    using place_orders_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_orders_res_t res)>;
+    result<spot_orders_res_t> placeSpotOrders(const std::string &symbol, std::vector<_side> sides, std::vector<_order_type> types, std::vector<_force> forces, std::vector<double_type> quantities, std::vector<double_type> prices, std::vector<std::string> clientOids, place_orders_cb cb = {}) { return placeSpotOrders(symbol.c_str(), sides, types, forces, quantities, prices, clientOids, cb); }
+    result<spot_orders_res_t> placeSpotOrders(const char* symbol, std::vector<_side> sides, std::vector<_order_type> types, std::vector<_force> forces, std::vector<double_type> quantities, std::vector<double_type> prices, std::vector<std::string> clientOids, place_orders_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#cancel-order
+    using cancel_order_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_cancel_res_t res)>;
+    result<spot_cancel_res_t> cancelSpotOrder(const std::string &symbol, const std::string &orderId, cancel_order_cb cb = {}) { return cancelSpotOrder(symbol.c_str(), orderId.c_str(), cb); }
+    result<spot_cancel_res_t> cancelSpotOrder(const std::string &symbol, const char* orderId, cancel_order_cb cb = {}) { return cancelSpotOrder(symbol.c_str(), orderId, cb);}
+    result<spot_cancel_res_t> cancelSpotOrder(const char* symbol, const std::string &orderId, cancel_order_cb cb = {}) { return cancelSpotOrder(symbol, orderId.c_str(), cb); }
+    result<spot_cancel_res_t> cancelSpotOrder(const char* symbol, const char* orderId, cancel_order_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#cancel-order-in-batch-single-instruments
+    using cancel_orders_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_cancel_res_t res)>;
+    result<spot_cancel_res_t> cancelSpotOrders(const std::string &symbol, std::vector<std::string> orderIds, cancel_orders_cb cb = {}) { return cancelSpotOrders(symbol.c_str(), orderIds, cb); }
+    result<spot_cancel_res_t> cancelSpotOrders(const char* symbol, std::vector<std::string> orderIds, cancel_orders_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-order-details
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-order-list
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-order-history
+    using order_history_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_orders_t res)>;
+    result<spot_orders_t> orderHistory(const std::string &symbol, order_history_cb cb = {}, std::size_t after = 0, std::size_t before = 0, uint32_t limit = 100) { return orderHistory(symbol.c_str(), cb, after, before, limit); }
+    result<spot_orders_t> orderHistory(const char* symbol, order_history_cb cb = {}, std::size_t after = 0, std::size_t before = 0, uint32_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-transaction-details
 
