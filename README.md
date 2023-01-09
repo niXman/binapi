@@ -3,106 +3,105 @@ Bitget API implemented in C++ for both synchronous and asynchronous way. Based o
 
 Note: This project is currently a work in progress. The expected date of completion is January 15, 2023.
 
+![25%](https://progress-bar.dev/25/?scale=100&title=REST%20API%20&width=240)
+
+![0%](https://progress-bar.dev/0/?scale=100&title=WebSocket%20API&width=216)
+
 ## TODO:
 
-Here are the files that need to be implemented before I get started on the REST API and WebSocket API.
-
-- [x] enums.hpp
-- [x] enums.cpp
-- [x] errors.hpp
-- [x] errors.cpp
-- [x] types.hpp
-- [x] types.cpp
-
-
-## REST API
+#### REST API
 
 Here is a breakdown of what needs to be done for the REST API:
 
-- **Spot methods**:
-    - [x] getServerTime()
-    - [x] getCoinList()
-    - [x] getSymbol()
-    - [x] getSymbols()
-    - [x] getSpotTicker()
-    - [x] getSpotTickers()
-    - [x] getSpotTrades()
-    - [x] getSpotCandles()
-    - [x] getSpotDepth()
-    - [x] transfer()
-    - [x] getAddress()
-    - [x] withdraw()
-    - [x] innerWithdraw()
-    - [ ] getWithdrawalList()
-    - [ ] getDepositList()
-    - [ ] getInfo()
-    - [ ] getAssets()
-    - [ ] getBills()
-    - [ ] getTransferList()
-    - [ ] placeOrder()
-    - [ ] placeOrders()
-    - [ ] cancelOrder()
-    - [ ] cancelOrders()
-    - [ ] getOrderDetails()
-    - [ ] getOpenOrders()
-    - [ ] getOrderHistory()
-    - [ ] getTransactionDetails()
-    - [ ] placePlanOrder()
-    - [ ] modifyPlanOrder()
-    - [ ] cancelPlanOrder()
-    - [ ] getPlanOrders()
-    - [ ] getHistoryPlanOrders()
-- **Futures methods**:
-    - [ ] Get All Symbols
-    - [ ] Get Depth
-    - [ ] Get Single Symbol Ticker
-    - [ ] Get All Symbol Ticker
-    - [ ] Get Fills
-    - [ ] Get Candle Data
-    - [ ] Get Symbol Index Price
-    - [ ] Get Symbol Next Funding
-    - [ ] Get History Funding Rate
-    - [ ] Get Current Funding Rate
-    - [ ] Get Open Interest
-    - [ ] Get Symbol Mark Price
-    - [ ] Get Symbol Leverage
-    - [ ] Get Single Account
-    - [ ] Get Account List
-    - [ ] Get Open Count
-    - [ ] Change Leverage
-    - [ ] Change Margin
-    - [ ] Change Margin Mode
-    - [ ] Change Hold Mode
-    - [ ] Get Symbol Position
-    - [ ] Get All Position
-    - [ ] Get Account Bill
-    - [ ] Get Business Account Bill
-    - [ ] Place Order
-    - [ ] Reversal
-    - [ ] Batch Order
-    - [ ] Cancel Order
-    - [ ] Batch Cancel Order
-    - [ ] Cancel All Order
-    - [ ] Get Open Order
-    - [ ] Get All Open Order
-    - [ ] Get History Orders
-    - [ ] Get ProductType History Orders
-    - [ ] Get Order Details
-    - [ ] Get Order Fill Detail
-    - [ ] Get ProductType Order Fill Detail
-    - [ ] Place Plan Order
-    - [ ] Modify Plan Order
-    - [ ] Modify Plan Order TPSL
-    - [ ] Place Stop Order
-    - [ ] Place Trailing Stop Order
-    - [ ] Place Position TPSL
-    - [ ] Modify Stop Order
-    - [ ] Cancel Plan Order (TPSL)
-    - [ ] Cancel All Trigger Order (TPSL)
-    - [ ] Get Plan Order (TPSL) List
-    - [ ] Get History Plan Orders (TPSL)
+##### Spot methods:
+| Method                        | Written               | Request Working       | Response Verified     |
+| :---                          | :----:                | :----:                | :---:                 |
+| getServerTime()               | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getCoinList()                 | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSymbol()                   | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSymbols()                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSpotTicker()               | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSpotTickers()              | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSpotTrades()               | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSpotCandles()              | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSpotDepth()                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| transfer()                    | :heavy_check_mark:    | :x:                   | :x:                   |
+| getAddress()                  | :heavy_check_mark:    | :x:                   | :x:                   |
+| withdraw()                    | :heavy_check_mark:    | :x:                   | :x:                   |
+| innerWithdraw()               | :heavy_check_mark:    | :x:                   | :x:                   |
+| getWithdrawalList()           | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   |
+| getDepositList()              | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   |
+| getApiKeyInfo()               | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSpotAccount()              | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| getSpotBills()                | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   |
+| getSpotTransferList()         | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   |
+| placeSpotOrder()              | :heavy_check_mark:    | :x:                   | :x:                   |
+| placeSpotOrders()             | :heavy_check_mark:    | :x:                   | :x:                   |
+| cancelSpotOrder()             | :heavy_check_mark:    | :x:                   | :x:                   |
+| cancelSpotOrders()            | :heavy_check_mark:    | :x:                   | :x:                   |
+| getSpotOrderDetails()         | :x:                   | :x:                   | :x:                   |
+| getSpotOpenOrders()           | :x:                   | :x:                   | :x:                   |
+| getSpotOrderHistory()         | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   |
+| getSpotFills()                | :x:                   | :x:                   | :x:                   |
+| placeSpotPlanOrder()          | :x:                   | :x:                   | :x:                   |
+| modifySpotPlanOrder()         | :x:                   | :x:                   | :x:                   |
+| cancelSpotPlanOrder()         | :x:                   | :x:                   | :x:                   |
+| getSpotPlanOrders()           | :x:                   | :x:                   | :x:                   |
+| getSpotHistoryPlanOrders()    | :x:                   | :x:                   | :x:                   |
 
-## WebSocket API
+##### Futures methods:
+| Method                        | Written               | Request Working       | Response Verified     |
+| :---                          | :----:                | :----:                | :---:                 |
+| getContracts()                | :x:                   | :x:                   | :x:                   |
+| getMixDepth()                 | :x:                   | :x:                   | :x:                   |
+| getMixTicker()                | :x:                   | :x:                   | :x:                   |
+| getMixTickers()               | :x:                   | :x:                   | :x:                   |
+| getMixFills()                 | :x:                   | :x:                   | :x:                   |
+| getMixCandles()               | :x:                   | :x:                   | :x:                   |
+| getMixIndex()                 | :x:                   | :x:                   | :x:                   |
+| getNextFundingTime()          | :x:                   | :x:                   | :x:                   |
+| getHistoryFundRate()          | :x:                   | :x:                   | :x:                   |
+| getFundRate()                 | :x:                   | :x:                   | :x:                   |
+| getOpenInterest()             | :x:                   | :x:                   | :x:                   |
+| getSymbolMarkPrice()          | :x:                   | :x:                   | :x:                   |
+| getSymbolLeverage()           | :x:                   | :x:                   | :x:                   |
+| getMixAccount()               | :x:                   | :x:                   | :x:                   |
+| getMixAccounts()              | :x:                   | :x:                   | :x:                   |
+| getOpenCount()                | :x:                   | :x:                   | :x:                   |
+| setLeverage()                 | :x:                   | :x:                   | :x:                   |
+| setMargin()                   | :x:                   | :x:                   | :x:                   |
+| setMarginMode()               | :x:                   | :x:                   | :x:                   |
+| setPositionMode()             | :x:                   | :x:                   | :x:                   |
+| getMixPosition()              | :x:                   | :x:                   | :x:                   |
+| getMixPositions()             | :x:                   | :x:                   | :x:                   |
+| getMixAccountBill()           | :x:                   | :x:                   | :x:                   |
+| getBizAccountBill()           | :x:                   | :x:                   | :x:                   |
+| placeMixOrder()               | :x:                   | :x:                   | :x:                   |
+| placeMixReversal()            | :x:                   | :x:                   | :x:                   |
+| placeMixBatchOrder()          | :x:                   | :x:                   | :x:                   |
+| cancelMixOrder()              | :x:                   | :x:                   | :x:                   |
+| batchCancelMixOrder()         | :x:                   | :x:                   | :x:                   |
+| cancelAllMixOrders()          | :x:                   | :x:                   | :x:                   |
+| getOpenMixOrder()             | :x:                   | :x:                   | :x:                   |
+| getOpenMixOrders()            | :x:                   | :x:                   | :x:                   |
+| getMixHistory()               | :x:                   | :x:                   | :x:                   |
+| getProductTypeHistory()       | :x:                   | :x:                   | :x:                   |
+| getMixOrderDetail()           | :x:                   | :x:                   | :x:                   |
+| getMixOrderFills()            | :x:                   | :x:                   | :x:                   |
+| getAllMixOrderFills()         | :x:                   | :x:                   | :x:                   |
+| placeMixPlanOrder()           | :x:                   | :x:                   | :x:                   |
+| modifyMixPlanOrder()          | :x:                   | :x:                   | :x:                   |
+| modifyMixPlanOrderTPSL()      | :x:                   | :x:                   | :x:                   |
+| placeMixStopOrder()           | :x:                   | :x:                   | :x:                   |
+| placeMixTrailingStopOrder()   | :x:                   | :x:                   | :x:                   |
+| placeMixPositionTPSL()        | :x:                   | :x:                   | :x:                   |
+| modifyMixStopOrder()          | :x:                   | :x:                   | :x:                   |
+| cancelMixPlanOrder()          | :x:                   | :x:                   | :x:                   |
+| cancelMixPlanOrders()         | :x:                   | :x:                   | :x:                   |
+| getMixPlanOrders()            | :x:                   | :x:                   | :x:                   |
+| getMixHistoryPlanOrders()     | :x:                   | :x:                   | :x:                   |
+
+#### WebSocket API
 
 Here is a breakdown of what needs to be done for the WebSocket API:
 - **Asynchronous**:
