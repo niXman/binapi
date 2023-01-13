@@ -1,0 +1,30 @@
+{
+    "code":"00000",
+    "message":"success",
+    "data":[
+      {
+        "userId": 9165454769,
+        "spotAssetsList": [
+          {
+            "coinId": 1,
+            "coinName": "BTC",
+            "available": "1.1",
+            "frozen": "0",
+            "lock": "1.1"
+          }
+        ]
+      },
+      {
+        "userId": 1765254759,
+        "spotAssetsList": [
+          {
+            "coinId": 2,
+            "coinName": "ETH",
+            "available": "12.1",
+            "frozen": "0",
+            "lock": "1.1"
+          }
+        ]
+      }
+  ]
+  }

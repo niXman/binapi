@@ -1,0 +1,799 @@
+{
+    "code": "00000",
+    "msg": "success",
+    "requestTime": 1673554254848,
+    "data": [
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524332521115661",
+            "side": "sell",
+            "fillPrice": "18848.12",
+            "fillQuantity": "0.2326",
+            "fillTime": "1673554254655"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524328335200270",
+            "side": "sell",
+            "fillPrice": "18847.71",
+            "fillQuantity": "0.6801",
+            "fillTime": "1673554253657"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524328104513539",
+            "side": "sell",
+            "fillPrice": "18847.49",
+            "fillQuantity": "0.2081",
+            "fillTime": "1673554253602"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524327236292617",
+            "side": "sell",
+            "fillPrice": "18848",
+            "fillQuantity": "0.2081",
+            "fillTime": "1673554253395"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524315756482561",
+            "side": "sell",
+            "fillPrice": "18852.63",
+            "fillQuantity": "0.4122",
+            "fillTime": "1673554250658"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524311583150113",
+            "side": "buy",
+            "fillPrice": "18849.87",
+            "fillQuantity": "0.7917",
+            "fillTime": "1673554249663"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524305102950407",
+            "side": "buy",
+            "fillPrice": "18850.21",
+            "fillQuantity": "0.1177",
+            "fillTime": "1673554248118"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524305102950402",
+            "side": "buy",
+            "fillPrice": "18850.2",
+            "fillQuantity": "0.0904",
+            "fillTime": "1673554248118"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524304394113088",
+            "side": "buy",
+            "fillPrice": "18850.65",
+            "fillQuantity": "0.2081",
+            "fillTime": "1673554247949"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524298979266590",
+            "side": "buy",
+            "fillPrice": "18849.43",
+            "fillQuantity": "0.7036",
+            "fillTime": "1673554246658"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524290800373760",
+            "side": "sell",
+            "fillPrice": "18848.76",
+            "fillQuantity": "0.0055",
+            "fillTime": "1673554244708"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524290796179457",
+            "side": "sell",
+            "fillPrice": "18848.91",
+            "fillQuantity": "0.0126",
+            "fillTime": "1673554244707"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524288141185026",
+            "side": "sell",
+            "fillPrice": "18849.94",
+            "fillQuantity": "0.06",
+            "fillTime": "1673554244074"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524284697661514",
+            "side": "sell",
+            "fillPrice": "18848.11",
+            "fillQuantity": "0.2081",
+            "fillTime": "1673554243253"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524283888160771",
+            "side": "sell",
+            "fillPrice": "18849.94",
+            "fillQuantity": "0.049",
+            "fillTime": "1673554243060"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524283888160769",
+            "side": "sell",
+            "fillPrice": "18850.09",
+            "fillQuantity": "0.1591",
+            "fillTime": "1673554243060"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524282197856257",
+            "side": "buy",
+            "fillPrice": "18851.7",
+            "fillQuantity": "0.607",
+            "fillTime": "1673554242657"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524269648498725",
+            "side": "buy",
+            "fillPrice": "18853.54",
+            "fillQuantity": "0.2225",
+            "fillTime": "1673554239665"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524261255696408",
+            "side": "buy",
+            "fillPrice": "18853.52",
+            "fillQuantity": "0.5097",
+            "fillTime": "1673554237664"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524260190343178",
+            "side": "sell",
+            "fillPrice": "18854.39",
+            "fillQuantity": "0.1393",
+            "fillTime": "1673554237410"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524260123234308",
+            "side": "sell",
+            "fillPrice": "18854.54",
+            "fillQuantity": "0.0393",
+            "fillTime": "1673554237394"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524260123234306",
+            "side": "sell",
+            "fillPrice": "18854.55",
+            "fillQuantity": "0.1713",
+            "fillTime": "1673554237394"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524254658056247",
+            "side": "sell",
+            "fillPrice": "18855.47",
+            "fillQuantity": "0.0297",
+            "fillTime": "1673554236091"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524254658056243",
+            "side": "sell",
+            "fillPrice": "18855.57",
+            "fillQuantity": "0.0354",
+            "fillTime": "1673554236091"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524254658056238",
+            "side": "sell",
+            "fillPrice": "18855.59",
+            "fillQuantity": "0.2462",
+            "fillTime": "1673554236091"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524249612308481",
+            "side": "buy",
+            "fillPrice": "18856.32",
+            "fillQuantity": "0.2081",
+            "fillTime": "1673554234888"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524248920248322",
+            "side": "buy",
+            "fillPrice": "18855.1",
+            "fillQuantity": "0.1974",
+            "fillTime": "1673554234723"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524248920248320",
+            "side": "buy",
+            "fillPrice": "18854.82",
+            "fillQuantity": "0.0107",
+            "fillTime": "1673554234723"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524244465897474",
+            "side": "buy",
+            "fillPrice": "18853.95",
+            "fillQuantity": "0.6029",
+            "fillTime": "1673554233661"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524226854014979",
+            "side": "sell",
+            "fillPrice": "18853.48",
+            "fillQuantity": "0.123",
+            "fillTime": "1673554229462"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524226854014977",
+            "side": "sell",
+            "fillPrice": "18853.49",
+            "fillQuantity": "0.0851",
+            "fillTime": "1673554229462"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524225989988383",
+            "side": "sell",
+            "fillPrice": "18853.48",
+            "fillQuantity": "0.1885",
+            "fillTime": "1673554229256"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524225989988378",
+            "side": "sell",
+            "fillPrice": "18853.99",
+            "fillQuantity": "0.0196",
+            "fillTime": "1673554229256"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524223485988948",
+            "side": "sell",
+            "fillPrice": "18855.84",
+            "fillQuantity": "0.6691",
+            "fillTime": "1673554228659"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524210911465497",
+            "side": "sell",
+            "fillPrice": "18856.34",
+            "fillQuantity": "0.3664",
+            "fillTime": "1673554225661"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524199024808076",
+            "side": "buy",
+            "fillPrice": "18854.71",
+            "fillQuantity": "0.102",
+            "fillTime": "1673554222827"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524199024808070",
+            "side": "buy",
+            "fillPrice": "18854.6",
+            "fillQuantity": "0.1061",
+            "fillTime": "1673554222827"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524197242228740",
+            "side": "buy",
+            "fillPrice": "18853.96",
+            "fillQuantity": "0.1864",
+            "fillTime": "1673554222402"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524197242228738",
+            "side": "buy",
+            "fillPrice": "18853.95",
+            "fillQuantity": "0.0031",
+            "fillTime": "1673554222402"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524196965404675",
+            "side": "buy",
+            "fillPrice": "18853.95",
+            "fillQuantity": "0.0107",
+            "fillTime": "1673554222336"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524196885712897",
+            "side": "buy",
+            "fillPrice": "18853.96",
+            "fillQuantity": "0.0393",
+            "fillTime": "1673554222317"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524194155220994",
+            "side": "buy",
+            "fillPrice": "18853.23",
+            "fillQuantity": "0.8434",
+            "fillTime": "1673554221666"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524187616301088",
+            "side": "sell",
+            "fillPrice": "18853.76",
+            "fillQuantity": "0.003",
+            "fillTime": "1673554220107"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524181274513408",
+            "side": "sell",
+            "fillPrice": "18853.84",
+            "fillQuantity": "0.0215",
+            "fillTime": "1673554218595"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524181035438141",
+            "side": "buy",
+            "fillPrice": "18853.87",
+            "fillQuantity": "0.3",
+            "fillTime": "1673554218538"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524177369616385",
+            "side": "sell",
+            "fillPrice": "18853.76",
+            "fillQuantity": "0.7635",
+            "fillTime": "1673554217664"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524174387466277",
+            "side": "sell",
+            "fillPrice": "18854.15",
+            "fillQuantity": "0.0131",
+            "fillTime": "1673554216953"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524168188284930",
+            "side": "sell",
+            "fillPrice": "18855.31",
+            "fillQuantity": "0.3499",
+            "fillTime": "1673554215475"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524164774121474",
+            "side": "buy",
+            "fillPrice": "18855.84",
+            "fillQuantity": "0.3091",
+            "fillTime": "1673554214661"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524160596594689",
+            "side": "buy",
+            "fillPrice": "18859.05",
+            "fillQuantity": "0.3584",
+            "fillTime": "1673554213665"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524151612395538",
+            "side": "sell",
+            "fillPrice": "18858.69",
+            "fillQuantity": "0.0065",
+            "fillTime": "1673554211523"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524147455840287",
+            "side": "sell",
+            "fillPrice": "18858.26",
+            "fillQuantity": "0.0065",
+            "fillTime": "1673554210532"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524145174138978",
+            "side": "sell",
+            "fillPrice": "18858.44",
+            "fillQuantity": "0.0076",
+            "fillTime": "1673554209988"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524143806795777",
+            "side": "buy",
+            "fillPrice": "18858.58",
+            "fillQuantity": "0.4891",
+            "fillTime": "1673554209662"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524143240564739",
+            "side": "sell",
+            "fillPrice": "18859.49",
+            "fillQuantity": "0.0975",
+            "fillTime": "1673554209527"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524143240564737",
+            "side": "sell",
+            "fillPrice": "18859.96",
+            "fillQuantity": "0.1105",
+            "fillTime": "1673554209527"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524142875660401",
+            "side": "sell",
+            "fillPrice": "18859.49",
+            "fillQuantity": "0.0099",
+            "fillTime": "1673554209440"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524142540115973",
+            "side": "sell",
+            "fillPrice": "18860.46",
+            "fillQuantity": "0.0904",
+            "fillTime": "1673554209360"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524142540115971",
+            "side": "sell",
+            "fillPrice": "18860.99",
+            "fillQuantity": "0.106",
+            "fillTime": "1673554209360"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524142540115969",
+            "side": "sell",
+            "fillPrice": "18861.33",
+            "fillQuantity": "0.0116",
+            "fillTime": "1673554209360"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524140623319041",
+            "side": "sell",
+            "fillPrice": "18860.03",
+            "fillQuantity": "0.0049",
+            "fillTime": "1673554208903"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524135413993474",
+            "side": "sell",
+            "fillPrice": "18861.19",
+            "fillQuantity": "0.2155",
+            "fillTime": "1673554207661"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524128401117186",
+            "side": "buy",
+            "fillPrice": "18862.9",
+            "fillQuantity": "0.208",
+            "fillTime": "1673554205989"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524127591616515",
+            "side": "buy",
+            "fillPrice": "18861.13",
+            "fillQuantity": "0.1625",
+            "fillTime": "1673554205796"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524127591616513",
+            "side": "buy",
+            "fillPrice": "18861.12",
+            "fillQuantity": "0.0454",
+            "fillTime": "1673554205796"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524126333325313",
+            "side": "buy",
+            "fillPrice": "18861.13",
+            "fillQuantity": "0.0453",
+            "fillTime": "1673554205496"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524126270410755",
+            "side": "buy",
+            "fillPrice": "18861.13",
+            "fillQuantity": "0.2188",
+            "fillTime": "1673554205481"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524125716762625",
+            "side": "buy",
+            "fillPrice": "18861.13",
+            "fillQuantity": "0.0357",
+            "fillTime": "1673554205349"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524124663992322",
+            "side": "buy",
+            "fillPrice": "18860.39",
+            "fillQuantity": "0.0858",
+            "fillTime": "1673554205098"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524123015630866",
+            "side": "buy",
+            "fillPrice": "18860.39",
+            "fillQuantity": "0.0731",
+            "fillTime": "1673554204705"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524114442473473",
+            "side": "sell",
+            "fillPrice": "18860.35",
+            "fillQuantity": "0.7844",
+            "fillTime": "1673554202661"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524114178232325",
+            "side": "sell",
+            "fillPrice": "18859.95",
+            "fillQuantity": "0.0429",
+            "fillTime": "1673554202598"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524114178232323",
+            "side": "sell",
+            "fillPrice": "18860.08",
+            "fillQuantity": "0.0115",
+            "fillTime": "1673554202598"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524113393897526",
+            "side": "sell",
+            "fillPrice": "18859.95",
+            "fillQuantity": "0.0298",
+            "fillTime": "1673554202411"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524097665257493",
+            "side": "sell",
+            "fillPrice": "18860.22",
+            "fillQuantity": "0.8127",
+            "fillTime": "1673554198661"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524093491925056",
+            "side": "sell",
+            "fillPrice": "18860.03",
+            "fillQuantity": "0.7821",
+            "fillTime": "1673554197666"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524086227390489",
+            "side": "sell",
+            "fillPrice": "18859.89",
+            "fillQuantity": "0.073",
+            "fillTime": "1673554195934"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524086126727325",
+            "side": "sell",
+            "fillPrice": "18859.89",
+            "fillQuantity": "0.2512",
+            "fillTime": "1673554195910"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524086126727323",
+            "side": "sell",
+            "fillPrice": "18859.96",
+            "fillQuantity": "0.0397",
+            "fillTime": "1673554195910"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524086126727321",
+            "side": "sell",
+            "fillPrice": "18860.11",
+            "fillQuantity": "0.2281",
+            "fillTime": "1673554195910"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524086126727319",
+            "side": "sell",
+            "fillPrice": "18860.39",
+            "fillQuantity": "0.2657",
+            "fillTime": "1673554195910"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524086126727317",
+            "side": "sell",
+            "fillPrice": "18860.55",
+            "fillQuantity": "0.1964",
+            "fillTime": "1673554195910"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524086126727315",
+            "side": "sell",
+            "fillPrice": "18860.66",
+            "fillQuantity": "0.9476",
+            "fillTime": "1673554195910"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524085757628418",
+            "side": "sell",
+            "fillPrice": "18860.11",
+            "fillQuantity": "0.0006",
+            "fillTime": "1673554195822"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524085086539777",
+            "side": "buy",
+            "fillPrice": "18861.29",
+            "fillQuantity": "0.4076",
+            "fillTime": "1673554195662"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524082137944066",
+            "side": "sell",
+            "fillPrice": "18861.54",
+            "fillQuantity": "0.001",
+            "fillTime": "1673554194959"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524080879652865",
+            "side": "sell",
+            "fillPrice": "18865.04",
+            "fillQuantity": "0.6287",
+            "fillTime": "1673554194659"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524080573468673",
+            "side": "sell",
+            "fillPrice": "18864.79",
+            "fillQuantity": "0.003",
+            "fillTime": "1673554194586"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524080313421873",
+            "side": "sell",
+            "fillPrice": "18865.89",
+            "fillQuantity": "0.2079",
+            "fillTime": "1673554194524"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524080229535745",
+            "side": "sell",
+            "fillPrice": "18865.89",
+            "fillQuantity": "0.007",
+            "fillTime": "1673554194504"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524080019820628",
+            "side": "sell",
+            "fillPrice": "18865.89",
+            "fillQuantity": "0.0309",
+            "fillTime": "1673554194454"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524076689543170",
+            "side": "buy",
+            "fillPrice": "18866.45",
+            "fillQuantity": "0.4302",
+            "fillTime": "1673554193660"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524072251969539",
+            "side": "sell",
+            "fillPrice": "18867.39",
+            "fillQuantity": "0.1589",
+            "fillTime": "1673554192602"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524072251969537",
+            "side": "sell",
+            "fillPrice": "18867.49",
+            "fillQuantity": "0.0176",
+            "fillTime": "1673554192602"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524071731875842",
+            "side": "sell",
+            "fillPrice": "18867.39",
+            "fillQuantity": "0.0049",
+            "fillTime": "1673554192478"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524071618629685",
+            "side": "sell",
+            "fillPrice": "18867.49",
+            "fillQuantity": "0.0176",
+            "fillTime": "1673554192451"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524071618629683",
+            "side": "sell",
+            "fillPrice": "18867.65",
+            "fillQuantity": "0.0138",
+            "fillTime": "1673554192451"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524068305129473",
+            "side": "sell",
+            "fillPrice": "18869.94",
+            "fillQuantity": "0.7401",
+            "fillTime": "1673554191661"
+        },
+        {
+            "symbol": "BTCUSDT_SPBL",
+            "tradeId": "997524067868921924",
+            "side": "sell",
+            "fillPrice": "18869.69",
+            "fillQuantity": "0.3257",
+            "fillTime": "1673554191557"
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "code": "00000",
+    "msg": "success",
+    "requestTime": 1654507973411,
+    "data": [
+        {
+            "id": "912533114861326336",
+            "txId": "912533114861326336",
+            "coin": "USDT",
+            "type": "withdraw",
+            "amount": "10.00000000",
+            "status": "success",
+            "toAddress": "7713789662",
+            "fee":"0",
+            "chain": "erc20",
+            "confirm":null,
+            "cTime": "1653290769222",
+            "uTime": "1653290769222"
+        },
+        {
+            "id": "912533114861326337",
+            "txId": "912533114861326337",
+            "coin": "USDT",
+            "type": "withdraw",
+            "amount": "10.00000000",
+            "status": "success",
+            "toAddress": "7713789663",
+            "fee":"0",
+            "chain": "erc20",
+            "confirm":null,
+            "cTime": "1653290770222",
+            "uTime": "1653290770222"
+        }
+    ]
+}

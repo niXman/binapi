@@ -1,0 +1,26 @@
+{
+    "code":"00000",
+    "message":"success",
+    "data":[{
+        "cTime":"1622697148",
+        "coinId":"22",
+        "coinName":"usdt",
+        "groupType":"deposit",
+        "bizType":"transfer-in", 
+        "quantity":"1",
+        "balance": "1",
+        "fees":"0",
+        "billId":"1291"
+    },
+    {
+        "cTime":"1622698148",
+        "coinId":"22",
+        "coinName":"usdt",
+        "groupType":"withdrawal",
+        "bizType":"transfer-out", 
+        "quantity":"1",
+        "balance": "1",
+        "fees":"0",
+        "billId":"1293"
+    }]
+}

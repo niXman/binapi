@@ -1,0 +1,14 @@
+{
+    "code":"00000",
+    "message":"success",
+    "data":[
+      {
+          "coinId":"10012",
+          "coinName":"usdt",
+          "available":"0",
+          "frozen":"0",
+          "lock":"0",
+          "uTime":"1622697148"
+      }
+  ]
+}

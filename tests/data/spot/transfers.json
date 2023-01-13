@@ -1,0 +1,26 @@
+{
+    "code":"00000",
+    "data":[
+        {
+            "coinName":"btc",
+            "status":"SUCCESS",
+            "toType":"USD_MIX",
+            "toSymbol":"",
+            "fromType":"CONTRACT",
+            "fromSymbol":"BTC/USD",
+            "amount":"1000.00000000",
+            "tradeTime":"1631070374488"
+        },
+        {
+            "coinName":"btc",
+            "status":"SUCCESS",
+            "toType":"USD_MIX",
+            "toSymbol":"",
+            "fromType":"CONTRACT",
+            "fromSymbol":"BTC/USD",
+            "amount":"1000.00000000",
+            "tradeTime":"1631070375488"
+        }
+    ],
+    "msg":"success"
+}

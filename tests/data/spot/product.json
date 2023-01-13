@@ -1,0 +1,19 @@
+{
+    "code": "00000",
+    "msg": "success",
+    "requestTime": 0,
+    "data": {
+        "symbol": "btcusdt_SPBL",
+        "symbolName": null,
+        "baseCoin": "BTC",
+        "quoteCoin": "USDT",
+        "minTradeAmount": "0.0001",
+        "maxTradeAmount": "0",
+        "takerFeeRate": "0.002",
+        "makerFeeRate": "0.002",
+        "priceScale": "2",
+        "quantityScale": "4",
+        "status": "online",
+        "minTradeUSDT": null
+    }
+}
