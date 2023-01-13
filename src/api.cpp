@@ -128,6 +128,80 @@ std::string hmac_sha256(const char *key, std::size_t klen, const char *data, std
     return b2a_hex(digest, dilen);
 }
 
+bool verify_signature(const unsigned char* sig, std::size_t slen, const char* data, std::size_t dlen)
+{
+    bool result = true;
+    auto pubkeyfile = BIO_new_file ( "testnet.pub.pem", "r" );
+    auto vkey = PEM_read_bio_PUBKEY( pubkeyfile, nullptr, nullptr, nullptr);
+
+    auto ctx = EVP_MD_CTX_new();
+    auto md = ::EVP_sha256();
+    assert(pubkeyfile && vkey && ctx && md);
+
+    if ( 1 != ( EVP_DigestInit_ex ( ctx, md, nullptr ) &&
+                EVP_DigestVerifyInit ( ctx, nullptr, md, nullptr, vkey ) &&
+                EVP_DigestVerifyUpdate ( ctx, data, dlen ) &&
+                EVP_DigestVerifyFinal ( ctx, sig, slen ) ) )
+    {
+        std::cerr << "EVP_DigestVerify* failed!" << std::endl;
+        result = false;
+    }
+
+    if (pubkeyfile)
+        BIO_free( pubkeyfile );
+    if (ctx)
+        EVP_MD_CTX_free( ctx );
+    if (vkey)
+        EVP_PKEY_free( vkey );
+
+    return result;
+}
+
+static std::string rsa_sha256(const char* privkeyfile, std::size_t pklen, const char *data, std::size_t dlen )
+{
+    static EVP_PKEY *pkey = nullptr;
+    if ( !pkey ) {
+         auto keybp = BIO_new_file ( privkeyfile, "r" );
+         pkey = EVP_PKEY_new();
+         pkey = PEM_read_bio_PrivateKey(keybp, nullptr, nullptr, nullptr);
+
+         if ( keybp )
+             BIO_free(keybp);
+    }
+    assert(pkey);
+
+    auto mdctx = EVP_MD_CTX_new();
+    std::size_t req = 0, slen = 0;
+    if ( 1 != (EVP_DigestSignInit( mdctx, nullptr, ::EVP_sha256(), nullptr, pkey ) &&
+               EVP_DigestSignUpdate( mdctx, data, dlen ) &&
+               EVP_DigestSignFinal( mdctx, nullptr, &req )) )
+    {
+        std::cerr << "EVP_DigestSign* failed!" << std::endl;
+        exit(1);
+    }
+
+    unsigned char* signature;
+    slen = req;
+    signature =  static_cast<unsigned char*> ( OPENSSL_malloc ( req ) );
+    if ( 1 != EVP_DigestSignFinal ( mdctx, signature, &slen ) ) {
+        std::cerr << "Digest Final (2) failed" << std::endl;
+    }
+    assert(slen == req);
+
+    // Uncomment to verify if priv/pub keypairs are working together
+    // assert( verify_signature(signature, slen, data, dlen ) );
+
+    unsigned char encodedSig[512];
+    int elen = EVP_EncodeBlock ( encodedSig, signature, slen );
+
+    if ( mdctx )
+        EVP_MD_CTX_free(mdctx);
+    if ( signature )
+        OPENSSL_free(signature);
+
+    return std::string(reinterpret_cast<char*>(encodedSig), elen);
+}
+
 /*************************************************************************************************/
 
 struct api::impl {
