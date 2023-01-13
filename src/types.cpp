@@ -1050,8 +1050,6 @@ std::ostream &operator<<(std::ostream &os, const spot_orders_res_t &f) {
 
 //------------------------------------------------------------------------------
 
-// This section might be rewritten depending on what the actual response from bitget is for
-// canceling multiple vs. single orders
 spot_cancel_res_t spot_cancel_res_t::construct(simdjson::ondemand::document &doc) {
     simdjson::ondemand::object obj(doc["data"].get_object());
     return construct(obj);
@@ -1066,14 +1064,9 @@ spot_cancel_res_t spot_cancel_res_t::construct(simdjson::ondemand::object &obj) 
         std::string_view key = field.unescaped_key();
         const char* name = std::string(key).c_str();
         if (name == "data") {
-            
-            if (field.value().type() == simdjson::ondemand::json_type::array) {
-                simdjson::ondemand::array arr(field.value().get_array());
-                for (auto item : arr) {
-                    res.orderId.emplace_back(item.get_string());
-                }
-            } else {
-                res.orderId.emplace_back(field.value().get_string());
+            simdjson::ondemand::array arr(field.value().get_array());
+            for (auto item : arr) {
+                res.orderId.emplace_back(item.get_string());
             }
         }
     }
@@ -1169,27 +1162,44 @@ std::ostream &operator<<(std::ostream &os, const spot_orders_t &f) {
 
 //------------------------------------------------------------------------------
 
-transaction_t transaction_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-
+transaction_t transaction_t::construct(simdjson::ondemand::object &obj) {
     transaction_t res = {};
-    res.accountId = doc["accountId"].get_uint64_in_string();
-    res.symbol = doc["symbol"].get_string();
-    res.orderId = doc["orderId"].get_string();
-    res.fillId = doc["fillId"].get_string();
-    res.orderType = order_type_from_string(doc["orderType"].get_string());
-    res.side = side_from_string(doc["side"].get_string());
-    double_type fillPrice(static_cast<std::string>(doc["fillPrice"].get_string().take_value()));
-    res.fillPrice = fillPrice;
-    double_type fillQuantity(static_cast<std::string>(doc["fillQuantity"].get_string().take_value()));
-    res.fillQuantity = fillQuantity;
-    double_type fillTotalAmount(static_cast<std::string>(doc["fillTotalAmount"].get_string().take_value()));
-    res.fillTotalAmount = fillTotalAmount;
-    res.cTime = doc["cTime"].get_uint64_in_string();
-    res.feeCcy = doc["feeCcy"].get_string();
-    double_type fees(static_cast<std::string>(doc["fees"].get_string().take_value()));
-    res.fees = fees;
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "accountId") {
+            res.accountId = field.value().get_uint64_in_string();
+        } else if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "orderId") {
+            res.orderId = field.value().get_string();
+        } else if (name == "fillId") {
+            res.fillId = field.value().get_string();
+        } else if (name == "orderType") {
+            res.orderType = order_type_from_string(field.value().get_string());
+        } else if (name == "side") {
+            res.side = side_from_string(field.value().get_string());
+        } else if (name == "fillPrice") {
+            double_type fillPrice(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fillPrice = fillPrice;
+        } else if (name == "fillQuantity") {
+            double_type fillQuantity(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fillQuantity = fillQuantity;
+        } else if (name == "fillTotalAmount") {
+            double_type fillTotalAmount(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fillTotalAmount = fillTotalAmount;
+        } else if (name == "cTime") {
+            res.cTime = field.value().get_uint64_in_string();
+        } else if (name == "feeCcy") {
+            res.feeCcy = field.value().get_string();
+        } else if (name == "fees") {
+            double_type fees(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fees = fees;
+        }
+    }
 
     return res;
 }
@@ -1212,25 +1222,104 @@ std::ostream &operator<<(std::ostream &os, const transaction_t &f) {
     return os;
 }
 
+transactions_t transactions_t::construct(simdjson::ondemand::document &doc) {
+    transactions_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto item : arr) {
+        res.transactions.emplace_back(transaction_t::construct(item.get_object().value()));
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const transactions_t &f) {
+    for (auto &item : f.transactions) {
+        os << item << ",\n";
+    }
+
+    return os;
+}
+
 //------------------------------------------------------------------------------
 
-spot_plan_order_t spot_plan_order_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
+spot_plan_order_res_t spot_plan_order_res_t::construct(simdjson::ondemand::document &doc) {
+    spot_plan_order_res_t res = {};
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "orderId") {
+            res.orderId = field.value().get_string();
+        } else if (name == "clientOrderId") {
+            res.clientOrderId = field.value().get_string();
+        }
+    }
 
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const spot_plan_order_res_t &f) {
+    os << "{\n"
+    << "\t\"orderId\":" << f.orderId << ",\n"
+    << "\t\"clientOrderId\":" << f.clientOrderId << "\n}";
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+cancel_spot_plan_order_res_t cancel_spot_plan_order_res_t::construct(simdjson::ondemand::document &doc) {
+    cancel_spot_plan_order_res_t res = {};
+    res.orderId = doc["data"].get_string();
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const cancel_spot_plan_order_res_t &f) {
+    os << "{\n"
+    << "\t\"orderId\":" << f.orderId << "\n}";
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+spot_plan_order_t spot_plan_order_t::construct(simdjson::ondemand::object &obj) {
     spot_plan_order_t res = {};
-    res.orderId = doc["orderId"].get_string();
-    res.symbol = doc["symbol"].get_string();
-    double_type size(static_cast<std::string>(doc["size"].get_string().take_value()));
-    res.size = size;
-    double_type executePrice(static_cast<std::string>(doc["executePrice"].get_string().take_value()));
-    res.executePrice = executePrice;
-    double_type triggerPrice(static_cast<std::string>(doc["triggerPrice"].get_string().take_value()));
-    res.triggerPrice = triggerPrice;
-    res.status = plan_status_from_string(doc["status"].get_string());
-    res.orderType = order_type_from_string(doc["orderType"].get_string());
-    res.side = side_from_string(doc["side"].get_string());
-    res.cTime = doc["cTime"].get_uint64_in_string();
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "orderId") {
+            res.orderId = field.value().get_string();
+        } else if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "size") {
+            double_type size(static_cast<std::string>(field.value().get_string().take_value()));
+            res.size = size;
+        } else if (name == "executePrice") {
+            double_type executePrice(static_cast<std::string>(field.value().get_string().take_value()));
+            res.executePrice = executePrice;
+        } else if (name == "triggerPrice") {
+            double_type triggerPrice(static_cast<std::string>(field.value().get_string().take_value()));
+            res.triggerPrice = triggerPrice;
+        } else if (name == "status") {
+            res.status = plan_status_from_string(field.value().get_string());
+        } else if (name == "orderType") {
+            res.orderType = order_type_from_string(field.value().get_string());
+        } else if (name == "side") {
+            res.side = side_from_string(field.value().get_string());
+        } else if (name == "triggerType") {
+            res.triggerType = trigger_type_from_string(field.value().get_string());
+        } else if (name == "cTime") {
+            res.cTime = field.value().get_uint64_in_string();
+        }
+    }
 
     return res;
 }
@@ -1247,6 +1336,37 @@ std::ostream &operator<<(std::ostream &os, const spot_plan_order_t &f) {
     << "\t\"side\":" << side_to_string(f.side) << ",\n"
     << "\t\"triggerType\":" << trigger_type_to_string(f.triggerType) << ",\n"
     << "\t\"cTime\":" << f.cTime << "\n}";
+
+    return os;
+}
+
+spot_plan_orders_t spot_plan_orders_t::construct(simdjson::ondemand::document &doc) {
+    spot_plan_orders_t res = {};
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "orderList") {
+            simdjson::ondemand::array orders = field.value().get_array();
+            for (auto order : orders) {
+                res.orders.push_back(spot_plan_order_t::construct(order.get_object().value()));
+            }
+        }
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const spot_plan_orders_t &f) {
+    os << "{\n"
+    << "\t\"Orders\":[\n";
+    for (auto &item : f.orders) {
+        os << "\t\t" << item << ",\n";
+    }
+    os << "\t]\n}";
 
     return os;
 }

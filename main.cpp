@@ -68,9 +68,9 @@ int main(int argc, char **argv) {
         ioctx,
         "api.bitget.com",
         "443",
-        "",
-        "",
-        "",
+        "", // apikey
+        "", // passphrase
+        "", // secret
         30
     );    
     
@@ -84,6 +84,8 @@ int main(int argc, char **argv) {
                 return false;
             }
 
+            std::cout << "server time: " << res.serverTime << std::endl;
+            std::cout << "request time: " << res.requestTime << std::endl;
             int64_t currTime2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
             std::cout << "ping: " << currTime2 - currTime << std::endl;
             std::cout << "currTime2: " << currTime2 << std::endl;

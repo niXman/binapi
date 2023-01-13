@@ -971,6 +971,35 @@ api::result<spot_cancel_res_t> api::cancelSpotOrders(const char* symbol, std::ve
 
 /*************************************************************************************************/
 
+api::result<spot_orders_t> api::getOrderDetails(const char* symbol, const char* orderId, order_detail_cb cb, const char* clientOrderId) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\",\"orderId\":\"";
+    params += orderId;
+    if (clientOrderId) {
+        params += "\",\"clientOid\":\"";
+        params += clientOrderId;
+    }
+    params += "\"}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/orderInfo", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_orders_t> api::getOrderList(const char* symbol, order_list_cb cb) {
+    std::string params = "";
+    if (symbol) {
+        params += "{\"symbol\":\"";
+        params += getSpotSymbol(symbol);
+        params += "\"}";
+    } 
+
+    return pimpl->post(true, "/api/spot/v1/trade/open-orders", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
 api::result<spot_orders_t> api::orderHistory(const char* symbol, order_history_cb cb, std::size_t after, std::size_t before, uint32_t limit) {
     std::string params = "{\"symbol\":\"";
     params += getSpotSymbol(symbol);
@@ -992,6 +1021,139 @@ api::result<spot_orders_t> api::orderHistory(const char* symbol, order_history_c
 
     return pimpl->post(true, "/api/spot/v1/trade/history", boost::beast::http::verb::post, params, std::move(cb));
 }
+
+/*************************************************************************************************/
+
+api::result<transactions_t> api::getTransactions(const char* symbol, transactions_cb cb, const char* orderId, std::size_t after, std::size_t before, uint32_t limit) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\"";
+    if (orderId) {
+        params += ",\"orderId\":\"";
+        params += orderId;
+    }
+    if (after) {
+        params += ",\"after\":";
+        params += std::to_string(after);
+    }
+    if (before) {
+        params += ",\"before\":";
+        params += std::to_string(before);
+    }
+    if (limit) {
+        params += ",\"limit\":";
+        params += std::to_string(limit);
+    }
+    params += "}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/fills", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_plan_order_res_t> api::placeSpotPlanOrder(const char* symbol, _side side, double_type triggerPrice, double_type size, _trigger_type triggerType, _order_type orderType, place_spot_plan_order_cb cb, double_type executePrice, const char* clientOid, _force force) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\",\"side\":\"";
+    params += side_to_string(side);
+    params += "\",\"triggerPrice\":\"";
+    params += triggerPrice.str();
+    if (executePrice) {
+        params += "\",\"executePrice\":\"";
+        params += executePrice.str();
+    }
+    params += "\",\"size\":\"";
+    params += size.str();
+    params += "\",\"triggerType\":\"";
+    params += trigger_type_to_string(triggerType);
+    params += "\",\"orderType\":\"";
+    params += order_type_to_string(orderType);
+    if (clientOid) {
+        params += "\",\"clientOid\":\"";
+        params += clientOid;
+    }
+    params += "\",\"force\":\"";
+    params += force_to_string(force);
+    params += "\"}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/plan-order", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_plan_order_res_t> api::modifySpotPlanOrder(const char* orderId, double_type triggerPrice, _order_type orderType, modify_spot_plan_order_cb cb, double_type executePrice, double_type size) {
+    std::string params = "{\"orderId\":\"";
+    params += orderId;
+    params += "\",\"triggerPrice\":\"";
+    params += triggerPrice.str();
+    if (executePrice) {
+        params += "\",\"executePrice\":\"";
+        params += executePrice.str();
+    }
+    if (size) {
+        params += "\",\"size\":\"";
+        params += size.str();
+    }
+    params += "\",\"orderType\":\"";
+    params += order_type_to_string(orderType);
+    params += "\"}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/modifyPlan", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<cancel_spot_plan_order_res_t> api::cancelSpotPlanOrder(const char* orderId, cancel_spot_plan_order_cb cb) {
+    std::string params = "{\"orderId\":\"";
+    params += orderId;
+    params += "\"}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/cancelPlan", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_plan_orders_t> api::getSpotPlanOrders(const char* symbol, spot_plan_orders_cb cb, uint16_t pageSize, const char* lastEndId) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\"";
+    if (pageSize) {
+        params += ",\"pageSize\":";
+        params += std::to_string(pageSize);
+    }
+    if (lastEndId) {
+        params += ",\"lastEndId\":\"";
+        params += lastEndId;
+    }
+    params += "}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/plan-orders", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<spot_plan_orders_t> api::getSpotPlanOrderHistory(const char* symbol, std::size_t startTime, std::size_t endTime, spot_plan_orders_cb cb, uint16_t pageSize, const char* lastEndId) {
+    std::string params = "{\"symbol\":\"";
+    params += getSpotSymbol(symbol);
+    params += "\"";
+    if (pageSize) {
+        params += ",\"pageSize\":";
+        params += std::to_string(pageSize);
+    }
+    if (lastEndId) {
+        params += ",\"lastEndId\":\"";
+        params += lastEndId;
+    }
+    params += ",\"startTime\":";
+    params += std::to_string(startTime);
+    params += ",\"endTime\":";
+    params += std::to_string(endTime);
+    params += "}";
+
+    return pimpl->post(true, "/api/spot/v1/trade/plan-orders-history", boost::beast::http::verb::post, params, std::move(cb));
+}
+
+/*************************************************************************************************/
 
 } // ns rest
 } // ns bg_api

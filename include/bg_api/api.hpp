@@ -258,8 +258,20 @@ struct api {
     result<spot_cancel_res_t> cancelSpotOrders(const char* symbol, std::vector<std::string> orderIds, cancel_orders_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-order-details
+    using order_detail_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_orders_t res)>;
+    result<spot_orders_t> getOrderDetails(const std::string &symbol, const std::string &orderId, order_detail_cb cb = {}, std::string clientOrderId = "") { return getOrderDetails(symbol.c_str(), orderId.c_str(), cb, clientOrderId.c_str()); }
+    result<spot_orders_t> getOrderDetails(const std::string &symbol, const std::string &orderId, order_detail_cb cb = {}, const char* clientOrderId = "") { return getOrderDetails(symbol.c_str(), orderId.c_str(), cb, clientOrderId); }
+    result<spot_orders_t> getOrderDetails(const std::string &symbol, const char* orderId, order_detail_cb cb = {}, std::string clientOrderId = "") { return getOrderDetails(symbol.c_str(), orderId, cb, clientOrderId.c_str()); }
+    result<spot_orders_t> getOrderDetails(const std::string &symbol, const char* orderId, order_detail_cb cb = {}, const char* clientOrderId = "") { return getOrderDetails(symbol.c_str(), orderId, cb, clientOrderId); }
+    result<spot_orders_t> getOrderDetails(const char* symbol, const std::string &orderId, order_detail_cb cb = {}, std::string clientOrderId = "") { return getOrderDetails(symbol, orderId.c_str(), cb, clientOrderId.c_str()); }
+    result<spot_orders_t> getOrderDetails(const char* symbol, const std::string &orderId, order_detail_cb cb = {}, const char* clientOrderId = "") { return getOrderDetails(symbol, orderId.c_str(), cb, clientOrderId); }
+    result<spot_orders_t> getOrderDetails(const char* symbol, const char* orderId, order_detail_cb cb = {}, std::string clientOrderId = "") { return getOrderDetails(symbol, orderId, cb, clientOrderId.c_str()); }
+    result<spot_orders_t> getOrderDetails(const char* symbol, const char* orderId, order_detail_cb cb = {}, const char* clientOrderId = "");
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-order-list
+    using order_list_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_orders_t res)>;
+    result<spot_orders_t> getOrderList(const std::string symbol = "", order_list_cb cb = {}) { return getOrderList(symbol.c_str(), cb); }
+    result<spot_orders_t> getOrderList(const char* symbol = "", order_list_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-order-history
     using order_history_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_orders_t res)>;
@@ -267,17 +279,105 @@ struct api {
     result<spot_orders_t> orderHistory(const char* symbol, order_history_cb cb = {}, std::size_t after = 0, std::size_t before = 0, uint32_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-transaction-details
+    using transactions_cb = std::function<bool(const char *fl, int ec, std::string errmsg, transactions_t res)>;
+    result<transactions_t> getTransactions(const std::string &symbol, transactions_cb cb = {}, std::string orderId = "", std::size_t after = 0, std::size_t before = 0, uint32_t limit = 100) { return getTransactions(symbol.c_str(), cb, orderId, after, before, limit); }
+    result<transactions_t> getTransactions(const std::string &symbol, transactions_cb cb = {}, const char* orderId = "", std::size_t after = 0, std::size_t before = 0, uint32_t limit = 100) { return getTransactions(symbol.c_str(), cb, orderId, after, before, limit); }
+    result<transactions_t> getTransactions(const char* symbol, transactions_cb cb = {}, std::string orderId = "", std::size_t after = 0, std::size_t before = 0, uint32_t limit = 100) { return getTransactions(symbol, cb, orderId.c_str(), after, before, limit); }
+    result<transactions_t> getTransactions(const char* symbol, transactions_cb cb = {}, const char* orderId = "", std::size_t after = 0, std::size_t before = 0, uint32_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#place-plan-order
+    using place_spot_plan_order_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_plan_order_res_t res)>;
+    result<spot_plan_order_res_t> placeSpotPlanOrder(
+        const std::string &symbol,
+        _side side,
+        double_type triggerPrice,
+        double_type size,
+        _trigger_type triggerType,
+        _order_type orderType,
+        place_spot_plan_order_cb cb = {},
+        double_type executePrice = 0,
+        std::string clientOid = "",
+        _force force = _force::_normal) {
+            return placeSpotPlanOrder(
+                symbol.c_str(),
+                side,
+                triggerPrice,
+                size,
+                triggerType,
+                orderType,
+                cb,
+                executePrice,
+                clientOid,
+                force); }
+    result<spot_plan_order_res_t> placeSpotPlanOrder(
+        const std::string &symbol,
+        _side side,
+        double_type triggerPrice,
+        double_type size,
+        _trigger_type triggerType,
+        _order_type orderType,
+        place_spot_plan_order_cb cb = {},
+        double_type executePrice = 0,
+        const char* clientOid = "",
+        _force force = _force::_normal) {
+            return placeSpotPlanOrder(
+                symbol.c_str(),
+                side,
+                triggerPrice,
+                size,
+                triggerType,
+                orderType,
+                cb,
+                executePrice,
+                clientOid,
+                force); }
+    result<spot_plan_order_res_t> placeSpotPlanOrder(
+        const char* symbol,
+        _side side,
+        double_type triggerPrice,
+        double_type size,
+        _trigger_type triggerType,
+        _order_type orderType,
+        place_spot_plan_order_cb cb = {},
+        double_type executePrice = 0,
+        std::string clientOid = "",
+        _force force = _force::_normal) {
+            return placeSpotPlanOrder(
+                symbol,
+                side,
+                triggerPrice,
+                size,
+                triggerType,
+                orderType,
+                cb,
+                executePrice,
+                clientOid.c_str(),
+                force); }
+    result<spot_plan_order_res_t> placeSpotPlanOrder(const char* symbol, _side side, double_type triggerPrice, double_type size, _trigger_type triggerType, _order_type orderType, place_spot_plan_order_cb cb = {}, double_type executePrice = 0, const char* clientOid = "", _force force = _force::_normal);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#modify-plan-order
+    using modify_spot_plan_order_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_plan_order_res_t res)>;
+    result<spot_plan_order_res_t> modifySpotPlanOrder(const std::string &orderId, double_type triggerPrice, _order_type orderType, modify_spot_plan_order_cb cb = {}, double_type executePrice = 0, double_type size = 0) { return modifySpotPlanOrder(orderId.c_str(), triggerPrice, orderType, cb, executePrice, size); }
+    result<spot_plan_order_res_t> modifySpotPlanOrder(const char* orderId, double_type triggerPrice, _order_type orderType, modify_spot_plan_order_cb cb = {}, double_type executePrice = 0, double_type size = 0);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#cancel-plan-order
+    using cancel_spot_plan_order_cb = std::function<bool(const char *fl, int ec, std::string errmsg, cancel_spot_plan_order_res_t res)>;
+    result<cancel_spot_plan_order_res_t> cancelSpotPlanOrder(const std::string &orderId, cancel_spot_plan_order_cb cb = {}) { return cancelSpotPlanOrder(orderId.c_str(), cb); }
+    result<cancel_spot_plan_order_res_t> cancelSpotPlanOrder(const char* orderId, cancel_spot_plan_order_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-current-plan-orders
+    using spot_plan_orders_cb = std::function<bool(const char *fl, int ec, std::string errmsg, spot_plan_orders_t res)>;
+    result<spot_plan_orders_t> getSpotPlanOrders(const std::string &symbol, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, std::string lastEndId = "") { return getSpotPlanOrders(symbol.c_str(), cb, pageSize, lastEndId.c_str()); }
+    result<spot_plan_orders_t> getSpotPlanOrders(const std::string &symbol, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, const char* lastEndId = "") { return getSpotPlanOrders(symbol, cb, pageSize, lastEndId); }
+    result<spot_plan_orders_t> getSpotPlanOrders(const char* symbol, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, std::string lastEndId = "") { return getSpotPlanOrders(symbol, cb, pageSize, lastEndId.c_str()); }
+    result<spot_plan_orders_t> getSpotPlanOrders(const char* symbol, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, const char* lastEndId = "");
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-history-plan-orders
-
+    result<spot_plan_orders_t> getSpotPlanOrderHistory(std::string &symbol, std::size_t startTime, std::size_t endTime, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, std::string lastEndId = "") { return getSpotPlanOrderHistory(symbol.c_str(), startTime, endTime, cb, pageSize, lastEndId.c_str()); }
+    result<spot_plan_orders_t> getSpotPlanOrderHistory(std::string &symbol, std::size_t startTime, std::size_t endTime, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, const char* lastEndId = "") { return getSpotPlanOrderHistory(symbol, startTime, endTime, cb, pageSize, lastEndId); }
+    result<spot_plan_orders_t> getSpotPlanOrderHistory(const char* symbol, std::size_t startTime, std::size_t endTime, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, std::string lastEndId = "") { return getSpotPlanOrderHistory(symbol, startTime, endTime, cb, pageSize, lastEndId.c_str()); }
+    result<spot_plan_orders_t> getSpotPlanOrderHistory(const char* symbol, std::size_t startTime, std::size_t endTime, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, const char* lastEndId = "");
+    
 
 /*************************************************************************************************/
 
@@ -377,6 +477,31 @@ struct api {
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-history-plan-orders-tpsl
 
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-trader-open-order
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-follower-open-orders
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-follower-history-orders
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#trader-close-position
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#trader-modify-tpsl
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-traders-history-orders
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-trader-profit-summary
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-trader-history-profit-summary-according-to-settlement-currency
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-trader-history-profit-summary-according-to-settlement-currency-and-date
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-trader-history-profit-detail
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-trader-profits-details
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#get-copytrade-symbols
+
+    // https://bitgetlimited.github.io/apidoc/en/mix/#trader-change-copytrade-symbol
 
 private:
     struct impl;

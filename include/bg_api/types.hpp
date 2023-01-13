@@ -376,8 +376,30 @@ namespace rest {
         std::string_view feeCcy;
         double_type fees;
 
-        static transaction_t construct(const simdjson::padded_string json);
+        static transaction_t construct(simdjson::ondemand::object &obj);
         friend std::ostream &operator<<(std::ostream &os, const transaction_t &f);
+    };
+
+    struct transactions_t {
+        std::vector<transaction_t> transactions;
+
+        static transactions_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const transactions_t &f);
+    };
+
+    struct spot_plan_order_res_t {
+        std::string_view orderId;
+        std::string_view clientOrderId;
+
+        static spot_plan_order_res_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const spot_plan_order_res_t &f);
+    };
+
+    struct cancel_spot_plan_order_res_t {
+        std::string_view orderId;
+
+        static cancel_spot_plan_order_res_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const cancel_spot_plan_order_res_t &f);
     };
 
     struct spot_plan_order_t {
@@ -392,8 +414,15 @@ namespace rest {
         _trigger_type triggerType;
         std::size_t cTime;
 
-        static spot_plan_order_t construct(const simdjson::padded_string json);
+        static spot_plan_order_t construct(simdjson::ondemand::object &obj);
         friend std::ostream &operator<<(std::ostream &os, const spot_plan_order_t &f);
+    };
+
+    struct spot_plan_orders_t {
+        std::vector<spot_plan_order_t> orders;
+
+        static spot_plan_orders_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const spot_plan_orders_t &f);
     };
 
 //------------------------------------------------------------------------------
@@ -640,7 +669,7 @@ namespace rest {
         std::size_t cTime;
 
         static futures_plan_order_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const spot_plan_order_t &f);
+        friend std::ostream &operator<<(std::ostream &os, const futures_plan_order_t &f);
     };
 
     struct futures_history_plan_order_t {
