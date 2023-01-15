@@ -3,7 +3,7 @@ Bitget API implemented in C++ for both synchronous and asynchronous way. Based o
 
 Note: This project is currently a work in progress. The expected date of completion is January 31, 2023.
 
-![](https://progress-bar.dev/26/?scale=100&title=REST%20API%20&width=240)
+![](https://progress-bar.dev/34/?scale=100&title=REST%20API%20&width=240)
 
 ![](https://progress-bar.dev/0/?scale=100&title=WebSocket%20API&width=216)
 
@@ -52,67 +52,67 @@ Here is a breakdown of what needs to be done for the REST API:
 
 ##### Futures methods:
 
-| Method                        | Written               | Tested                |
-| :---                          | :----:                | :----:                |
-| getContracts()                | :x:                   | :x:                   |
-| getMixDepth()                 | :x:                   | :x:                   |
-| getMixTicker()                | :x:                   | :x:                   |
-| getMixTickers()               | :x:                   | :x:                   |
-| getMixFills()                 | :x:                   | :x:                   |
-| getMixCandles()               | :x:                   | :x:                   |
-| getMixIndex()                 | :x:                   | :x:                   |
-| getNextFundingTime()          | :x:                   | :x:                   |
-| getHistoryFundRate()          | :x:                   | :x:                   |
-| getFundRate()                 | :x:                   | :x:                   |
-| getOpenInterest()             | :x:                   | :x:                   |
-| getSymbolMarkPrice()          | :x:                   | :x:                   |
-| getSymbolLeverage()           | :x:                   | :x:                   |
-| getMixAccount()               | :x:                   | :x:                   |
-| getMixAccounts()              | :x:                   | :x:                   |
-| getOpenCount()                | :x:                   | :x:                   |
-| setLeverage()                 | :x:                   | :x:                   |
-| setMargin()                   | :x:                   | :x:                   |
-| setMarginMode()               | :x:                   | :x:                   |
-| setPositionMode()             | :x:                   | :x:                   |
-| getMixPosition()              | :x:                   | :x:                   |
-| getMixPositions()             | :x:                   | :x:                   |
-| getMixAccountBill()           | :x:                   | :x:                   |
-| getBizAccountBill()           | :x:                   | :x:                   |
-| placeMixOrder()               | :x:                   | :x:                   |
-| placeMixReversal()            | :x:                   | :x:                   |
-| placeMixBatchOrder()          | :x:                   | :x:                   |
-| cancelMixOrder()              | :x:                   | :x:                   |
-| batchCancelMixOrder()         | :x:                   | :x:                   |
-| cancelAllMixOrders()          | :x:                   | :x:                   |
-| getOpenMixOrder()             | :x:                   | :x:                   |
-| getOpenMixOrders()            | :x:                   | :x:                   |
-| getMixHistory()               | :x:                   | :x:                   |
-| getProductTypeHistory()       | :x:                   | :x:                   |
-| getMixOrderDetail()           | :x:                   | :x:                   |
-| getMixOrderFills()            | :x:                   | :x:                   |
-| getAllMixOrderFills()         | :x:                   | :x:                   |
-| placeMixPlanOrder()           | :x:                   | :x:                   |
-| modifyMixPlanOrder()          | :x:                   | :x:                   |
-| modifyMixPlanOrderTPSL()      | :x:                   | :x:                   |
-| placeMixStopOrder()           | :x:                   | :x:                   |
-| placeMixTrailingStopOrder()   | :x:                   | :x:                   |
-| placeMixPositionTPSL()        | :x:                   | :x:                   |
-| modifyMixStopOrder()          | :x:                   | :x:                   |
-| cancelMixPlanOrder()          | :x:                   | :x:                   |
-| cancelMixPlanOrders()         | :x:                   | :x:                   |
-| getMixPlanOrders()            | :x:                   | :x:                   |
-| getMixHistoryPlanOrders()     | :x:                   | :x:                   |
-| getTraderOpenOrder()          | :x:                   | :x:                   |
-| getTraderOpenOrders()         | :x:                   | :x:                   |
-| getFollowerHistoryOrders()    | :x:                   | :x:                   |
-| closePosition()               | :x:                   | :x:                   |
-| modifyTPSL()                  | :x:                   | :x:                   |
-| getTradersHistoryOrders()     | :x:                   | :x:                   |
-| getTraderProfitSummary()      | :x:                   | :x:                   |
-| getTraderHistoryProfit()      | :x:                   | :x:                   |
-| getTraderProfitDetails()      | :x:                   | :x:                   |
-| getCopyTradeSymbols()         | :x:                   | :x:                   |
-| changeCopyTradeSymbol()       | :x:                   | :x:                   |
+| Method                            | Written               | Tested                |
+| :---                              | :----:                | :----:                |
+| getContracts()                    | :heavy_check_mark:    | :x:                   |
+| getFuturesDepth()                 | :heavy_check_mark:    | :x:                   |
+| getFuturesTicker()                | :heavy_check_mark:    | :x:                   |
+| getFuturesTickers()               | :heavy_check_mark:    | :x:                   |
+| getFuturesFills()                 | :heavy_check_mark:    | :x:                   |
+| getFuturesCandles()               | :heavy_check_mark:    | :x:                   |
+| getFuturesIndex()                 | :heavy_check_mark:    | :x:                   |
+| getNextFundingTime()              | :heavy_check_mark:    | :x:                   |
+| getHistoryFundRate()              | :heavy_check_mark:    | :x:                   |
+| getFundRate()                     | :heavy_check_mark:    | :x:                   |
+| getOpenInterest()                 | :heavy_check_mark:    | :x:                   |
+| getSymbolMarkPrice()              | :heavy_check_mark:    | :x:                   |
+| getSymbolLeverage()               | :heavy_check_mark:    | :x:                   |
+| getFuturesAccount()               | :x:                   | :x:                   |
+| getFuturesAccounts()              | :x:                   | :x:                   |
+| getOpenCount()                    | :x:                   | :x:                   |
+| setLeverage()                     | :x:                   | :x:                   |
+| setMargin()                       | :x:                   | :x:                   |
+| setMarginMode()                   | :x:                   | :x:                   |
+| setPositionMode()                 | :x:                   | :x:                   |
+| getFuturesPosition()              | :x:                   | :x:                   |
+| getFuturesPositions()             | :x:                   | :x:                   |
+| getFuturesAccountBill()           | :x:                   | :x:                   |
+| getBizAccountBill()               | :x:                   | :x:                   |
+| placeFuturesOrder()               | :x:                   | :x:                   |
+| placeFuturesReversal()            | :x:                   | :x:                   |
+| placeFuturesBatchOrder()          | :x:                   | :x:                   |
+| cancelFuturesOrder()              | :x:                   | :x:                   |
+| batchCancelFuturesOrder()         | :x:                   | :x:                   |
+| cancelAllFuturesOrders()          | :x:                   | :x:                   |
+| getOpenFuturesOrder()             | :x:                   | :x:                   |
+| getOpenFuturesOrders()            | :x:                   | :x:                   |
+| getFuturesHistory()               | :x:                   | :x:                   |
+| getProductTypeHistory()           | :x:                   | :x:                   |
+| getFuturesOrderDetail()           | :x:                   | :x:                   |
+| getFuturesOrderFills()            | :x:                   | :x:                   |
+| getAllFuturesOrderFills()         | :x:                   | :x:                   |
+| placeFuturesPlanOrder()           | :x:                   | :x:                   |
+| modifyFuturesPlanOrder()          | :x:                   | :x:                   |
+| modifyFuturesPlanOrderTPSL()      | :x:                   | :x:                   |
+| placeFuturesStopOrder()           | :x:                   | :x:                   |
+| placeFuturesTrailingStopOrder()   | :x:                   | :x:                   |
+| placeFuturesPositionTPSL()        | :x:                   | :x:                   |
+| modifyFuturesStopOrder()          | :x:                   | :x:                   |
+| cancelFuturesPlanOrder()          | :x:                   | :x:                   |
+| cancelFuturesPlanOrders()         | :x:                   | :x:                   |
+| getFuturesPlanOrders()            | :x:                   | :x:                   |
+| getFuturesHistoryPlanOrders()     | :x:                   | :x:                   |
+| getTraderOpenOrder()              | :x:                   | :x:                   |
+| getTraderOpenOrders()             | :x:                   | :x:                   |
+| getFollowerHistoryOrders()        | :x:                   | :x:                   |
+| closePosition()                   | :x:                   | :x:                   |
+| modifyTPSL()                      | :x:                   | :x:                   |
+| getTradersHistoryOrders()         | :x:                   | :x:                   |
+| getTraderProfitSummary()          | :x:                   | :x:                   |
+| getTraderHistoryProfit()          | :x:                   | :x:                   |
+| getTraderProfitDetails()          | :x:                   | :x:                   |
+| getCopyTradeSymbols()             | :x:                   | :x:                   |
+| changeCopyTradeSymbol()           | :x:                   | :x:                   |
 
 #### WebSocket API
 

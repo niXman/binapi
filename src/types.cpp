@@ -14,7 +14,6 @@
 
 #include <bg_api/types.hpp>
 #include <bg_api/fnv1a.hpp>
-#include <bg_api/LUTs.hpp>
 
 #include <type_traits>
 
@@ -1373,39 +1372,59 @@ std::ostream &operator<<(std::ostream &os, const spot_plan_orders_t &f) {
 
 //------------------------------------------------------------------------------
 
-contract_t contract_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-
+contract_t contract_t::construct(simdjson::ondemand::object &obj) {
     contract_t res = {};
-    res.baseCoin = doc["baseCoin"].get_string();
-    res.quoteCoin = doc["quoteCoin"].get_string();
-    res.symbol = doc["symbol"].get_string();
-    double_type buyLimitPriceRatio(static_cast<std::string>(doc["buyLimitPriceRatio"].get_string().take_value()));
-    res.buyLimitPriceRatio = buyLimitPriceRatio;
-    double_type sellLimitPriceRatio(static_cast<std::string>(doc["sellLimitPriceRatio"].get_string().take_value()));
-    res.sellLimitPriceRatio = sellLimitPriceRatio;
-    double_type feeRateUpRatio(static_cast<std::string>(doc["feeRateUpRatio"].get_string().take_value()));
-    res.feeRateUpRatio = feeRateUpRatio;
-    double_type openCostUpRatio(static_cast<std::string>(doc["openCostUpRatio"].get_string().take_value()));
-    res.openCostUpRatio = openCostUpRatio;
-    double_type sizeMultiplier(static_cast<std::string>(doc["sizeMultiplier"].get_string().take_value()));
-    res.sizeMultiplier = sizeMultiplier;
-    double_type makerFeeRate(static_cast<std::string>(doc["makerFeeRate"].get_string().take_value()));
-    res.makerFeeRate = makerFeeRate;
-    double_type takerFeeRate(static_cast<std::string>(doc["takerFeeRate"].get_string().take_value()));
-    res.takerFeeRate = takerFeeRate;
-    double_type minTradeNum(static_cast<std::string>(doc["minTradeNum"].get_string().take_value()));
-    res.minTradeNum = minTradeNum;
-    res.priceEndStep = doc["priceEndStep"].get_uint64_in_string();
-    res.pricePlace = doc["pricePlace"].get_uint64_in_string();
-    res.volumePlace = doc["volumePlace"].get_uint64_in_string();
-    res.symbolType = doc["symbolType"].get_string();
-    simdjson::ondemand::array arr = doc["supportMarginCoins"].get_array();
-    for (auto coin : arr) {
-        res.supportMarginCoins.push_back(static_cast<std::string>(coin.get_string().take_value()));
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "baseCoin") {
+            res.baseCoin = field.value().get_string();
+        } else if (name == "quoteCoin") {
+            res.quoteCoin = field.value().get_string();
+        } else if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "buyLimitPriceRatio") {
+            double_type buyLimitPriceRatio(static_cast<std::string>(field.value().get_string().take_value()));
+            res.buyLimitPriceRatio = buyLimitPriceRatio;
+        } else if (name == "sellLimitPriceRatio") {
+            double_type sellLimitPriceRatio(static_cast<std::string>(field.value().get_string().take_value()));
+            res.sellLimitPriceRatio = sellLimitPriceRatio;
+        } else if (name == "feeRateUpRatio") {
+            double_type feeRateUpRatio(static_cast<std::string>(field.value().get_string().take_value()));
+            res.feeRateUpRatio = feeRateUpRatio;
+        } else if (name == "openCostUpRatio") {
+            double_type openCostUpRatio(static_cast<std::string>(field.value().get_string().take_value()));
+            res.openCostUpRatio = openCostUpRatio;
+        } else if (name == "sizeMultiplier") {
+            double_type sizeMultiplier(static_cast<std::string>(field.value().get_string().take_value()));
+            res.sizeMultiplier = sizeMultiplier;
+        } else if (name == "makerFeeRate") {
+            double_type makerFeeRate(static_cast<std::string>(field.value().get_string().take_value()));
+            res.makerFeeRate = makerFeeRate;
+        } else if (name == "takerFeeRate") {
+            double_type takerFeeRate(static_cast<std::string>(field.value().get_string().take_value()));
+            res.takerFeeRate = takerFeeRate;
+        } else if (name == "minTradeNum") {
+            double_type minTradeNum(static_cast<std::string>(field.value().get_string().take_value()));
+            res.minTradeNum = minTradeNum;
+        } else if (name == "priceEndStep") {
+            res.priceEndStep = field.value().get_uint64_in_string();
+        } else if (name == "pricePlace") {
+            res.pricePlace = field.value().get_uint64_in_string();
+        } else if (name == "volumePlace") {
+            res.volumePlace = field.value().get_uint64_in_string();
+        } else if (name == "symbolType") {
+            res.symbolType = field.value().get_string();
+        } else if (name == "supportMarginCoins") {
+            simdjson::ondemand::array arr = field.value().get_array();
+            for (auto item : arr) {
+                res.supportMarginCoins.emplace_back(item.get_string().take_value());
+            }
+        }
     }
-
     return res;
 }
 
@@ -1435,26 +1454,164 @@ std::ostream &operator<<(std::ostream &os, const contract_t &f) {
     return os;
 }
 
+contracts_t contracts_t::construct(simdjson::ondemand::document &doc) {
+    contracts_t res = {};
+    simdjson::ondemand::array arr = doc["data"].get_array();
+    for (auto field : arr) {
+        res.contracts.emplace_back(contract_t::construct(field.get_object().value()));
+    }
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const contracts_t &f) {
+    os << "{\n"
+    << "\t\"contracts\":[\n";
+    for (const auto &c : f.contracts) {
+        os << "\t\t" << c << ",\n";
+    }
+    os << "\t]\n}";
+
+    return os;
+}
+
 //------------------------------------------------------------------------------
 
-fill_t fill_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
+futures_ticker_t futures_ticker_t::construct(simdjson::ondemand::document &doc) {
+    return futures_ticker_t::construct(doc["data"].get_object().value());
+}
 
+futures_ticker_t futures_ticker_t::construct(simdjson::ondemand::object &obj) {
+    futures_ticker_t res = {};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str(); // This makes the comparisons WAY faster
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "last") {
+            double_type last(static_cast<std::string>(field.value().get_string().take_value()));
+            res.last = last;
+        } else if (name == "bestAsk") {
+            double_type bestAsk(static_cast<std::string>(field.value().get_string().take_value()));
+            res.bestAsk = bestAsk;
+        } else if (name == "bestBid") {
+            double_type bestBid(static_cast<std::string>(field.value().get_string().take_value()));
+            res.bestBid = bestBid;
+        } else if (name == "bidSz") {
+            double_type bidSz(static_cast<std::string>(field.value().get_string().take_value()));
+            res.bidSz = bidSz;
+        } else if (name == "askSz") {
+            double_type askSz(static_cast<std::string>(field.value().get_string().take_value()));
+            res.askSz = askSz;
+        } else if (name == "high24h") {
+            double_type high24h(static_cast<std::string>(field.value().get_string().take_value()));
+            res.high24h = high24h;
+        } else if (name == "low24h") {
+            double_type low24h(static_cast<std::string>(field.value().get_string().take_value()));
+            res.low24h = low24h;
+        } else if (name == "timestamp") {
+            res.timestamp = field.value().get_uint64_in_string();
+        } else if (name == "priceChangePercent") {
+            double_type priceChangePercent(static_cast<std::string>(field.value().get_string().take_value()));
+            res.priceChangePercent = priceChangePercent;
+        } else if (name == "baseVolume") {
+            double_type quoteVolume(static_cast<std::string>(field.value().get_string().take_value()));
+            res.quoteVolume = quoteVolume;
+        } else if (name == "quoteVolume") {
+            double_type baseVolume(static_cast<std::string>(field.value().get_string().take_value()));
+            res.baseVolume = baseVolume;
+        } else if (name == "usdtVolume") {
+            double_type usdtVolume(static_cast<std::string>(field.value().get_string().take_value()));
+            res.usdtVolume = usdtVolume;
+        } else if (name == "openUtc") {
+            double_type openUtc(static_cast<std::string>(field.value().get_string().take_value()));
+            res.openUtc = openUtc;
+        } else if (name == "chgUtc") {
+            double_type chgUtc(static_cast<std::string>(field.value().get_string().take_value()));
+            res.chgUtc = chgUtc;
+        }
+    }
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const futures_ticker_t &f) {
+    os << "{\n"
+    << "\t\"symbol\":\"" << f.symbol << "\",\n"
+    << "\t\"last\":" << f.last << ",\n"
+    << "\t\"bestAsk\":" << f.bestAsk << ",\n"
+    << "\t\"bestBid\":" << f.bestBid << ",\n"
+    << "\t\"bidSz\":" << f.bidSz << ",\n"
+    << "\t\"askSz\":" << f.askSz << ",\n"
+    << "\t\"high24h\":" << f.high24h << ",\n"
+    << "\t\"low24h\":" << f.low24h << ",\n"
+    << "\t\"timestamp\":" << f.timestamp << ",\n"
+    << "\t\"priceChangePercent\":" << f.priceChangePercent << ",\n"
+    << "\t\"baseVolume\":" << f.baseVolume << ",\n"
+    << "\t\"quoteVolume\":" << f.quoteVolume << ",\n"
+    << "\t\"usdtVolume\":" << f.usdtVolume << ",\n"
+    << "\t\"openUtc\":" << f.openUtc << ",\n"
+    << "\t\"chgUtc\":" << f.chgUtc << "\n}";
+
+    return os;
+}
+
+futures_tickers_t futures_tickers_t::construct(simdjson::ondemand::document &doc) {
+    futures_tickers_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto ticker : arr) {
+        res.tickers.emplace_back(futures_ticker_t::construct(ticker.get_object().value()));
+    }
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const futures_tickers_t &f) {
+    os << "{\n"
+    << "\t\"tickers\":[\n";
+    for (auto &ticker : f.tickers) {
+        os << ticker << ",\n";
+    }
+    os << "\t]\n}";
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+fills_t::fill_t fills_t::fill_t::construct(simdjson::ondemand::object &obj) {
     fill_t res = {};
-    res.tradeId = doc["tradeId"].get_string();
-    double_type price(static_cast<std::string>(doc["price"].get_string().take_value()));
-    res.price = price;
-    double_type size(static_cast<std::string>(doc["size"].get_string().take_value()));
-    res.size = size;
-    res.side = side_from_string(doc["side"].get_string());
-    res.timestamp = doc["timestamp"].get_uint64_in_string();
-    res.symbol = doc["symbol"].get_string();
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "tradeId") {
+            res.tradeId = field.value().get_string();
+        } else if (name == "price") {
+            double_type price(static_cast<std::string>(field.value().get_string().take_value()));
+            res.price = price;
+        } else if (name == "size") {
+            double_type size(static_cast<std::string>(field.value().get_string().take_value()));
+            res.size = size;
+        } else if (name == "side") {
+            res.side = side_from_string(field.value().get_string().take_value());
+        } else if (name == "timestamp") {
+            res.timestamp = field.value().get_uint64_in_string();
+        } else if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        }
+    }
     
     return res;
 }
 
-std::ostream &operator<<(std::ostream &os, const fill_t &f) {
+std::ostream &operator<<(std::ostream &os, const fills_t::fill_t &f) {
     os << "{\n"
     << "\t\"tradeId\":" << f.tradeId << ",\n"
     << "\t\"price\":" << f.price << ",\n"
@@ -1466,21 +1623,200 @@ std::ostream &operator<<(std::ostream &os, const fill_t &f) {
     return os;
 }
 
+fills_t fills_t::construct(simdjson::ondemand::document &doc) {
+    fills_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto fill : arr) {
+        res.fills.emplace_back(fill_t::construct(fill.get_object().value()));
+    }
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const fills_t &f) {
+    os << "{\n"
+    << "\t\"fills\":[\n";
+    for (auto &fill : f.fills) {
+        os << fill << ",\n";
+    }
+    os << "\t]\n}";
+    return os;
+}
+
 //------------------------------------------------------------------------------
 
-symbol_leverage_t symbol_leverage_t::construct(const simdjson::padded_string json) {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
+index_t index_t::construct(simdjson::ondemand::document &doc) {
+    index_t res = {};
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "index") {
+            double_type index(static_cast<std::string>(field.value().get_string().take_value()));
+            res.index = index;
+        } else if (name == "timestamp") {
+            res.timestamp = field.value().get_uint64_in_string();
+        }
+    }
+    return res;
+}
 
-    symbol_leverage_t res = {};
-    res.symbol = doc["symbol"].get_string();
-    res.minLeverage = doc["minLeverage"].get_uint64_in_string();
-    res.maxLeverage = doc["maxLeverage"].get_uint64_in_string();
+std::ostream &operator<<(std::ostream &os, const index_t &f) {
+    os << "{\n"
+    << "\t\"symbol\":" << f.symbol << ",\n"
+    << "\t\"index\":" << f.index << ",\n"
+    << "\t\"timestamp\":" << f.timestamp << "\n}";
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+funding_t funding_t::construct(simdjson::ondemand::document &doc) {
+    return construct(doc["data"].get_object().value());
+}
+
+funding_t funding_t::construct(simdjson::ondemand::object &obj) {
+    funding_t res = {};
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "fundingRate") {
+            double_type fundingRate(static_cast<std::string>(field.value().get_string().take_value()));
+            res.fundingRate = fundingRate;
+        } else if (name == "fundingTime" || name == "settleTime") {
+            res.fundingTime = field.value().get_uint64_in_string();
+        }
+    }
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const funding_t &f) {
+    os << "{\n"
+    << "\t\"symbol\":" << f.symbol << ",\n"
+    << "\t\"fundingRate\":" << f.fundingRate << ",\n"
+    << "\t\"fundingTime\":" << f.fundingTime << "\n}";
+
+    return os;
+}
+
+fundings_t fundings_t::construct(simdjson::ondemand::document &doc) {
+    fundings_t res = {};
+    simdjson::ondemand::array arr(doc["data"].get_array());
+    for (auto funding : arr) {
+        res.fundings.emplace_back(funding_t::construct(funding.get_object().value()));
+    }
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const fundings_t &f) {
+    os << "{\n"
+    << "\t\"fundings\":[\n";
+    for (auto &funding : f.fundings) {
+        os << funding << ",\n";
+    }
+    os << "\t]\n}";
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+open_interest_t open_interest_t::construct(simdjson::ondemand::document &doc) {
+    open_interest_t res = {};
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "amount") {
+            double_type amount(static_cast<std::string>(field.value().get_string().take_value()));
+            res.amount = amount;
+        } else if (name == "timestamp") {
+            res.timestamp = field.value().get_uint64_in_string();
+        }
+    }
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const open_interest_t &f) {
+    os << "{\n"
+    << "\t\"symbol\":" << f.symbol << ",\n"
+    << "\t\"amount\":" << f.amount << ",\n"
+    << "\t\"timestamp\":" << f.timestamp << "\n}";
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+mark_price_t mark_price_t::construct(simdjson::ondemand::document &doc) {
+    mark_price_t res = {};
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "markPrice") {
+            double_type markPrice(static_cast<std::string>(field.value().get_string().take_value()));
+            res.markPrice = markPrice;
+        } else if (name == "timestamp") {
+            res.timestamp = field.value().get_uint64_in_string();
+        }
+    }
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const mark_price_t &f) {
+    os << "{\n"
+    << "\t\"symbol\":" << f.symbol << ",\n"
+    << "\t\"markPrice\":" << f.markPrice << ",\n"
+    << "\t\"timestamp\":" << f.timestamp << "\n}";
+
+    return os;
+}
+
+//------------------------------------------------------------------------------
+
+leverage_t leverage_t::construct(simdjson::ondemand::document &doc) {
+    leverage_t res = {};
+    simdjson::ondemand::object obj(doc["data"].get_object());
+    for (auto field : obj) {
+        if (field.value().is_null()) {
+            continue;
+        }
+        std::string_view key = field.unescaped_key();
+        const char* name = std::string(key).c_str();
+        if (name == "symbol") {
+            res.symbol = field.value().get_string();
+        } else if (name == "minLeverage") {
+            res.minLeverage = field.value().get_uint64_in_string();
+        } else if (name == "maxLeverage") {
+            double_type maxLeverage(static_cast<std::string>(field.value().get_string().take_value()));
+            res.maxLeverage = field.value().get_uint64_in_string();
+        }
+    }
 
     return res;
 }
 
-std::ostream &operator<<(std::ostream &os, const symbol_leverage_t &f) {
+std::ostream &operator<<(std::ostream &os, const leverage_t &f) {
     os << "{\n"
     << "\t\"symbol\":" << f.symbol << ",\n"
     << "\t\"minLeverage\":" << f.minLeverage << ",\n"
