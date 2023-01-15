@@ -96,22 +96,22 @@ struct api {
     result<trades_t> getSpotTrades(const char* symbol, spot_trades_cb cb = {}, uint16_t limit = 100);
     
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-candle-data
-    using spot_candles_cb = std::function<bool(const char *fl, int ec, std::string errmsg, candles_t res)>;
-    result<candles_t> getSpotCandles(const std::string &symbol, const std::string &period, spot_candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol.c_str(), candle_gran_from_string(period), cb, startTime, endTime, limit); }
-    result<candles_t> getSpotCandles(const std::string &symbol, const char* period, spot_candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol.c_str(), candle_gran_from_string(period), cb, startTime, endTime, limit); }
-    result<candles_t> getSpotCandles(const std::string &symbol, std::size_t period, spot_candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol.c_str(), static_cast<_candle_gran>(period), cb, startTime, endTime, limit); }
-    result<candles_t> getSpotCandles(const std::string &symbol, _candle_gran period, spot_candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol.c_str(), period, cb, startTime, endTime, limit); }
-    result<candles_t> getSpotCandles(const char* symbol, const std::string &period, spot_candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol, candle_gran_from_string(period), cb, startTime, endTime, limit); }
-    result<candles_t> getSpotCandles(const char* symbol, const char* period, spot_candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol, candle_gran_from_string(period), cb, startTime, endTime, limit); }
-    result<candles_t> getSpotCandles(const char* symbol, std::size_t period, spot_candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol, static_cast<_candle_gran>(period), cb, startTime, endTime, limit); }
-    result<candles_t> getSpotCandles(const char* symbol, _candle_gran period, spot_candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100);
+    using candles_cb = std::function<bool(const char *fl, int ec, std::string errmsg, candles_t res)>;
+    result<candles_t> getSpotCandles(const std::string &symbol, const std::string &period, candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol.c_str(), candle_gran_from_string(period), cb, startTime, endTime, limit); }
+    result<candles_t> getSpotCandles(const std::string &symbol, const char* period, candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol.c_str(), candle_gran_from_string(period), cb, startTime, endTime, limit); }
+    result<candles_t> getSpotCandles(const std::string &symbol, std::size_t period, candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol.c_str(), static_cast<_candle_gran>(period), cb, startTime, endTime, limit); }
+    result<candles_t> getSpotCandles(const std::string &symbol, _candle_gran period, candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol.c_str(), period, cb, startTime, endTime, limit); }
+    result<candles_t> getSpotCandles(const char* symbol, const std::string &period, candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol, candle_gran_from_string(period), cb, startTime, endTime, limit); }
+    result<candles_t> getSpotCandles(const char* symbol, const char* period, candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol, candle_gran_from_string(period), cb, startTime, endTime, limit); }
+    result<candles_t> getSpotCandles(const char* symbol, std::size_t period, candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100) { return getSpotCandles(symbol, static_cast<_candle_gran>(period), cb, startTime, endTime, limit); }
+    result<candles_t> getSpotCandles(const char* symbol, _candle_gran period, candles_cb cb = {}, std::size_t startTime = 0, std::size_t endTime = 0, uint16_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#get-depth
     // Note that this doesn't support different step types due to the json returned having different value types
     // This may or may not be compensated in a future version
-    using spot_depth_cb = std::function<bool(const char *fl, int ec, std::string errmsg, depth_t res)>;
-    result<depth_t> getSpotDepth(const std::string &symbol, spot_depth_cb cb = {}, uint16_t limit = 100) { return getSpotDepth(symbol.c_str(), cb, limit); }
-    result<depth_t> getSpotDepth(const char* symbol, spot_depth_cb cb = {}, uint16_t limit = 100);
+    using depth_cb = std::function<bool(const char *fl, int ec, std::string errmsg, depth_t res)>;
+    result<depth_t> getSpotDepth(const std::string &symbol, depth_cb cb = {}, uint16_t limit = 100) { return getSpotDepth(symbol.c_str(), cb, limit); }
+    result<depth_t> getSpotDepth(const char* symbol, depth_cb cb = {}, uint16_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/spot/#transfer
     using transfer_cb = std::function<bool(const char *fl, int ec, std::string errmsg, transfer_res_t res)>;
@@ -378,34 +378,67 @@ struct api {
     result<spot_plan_orders_t> getSpotPlanOrderHistory(const char* symbol, std::size_t startTime, std::size_t endTime, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, std::string lastEndId = "") { return getSpotPlanOrderHistory(symbol, startTime, endTime, cb, pageSize, lastEndId.c_str()); }
     result<spot_plan_orders_t> getSpotPlanOrderHistory(const char* symbol, std::size_t startTime, std::size_t endTime, spot_plan_orders_cb cb = {}, uint16_t pageSize = 20, const char* lastEndId = "");
     
-
 /*************************************************************************************************/
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-all-symbols
+    using contracts_cb = std::function<bool(const char *fl, int ec, std::string errmsg, contracts_t res)>;
+    result<contracts_t> getContracts(_product_type productType, contracts_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-depth
+    result<depth_t> getFuturesDepth(const std::string &symbol, depth_cb cb = {}, uint8_t limit = 100) { return getFuturesDepth(symbol.c_str(), cb, limit); }
+    result<depth_t> getFuturesDepth(const char* symbol, depth_cb cb = {}, uint8_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-single-symbol-ticker
+    using futures_ticker_cb = std::function<bool(const char *fl, int ec, std::string errmsg, futures_ticker_t res)>;
+    result<futures_ticker_t> getFuturesTicker(const std::string &symbol, futures_ticker_cb cb = {}) { return getFuturesTicker(symbol.c_str(), cb); }
+    result<futures_ticker_t> getFuturesTicker(const char* symbol, futures_ticker_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-all-symbol-ticker
+    using futures_tickers_cb = std::function<bool(const char *fl, int ec, std::string errmsg, futures_tickers_t res)>;
+    result<futures_tickers_t> getFuturesTickers(_product_type productType, futures_tickers_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-fills
+    using fills_cb = std::function<bool(const char *fl, int ec, std::string errmsg, fills_t res)>;
+    result<fills_t> getFills(const std::string &symbol, fills_cb cb = {}, uint16_t limit = 100) { return getFills(symbol.c_str(), cb, limit); }
+    result<fills_t> getFills(const char* symbol, fills_cb cb = {}, uint16_t limit = 100);
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-candle-data
+    result<candles_t> getFuturesCandles(const std::string &symbol, _candle_gran granularity, std::size_t startTime, std::size_t endTime, candles_cb cb = {}) { return getFuturesCandles(symbol.c_str(), granularity, startTime, endTime, cb); }
+    result<candles_t> getFuturesCandles(const char* symbol, _candle_gran granularity, std::size_t startTime, std::size_t endTime, candles_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-symbol-index-price
+    using index_cb = std::function<bool(const char *fl, int ec, std::string errmsg, index_t res)>;
+    result<index_t> getFuturesIndexPrice(const std::string &symbol, index_cb cb = {}) { return getFuturesIndexPrice(symbol.c_str(), cb); }
+    result<index_t> getFuturesIndexPrice(const char* symbol, index_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-symbol-next-funding-time
+    using funding_cb = std::function<bool(const char *fl, int ec, std::string errmsg, funding_t res)>;
+    result<funding_t> getNextFundingTime(const std::string &symbol, funding_cb cb = {}) { return getNextFundingTime(symbol.c_str(), cb); }
+    result<funding_t> getNextFundingTime(const char* symbol, funding_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-history-funding-rate
+    using history_funding_cb = std::function<bool(const char *fl, int ec, std::string errmsg, fundings_t res)>;
+    result<fundings_t> getHistoryFundRate(const std::string &symbol, history_funding_cb cb = {}, uint16_t pageSize = 20, uint16_t pageNo = 1, bool nextPage = false) { return getHistoryFundRate(symbol.c_str(), cb, pageSize, pageNo, nextPage); }
+    result<fundings_t> getHistoryFundRate(const char* symbol, history_funding_cb cb = {}, uint16_t pageSize = 20, uint16_t pageNo = 1, bool nextPage = false);
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-current-funding-rate
+    result<funding_t> getFundRate(const std::string &symbol, funding_cb cb = {}) { return getFundRate(symbol.c_str(), cb); }
+    result<funding_t> getFundRate(const char* symbol, funding_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-open-interest
+    using open_interest_cb = std::function<bool(const char *fl, int ec, std::string errmsg, open_interest_t res)>;
+    result<open_interest_t> getOpenInterest(const std::string &symbol, open_interest_cb cb = {}) { return getOpenInterest(symbol.c_str(), cb); }
+    result<open_interest_t> getOpenInterest(const char* symbol, open_interest_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-symbol-mark-price
+    using mark_price_cb = std::function<bool(const char *fl, int ec, std::string errmsg, mark_price_t res)>;
+    result<mark_price_t> getMarkPrice(const std::string &symbol, mark_price_cb cb = {}) { return getMarkPrice(symbol.c_str(), cb); }
+    result<mark_price_t> getMarkPrice(const char* symbol, mark_price_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-symbol-leverage
+    using leverage_cb = std::function<bool(const char *fl, int ec, std::string errmsg, leverage_t res)>;
+    result<leverage_t> getLeverage(const std::string &symbol, leverage_cb cb = {}) { return getLeverage(symbol.c_str(), cb); }
+    result<leverage_t> getLeverage(const char* symbol, leverage_cb cb = {});
 
     // https://bitgetlimited.github.io/apidoc/en/mix/#get-single-account
 

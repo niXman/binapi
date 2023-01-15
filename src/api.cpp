@@ -13,7 +13,6 @@
 #include <bg_api/api.hpp>
 #include <bg_api/invoker.hpp>
 #include <bg_api/errors.hpp>
-#include <bg_api/LUTs.hpp>
 
 #include <boost/preprocessor.hpp>
 #include <boost/callable_traits.hpp>
@@ -600,6 +599,8 @@ api::~api()
 {}
 
 /*************************************************************************************************/
+/****************************************SPOT ENDPOINTS*******************************************/
+/*************************************************************************************************/
 
 api::result<server_time_t> api::getServerTime(server_time_cb cb) {
     return pimpl->post(false, "/api/spot/v1/public/time", boost::beast::http::verb::get, "", std::move(cb));
@@ -621,7 +622,7 @@ api::result<symbols_t> api::getSymbols(symbols_cb cb) {
 
 api::result<symbol_t> api::getSymbol(const char* symbol, symbol_cb cb) {
     std::string params = "?symbol=";
-    params += getSpotSymbol(symbol);
+    params += symbol;
 
     return pimpl->post(false, "/api/spot/v1/public/product", boost::beast::http::verb::get, params, std::move(cb));
 }
@@ -630,7 +631,7 @@ api::result<symbol_t> api::getSymbol(const char* symbol, symbol_cb cb) {
 
 api::result<spot_ticker_t> api::getSpotTicker(const char* symbol, spot_ticker_cb cb) {
     std::string params = "?symbol=";
-    params += getSpotSymbol(symbol);
+    params += symbol;
 
     return pimpl->post(false, "/api/spot/v1/market/ticker", boost::beast::http::verb::get, params, std::move(cb));
 }
@@ -645,7 +646,7 @@ api::result<spot_tickers_t> api::getSpotTickers(spot_tickers_cb cb) {
 
 api::result<trades_t> api::getSpotTrades(const char* symbol, spot_trades_cb cb, uint16_t limit) {
     std::string params = "?symbol=";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     if (limit) {
         params += "&limit=";
         params += std::to_string(limit);
@@ -656,9 +657,9 @@ api::result<trades_t> api::getSpotTrades(const char* symbol, spot_trades_cb cb, 
 
 /*************************************************************************************************/
 
-api::result<candles_t> api::getSpotCandles(const char* symbol, _candle_gran period, spot_candles_cb cb, std::size_t startTime, std::size_t endTime, uint16_t limit) {
+api::result<candles_t> api::getSpotCandles(const char* symbol, _candle_gran period, candles_cb cb, std::size_t startTime, std::size_t endTime, uint16_t limit) {
     std::string params = "?symbol=";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "&period=";
     params += candle_gran_to_string(period);
     if (startTime) {
@@ -679,9 +680,9 @@ api::result<candles_t> api::getSpotCandles(const char* symbol, _candle_gran peri
 
 /*************************************************************************************************/
 
-api::result<depth_t> api::getSpotDepth(const char* symbol, spot_depth_cb cb, uint16_t limit) {
+api::result<depth_t> api::getSpotDepth(const char* symbol, depth_cb cb, uint16_t limit) {
     std::string params = "?symbol=";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     if (limit) {
         params += "&limit=";
         params += std::to_string(limit);
@@ -881,7 +882,7 @@ api::result<transfers_t> api::getTransferList(std::size_t coinId, const char* fr
 
 api::result<spot_order_res_t> api::placeSpotOrder(const char* symbol, _side side, _order_type type, _force force, double_type quantity, place_order_cb cb, double_type price, const char* clientOid) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\",\"side\":\"";
     params += side_to_string(side);
     params += "\",\"type\":\"";
@@ -908,7 +909,7 @@ api::result<spot_order_res_t> api::placeSpotOrder(const char* symbol, _side side
 api::result<spot_orders_res_t> api::placeSpotOrders(const char* symbol, std::vector<_side> sides, std::vector<_order_type> types, std::vector<_force> forces, std::vector<double_type> quantities, std::vector<double_type> prices, std::vector<std::string> clientOids, place_orders_cb cb) {
     assert(sides.size() == types.size() && sides.size() == forces.size() && sides.size() == quantities.size() && sides.size() == prices.size() && sides.size() == clientOids.size());
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\",\"orderList\":[";
     for (std::size_t i = 0; i < sides.size(); ++i) {
         params += "{\"side\":\"";
@@ -941,7 +942,7 @@ api::result<spot_orders_res_t> api::placeSpotOrders(const char* symbol, std::vec
 
 api::result<spot_cancel_res_t> api::cancelSpotOrder(const char* symbol, const char* orderId, cancel_order_cb cb) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\",\"orderId\":\"";
     params += orderId;
     params += "\"}";
@@ -954,7 +955,7 @@ api::result<spot_cancel_res_t> api::cancelSpotOrder(const char* symbol, const ch
 
 api::result<spot_cancel_res_t> api::cancelSpotOrders(const char* symbol, std::vector<std::string> orderIds, cancel_orders_cb cb) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\",\"orderIds\":[";
     for (std::size_t i = 0; i < orderIds.size(); ++i) {
         params += "\"";
@@ -973,7 +974,7 @@ api::result<spot_cancel_res_t> api::cancelSpotOrders(const char* symbol, std::ve
 
 api::result<spot_orders_t> api::getOrderDetails(const char* symbol, const char* orderId, order_detail_cb cb, const char* clientOrderId) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\",\"orderId\":\"";
     params += orderId;
     if (clientOrderId) {
@@ -991,7 +992,7 @@ api::result<spot_orders_t> api::getOrderList(const char* symbol, order_list_cb c
     std::string params = "";
     if (symbol) {
         params += "{\"symbol\":\"";
-        params += getSpotSymbol(symbol);
+        params += symbol;
         params += "\"}";
     } 
 
@@ -1002,7 +1003,7 @@ api::result<spot_orders_t> api::getOrderList(const char* symbol, order_list_cb c
 
 api::result<spot_orders_t> api::orderHistory(const char* symbol, order_history_cb cb, std::size_t after, std::size_t before, uint32_t limit) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\"";
     if (after) {
         params += "\",\"after\":";
@@ -1026,7 +1027,7 @@ api::result<spot_orders_t> api::orderHistory(const char* symbol, order_history_c
 
 api::result<transactions_t> api::getTransactions(const char* symbol, transactions_cb cb, const char* orderId, std::size_t after, std::size_t before, uint32_t limit) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\"";
     if (orderId) {
         params += ",\"orderId\":\"";
@@ -1053,7 +1054,7 @@ api::result<transactions_t> api::getTransactions(const char* symbol, transaction
 
 api::result<spot_plan_order_res_t> api::placeSpotPlanOrder(const char* symbol, _side side, double_type triggerPrice, double_type size, _trigger_type triggerType, _order_type orderType, place_spot_plan_order_cb cb, double_type executePrice, const char* clientOid, _force force) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\",\"side\":\"";
     params += side_to_string(side);
     params += "\",\"triggerPrice\":\"";
@@ -1115,7 +1116,7 @@ api::result<cancel_spot_plan_order_res_t> api::cancelSpotPlanOrder(const char* o
 
 api::result<spot_plan_orders_t> api::getSpotPlanOrders(const char* symbol, spot_plan_orders_cb cb, uint16_t pageSize, const char* lastEndId) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\"";
     if (pageSize) {
         params += ",\"pageSize\":";
@@ -1134,7 +1135,7 @@ api::result<spot_plan_orders_t> api::getSpotPlanOrders(const char* symbol, spot_
 
 api::result<spot_plan_orders_t> api::getSpotPlanOrderHistory(const char* symbol, std::size_t startTime, std::size_t endTime, spot_plan_orders_cb cb, uint16_t pageSize, const char* lastEndId) {
     std::string params = "{\"symbol\":\"";
-    params += getSpotSymbol(symbol);
+    params += symbol;
     params += "\"";
     if (pageSize) {
         params += ",\"pageSize\":";
@@ -1154,6 +1155,153 @@ api::result<spot_plan_orders_t> api::getSpotPlanOrderHistory(const char* symbol,
 }
 
 /*************************************************************************************************/
+/**************************************FUTURES ENDPOINTS******************************************/
+/*************************************************************************************************/
+
+api::result<contracts_t> api::getContracts(_product_type productType, contracts_cb cb) {
+    std::string params = "?productType=";
+    params += product_type_to_string(productType);
+
+    return pimpl->post(false, "/api/mix/v1/market/contracts", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<depth_t> api::getFuturesDepth(const char* symbol, depth_cb cb, uint8_t limit) {
+    std::string params = "?symbol=";
+    params += symbol;
+    if (limit == 5 || limit == 15 || limit == 50 || limit == 100) {
+        params += "&limit=";
+        params += std::to_string(limit);
+    }
+
+    return pimpl->post(false, "/api/mix/v1/market/depth", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<futures_ticker_t> api::getFuturesTicker(const char* symbol, futures_ticker_cb cb) {
+    std::string params = "?symbol=";
+    params += symbol;
+
+    return pimpl->post(false, "/api/mix/v1/market/ticker", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<futures_tickers_t> api::getFuturesTickers(_product_type productType, futures_tickers_cb cb) {
+    std::string params = "?productType=";
+    params += product_type_to_string(productType);
+
+    return pimpl->post(false, "/api/mix/v1/market/tickers", boost::beast::http::verb::get, "", std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<fills_t> api::getFills(const char* symbol, fills_cb cb, uint16_t limit) {
+    std::string params = "?symbol=";
+    params += symbol;
+    if (limit) {
+        params += "&limit=";
+        params += std::to_string(limit);
+    }
+
+    return pimpl->post(false, "/api/mix/v1/market/fills", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<candles_t> api::getFuturesCandles(const char* symbol, _candle_gran granularity, std::size_t startTime, std::size_t endTime, candles_cb cb) {
+    std::string params = "?symbol=";
+    params += symbol;
+    params += "&granularity=";
+    params += candle_gran_to_string(granularity);
+    params += "&startTime=";
+    params += std::to_string(startTime);
+    params += "&endTime=";
+    params += std::to_string(endTime);
+
+    return pimpl->post(false, "/api/mix/v1/market/candles", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<index_t> api::getFuturesIndexPrice(const char* symbol, index_cb cb) {
+    std::string params = "?symbol=";
+    params += symbol;
+
+    return pimpl->post(false, "/api/mix/v1/market/index", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<funding_t> api::getNextFundingTime(const char* symbol, funding_cb cb) {
+    std::string params = "?symbol=";
+    params += symbol;
+
+    return pimpl->post(false, "/api/mix/v1/market/funding-time", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<fundings_t> api::getHistoryFundRate(const char* symbol, history_funding_cb cb, uint16_t pageSize, uint16_t pageNo, bool nextPage) {
+    std::string params = "?symbol=";
+    params += symbol;
+    if (pageSize) {
+        params += "&pageSize=";
+        params += std::to_string(pageSize);
+    }
+    if (pageNo) {
+        params += "&pageNo=";
+        params += std::to_string(pageNo);
+    }
+    if (nextPage) {
+        params += "&nextPage=";
+        params += nextPage ? "true" : "false";
+    }
+
+    return pimpl->post(false, "/api/mix/v1/market/history-fundRate", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<funding_t> api::getFundRate(const char* symbol, funding_cb cb) {
+    std::string params = "?symbol=";
+    params += symbol;
+
+    return pimpl->post(false, "/api/mix/v1/market/current-fundRate", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<open_interest_t> api::getOpenInterest(const char* symbol, open_interest_cb cb) {
+    std::string params = "?symbol=";
+    params += symbol;
+
+    return pimpl->post(false, "/api/mix/v1/market/open-interest", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<mark_price_t> api::getMarkPrice(const char* symbol, mark_price_cb cb) {
+    std::string params = "?symbol=";
+    params += symbol;
+
+    return pimpl->post(false, "/api/mix/v1/market/mark-price", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+api::result<leverage_t> api::getLeverage(const char* symbol, leverage_cb cb) {
+    std::string params = "?symbol=";
+    params += symbol;
+
+    return pimpl->post(false, "/api/mix/v1/position/symbol-leverage", boost::beast::http::verb::get, params, std::move(cb));
+}
+
+/*************************************************************************************************/
+
+
 
 } // ns rest
 } // ns bg_api
