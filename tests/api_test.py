@@ -4,6 +4,9 @@ import time
 
 app = Flask(__name__)
 
+def verify_signature(headers, data):
+    pass
+
 ####################################################################################################
 # Spot Endpoints
 # GET /api/spot/v1/public/time
@@ -37,62 +40,231 @@ def get_product():
         return res
 
 # GET /api/spot/v1/market/ticker
+@app.get('/api/spot/v1/public/ticker')
+def get_():
+    with open('data/spot/ticker.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # GET /api/spot/v1/market/tickers
+@app.get('/api/spot/v1/public/tickers')
+def get_():
+    with open('data/spot/tickers.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # GET /api/spot/v1/market/fills
+@app.get('/api/spot/v1/public/')
+def get_():
+    with open('', 'r') as f:
+        res = json.load(f)
+        return res
 
 # GET /api/spot/v1/market/candles
+@app.get('')
+def get_():
+    with open('', 'r') as f:
+        res = json.load(f)
+        return res
 
 # GET /api/spot/v1/market/depth
+@app.get('/api/spot/v1/public/depth')
+def get_():
+    with open('data/spot/depth.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/wallet/transfer
+@app.get('/api/spot/v1/public/transfer')
+def get_():
+    res = {
+                "code":"00000",
+                "msg":"success"
+        }       
+    return res
 
 # POST /api/spot/v1/wallet/subTransfer
+@app.get('/api/spot/v1/public/subTransfer')
+def get_():
+    res = {
+    "code":"00000",
+    "msg":"success"
+    }
+    return res
 
 # GET /api/spot/v1/wallet/deposit-address
+@app.get('/api/spot/v1/public/')
+def get_():
+    with open('', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/wallet/withdrawal
+@app.get('/api/spot/v1/public/withdraw')
+def get_():
+    res = {
+  "code": "00000",
+  "msg": "success",
+  "data": "888291686266343424"
+}
+    return res
 
 # POST /api/spot/v1/wallet/withdrawal-inner
+@app.get('/api/spot/v1/public/withdraw-inner')
+def get_():
+    res = {
+  "code": "00000",
+  "msg": "success",
+  "data": "888291686266343424"
+}
+    return res
 
 # GET /api/spot/v1/wallet/withdrawal-list
+@app.get('/api/spot/v1/public/withdraw-list')
+def get_():
+    with open('data/spot/withdraws.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # GET /api/spot/v1/wallet/deposit-list
+@app.get('/api/spot/v1/public/deposit_list')
+def get_():
+    with open('data/spot/deposits.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # GET /api/spot/v1/account/getInfo
+@app.get('/api/spot/v1/public/getInfo')
+def get_():
+    with open('data/spot/apikey_info.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # GET /api/spot/v1/account/assets
+@app.get('/api/spot/v1/public/assets')
+def get_():
+    with open('data/spot/assets.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/account/bills
+@app.get('/api/spot/v1/public/bills')
+def get_():
+    with open('data/spot/bills.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # GET /api/spot/v1/account/transferRecords
+@app.get('/api/spot/v1/public/')
+def get_():
+    with open('', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/trade/orders
+@app.get('/api/spot/v1/public/orders')
+def get_():
+    res = {
+    "code":"00000",
+    "msg":"success",
+    "data":{
+        "orderId":"1001",
+        "clientOrderId":"hgXjh89AsxleMSw"
+    }
+}
+    return res
 
 # POST /api/spot/v1/trade/batch-orders
+@app.get('/api/spot/v1/public/batch-order')
+def get_():
+    with open('data/spot/batchOrder.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/trade/cancel-order
+@app.get('/api/spot/v1/public/cancel-order')
+def get_():
+    res = {
+
+  "code":"00000",
+   "message":"success",
+  "data": "202934892814667"
+}  
+    return res
 
 # POST /api/spot/v1/trade/cancel-batch-orders
+@app.get('/api/spot/v1/public/')
+def get_():
+    with open('', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/trade/orderInfo
+@app.get('/api/spot/v1/public/orderInfo')
+def get_():
+    with open('data/spot/orderInfo.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/trade/open-orders
+@app.get('/api/spot/v1/public/')
+def get_():
+    with open('', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/trade/history
+@app.get('/api/spot/v1/public/orderHistory')
+def get_():
+    with open('data/spot/orderHistory.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/trade/fills
+@app.get('/api/spot/v1/public/')
+def get_():
+    with open('', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/plan/placePlan
+@app.get('/api/spot/v1/public/placePlan')
+def get_():
+    with open('data/spot/placePlan.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/plan/modifyPlan
+@app.get('/api/spot/v1/public/modifyPlan')
+def get_():
+    with open('data/spot/modifyPlan.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/plan/cancelPlan
+@app.get('/api/spot/v1/public/cancelPlan')
+def get_():
+    res = {
+  "code": "00000",
+  "msg": "success",
+  "requestTime": 1668134497496,
+  "data": "974792060738441216"
+}
+    return res
 
 # POST /api/spot/v1/plan/currentPlan
+@app.get('/api/spot/v1/public/currentPlan')
+def get_():
+    with open('data/spot/currentPlan.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 # POST /api/spot/v1/plan/historyPlan
+@app.get('/api/spot/v1/public/historyPlan')
+def get_():
+    with open('data/spot/historyPlan.json', 'r') as f:
+        res = json.load(f)
+        return res
 
 ####################################################################################################
 # Futures Endpoints

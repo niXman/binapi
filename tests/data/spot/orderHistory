@@ -1,0 +1,19 @@
+{
+  "code":"00000",
+  "message":"success",
+"data":[{
+  "accountId":"10012",
+  "symbol":"btcusdt_spbl",
+  "orderId":"2222222",
+  "clientOrderId":"xxxxxxx",
+  "price":"34982.12",
+  "quantity":"1",  
+  "orderType":"limit",
+  "side":"buy",
+  "status":"new",
+  "fillPrice":"34982.12",
+  "fillQuantity":"1",
+  "fillTotalAmount":"34982.12",
+  "cTime":"1622697148"
+}]
+}

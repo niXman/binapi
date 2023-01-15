@@ -1,0 +1,20 @@
+{
+    "code": "00000",
+    "msg": "success",
+    "requestTime": 1666336231317,
+    "data": {
+        "resultList": [
+            {
+                "orderId": "96724974842718610",
+                "clientOrderId": "1"
+            }
+        ],
+        "failure": [
+            {
+                "orderId": "96724974842718611",
+                "clientOrderId": "1",
+                "errorMsg": "clientOrderId duplicate"
+            }
+        ]
+    }
+}
