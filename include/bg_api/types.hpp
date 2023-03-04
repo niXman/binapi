@@ -39,52 +39,47 @@ namespace bg_api {
 namespace rest {
 
 //------------------------------------------------------------------------------
-    
-    // Spot endpoints
 
     struct server_time_t {
-        time_t requestTime;
         time_t serverTime;
         
         static server_time_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const server_time_t &f);
     };
 
-    struct coin_t {
-        std::size_t coinId;
-        std::string_view coinName;
-        bool transfer;
+    struct currencies_t {
+        struct currency_t {
+            uint64_t coinId;
+            std::string_view coinName;
+            bool transfer;
+            struct chain_t {
+                std::string_view chain;
+                bool needTag;
+                bool withdrawable;
+                bool rechargeable;
+                double_type withdrawFee;
+                double_type extraWithDrawFee;
+                uint64_t depositConfirm;
+                uint64_t withdrawConfirm;
+                double_type minDepositAmount;
+                double_type minWithdrawAmount;
+                std::string_view browserUrl;
 
-        struct chain_t {
-            std::string_view chain;
-            bool needTag;
-            bool withdrawable;
-            bool rechargeable;
-            double_type withdrawFee;
-            double_type extraWithDrawFee;
-            std::size_t depositConfirm;
-            std::size_t withdrawConfirm;
-            double_type minDepositAmount;
-            double_type minWithdrawAmount;
-            std::string_view browserUrl;
+                static chain_t construct(simdjson::ondemand::object &obj);
+                friend std::ostream &operator<<(std::ostream &os, const chain_t &f);
+            };
+            std::vector<chain_t> chains;
 
-            static chain_t construct(simdjson::ondemand::object &obj);
-            friend std::ostream &operator<<(std::ostream &os, const chain_t &f);
+            static currency_t construct(simdjson::ondemand::object &obj);
+            friend std::ostream &operator<<(std::ostream &os, const currency_t &f);
         };
-        std::vector<chain_t> chains;
+        std::vector<currency_t> currencies;
 
-        static coin_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const coin_t &f);
+        static currencies_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const currencies_t &f);
     };
 
-    struct coin_list_t {
-        std::vector<coin_t> coins;
-
-        static coin_list_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const coin_list_t &f);
-    };
-
-    struct symbol_t {
+    struct product_t {
         std::string_view symbol;
         std::string_view symbolName;
         std::string_view baseCoin;
@@ -93,22 +88,23 @@ namespace rest {
         double_type maxTradeAmount;
         double_type takerFeeRate;
         double_type makerFeeRate;
-        std::size_t priceScale;
-        std::size_t quantityScale;
+        uint64_t priceScale;
+        uint64_t quantityScale;
         std::string_view status;
+        uint64_t minTradeUSDT;
 
-        static symbol_t construct(simdjson::ondemand::document &doc);
-        static symbol_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const symbol_t &f);
+        static product_t construct(simdjson::ondemand::document &doc);
+        static product_t construct(simdjson::ondemand::object &obj);
+        friend std::ostream &operator<<(std::ostream &os, const product_t &f);
     };
 
-    struct symbols_t {
-        std::vector<symbol_t> symbols;
+    struct products_t {
+        std::vector<product_t> products;
 
-        static symbols_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const symbols_t &f);
+        static products_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const products_t &f);
     };
-    
+
     struct spot_ticker_t {
         std::string_view symbol;
         double_type high24h;
@@ -117,7 +113,7 @@ namespace rest {
         double_type quoteVol;
         double_type baseVol;
         double_type usdtVol;
-        std::size_t ts;
+        time_t ts;
         double_type buyOne;
         double_type sellOne;
         double_type bidSz;
@@ -125,7 +121,7 @@ namespace rest {
         double_type openUtc0;
         double_type changeUtc;
         double_type change;
-        
+
         static spot_ticker_t construct(simdjson::ondemand::document &doc);
         static spot_ticker_t construct(simdjson::ondemand::object &obj);
         friend std::ostream &operator<<(std::ostream &os, const spot_ticker_t &f);
@@ -138,658 +134,212 @@ namespace rest {
         friend std::ostream &operator<<(std::ostream &os, const spot_tickers_t &f);
     };
 
-    struct trade_t {
-        std::string_view symbol;
-        std::string_view tradeId;
-        _side side;
-        double_type fillPrice;
-        double_type fillQuantity;
-        std::size_t fillTime;
+    struct spot_fills_t {
+        struct spot_fill_t {
+            std::string_view symbol;
+            std::string_view tradeId;
+            _side side;
+            double_type fillPrice;
+            double_type fillQuantity;
+            time_t fillTime;
 
-        static trade_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const trade_t &f);
-    };
-    
-    struct trades_t {
-        std::vector<trade_t> trades;
+            static spot_fill_t construct(simdjson::ondemand::object &obj);
+            friend std::ostream &operator<<(std::ostream &os, const spot_fill_t &f);
+        };
+        std::vector<spot_fill_t> fills;
 
-        static trades_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const trades_t &f);
-    };
-
-    struct candle_t {
-        double_type open;
-        double_type high;
-        double_type low;
-        double_type close;
-        double_type quoteVol;
-        double_type baseVol;
-        std::size_t ts;
-
-        static candle_t construct(simdjson::ondemand::object &obj);
-        static candle_t construct(simdjson::ondemand::array &arr);
-        friend std::ostream &operator<<(std::ostream &os, const candle_t &f);
+        static spot_fills_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const spot_fills_t &f);
     };
 
-    struct candles_t {
-        std::vector<candle_t> candles;
+    struct spot_candles_t {
+        struct spot_candle_t {
+            double_type open;
+            double_type high;
+            double_type low;
+            double_type close;
+            double_type quoteVol;
+            double_type baseVol;
+            double_type usdtVol;
+            time_t ts;
 
-        static candles_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const candles_t &f);
+            static spot_candle_t construct(simdjson::ondemand::object &obj);
+            friend std::ostream &operator<<(std::ostream &os, const spot_candle_t &f);
+        };
+        std::vector<spot_candle_t> candles;
+
+        static spot_candles_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const spot_candles_t &f);
     };
-    
-    struct depth_t {
+
+    struct spot_depth_t {
         std::map<double_type, double_type> asks;
         std::map<double_type, double_type> bids;
-        std::size_t timestamp;
+        time_t timestamp;
 
-        static depth_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const depth_t &f);
+        static spot_depth_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const spot_depth_t &f);
+    };
+
+    struct spot_vip_rates_t {
+        struct rate_t {
+            uint64_t level;
+            double_type dealAmount;
+            double_type assetAmount;
+            double_type takerFeeRate;
+            double_type makerFeeRate;
+            double_type withdrawAmount;
+            double_type withdrawAmountUSDT;
+
+            static rate_t construct(simdjson::ondemand::object &obj);
+            friend std::ostream &operator<<(std::ostream &os, const rate_t &f);
+        };
+        std::vector<rate_t> rates;
+
+        static spot_vip_rates_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const spot_vip_rates_t &f);
+    };
+
+    struct transfer_req_t {
+        _from_to_type fromType;
+        _from_to_type toType;
+        double_type amount;
+        const char* coin;
+        const char* clientOid;
+
+        static transfer_req_t construct(_from_to_type fromType, _from_to_type toType, double_type amount, const char* coin, const char* clientOid = "");
+        friend std::ostream &operator<<(std::ostream &os, const transfer_req_t &f);
     };
 
     struct transfer_res_t {
-        std::string_view msg;
+        bool success;
 
         static transfer_res_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const transfer_res_t &f);
     };
 
-    struct address_t {
+    struct deposit_address_t {
         std::string_view address;
         std::string_view chain;
         std::string_view coin;
         std::string_view tag;
         std::string_view url;
 
-        static address_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const address_t &f);
+        static deposit_address_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const deposit_address_t &f);
     };
-    
+
+    struct withdraw_req_t {
+        const char* coin;
+        const char* address;
+        const char* chain;
+        double_type amount;
+        const char* tag;
+        const char* remark;
+        const char* clientOid;
+
+        static withdraw_req_t construct(const char* coin, const char* address, const char* chain, double_type amount, const char* tag = "", const char* remark = "", const char* clientOid = "");
+        friend std::ostream &operator<<(std::ostream &os, const withdraw_req_t &f);
+    };
+
+    struct inner_withdraw_req_t {
+        const char* coin;
+        const char* toUid;
+        double_type amount;
+        const char* clientOid;
+
+        static inner_withdraw_req_t construct(const char* coin, const char* toUid, double_type amount, const char* clientOid = "");
+        friend std::ostream &operator<<(std::ostream &os, const inner_withdraw_req_t &f);
+    };
+
     struct withdraw_res_t {
-        std::string_view data;
+        bool success;
+        std::string_view orderId;
 
         static withdraw_res_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const withdraw_res_t &f);
     };
 
-    struct deposit_withdrawal_t {
-        std::string_view id;
-        std::string_view txId;
-        std::string_view coin;
-        std::string_view type;
-        double_type amount;
-        std::string_view status;
-        std::string_view toAddress;
-        double_type fee;
-        std::string_view chain;
-        std::size_t confirm;
-        std::size_t cTime;
-        std::size_t uTime;
+    struct tx_list_t {
+        struct tx_t {
+            std::string_view id;
+            std::string_view txId;
+            std::string_view coin;
+            std::string_view type;
+            double_type amount;
+            std::string_view status;
+            std::string_view toAddress;
+            double_type fee;
+            std::string_view chain;
+            uint64_t confirm;
+            time_t cTime;
+            time_t uTime;
 
-        static deposit_withdrawal_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const deposit_withdrawal_t &f);
-    };
+            static tx_t construct(simdjson::ondemand::object &obj);
+            friend std::ostream &operator<<(std::ostream &os, const tx_t &f);
+        };
+        std::vector<tx_t> transactions;
 
-    struct deposit_withdrawals_t {
-        std::vector<deposit_withdrawal_t> deposit_withdrawals;
-
-        static deposit_withdrawals_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const deposit_withdrawals_t &f);
+        static tx_list_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const tx_list_t &f);
     };
 
     struct apikey_t {
-        std::string_view userId;
-        std::string_view inviterId;
-        std::string_view agentInviterCode;
+        uint64_t user_id;
+        std::string_view inviter_id;
+        std::string_view agent_inviter_code;
         std::string_view channel;
         std::string_view ips;
-        std::set<std::string> auths;
-        std::size_t parentId;
+        std::vector<std::string> auths;
+        uint64_t parentId;
         bool trader;
 
         static apikey_t construct(simdjson::ondemand::document &doc);
         friend std::ostream &operator<<(std::ostream &os, const apikey_t &f);
     };
 
-    struct spot_account_t {
-        struct coin_t {
-            std::size_t coinId;
+    struct assets_t {
+        struct asset_t {
+            uint64_t coinId;
             std::string_view coinName;
             double_type available;
+            double_type frozen;
             double_type lock;
-            std::size_t uTime;
+            time_t uTime;
+
+            static asset_t construct(simdjson::ondemand::object &obj);
+            friend std::ostream &operator<<(std::ostream &os, const asset_t &f);
+        };
+        std::vector<asset_t> assets;
+
+        static assets_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const assets_t &f);
+    };
+
+    struct spot_bills_req_t {
+        uint64_t coinId;
+        _group_type groupType;
+        _biz_type bizType;
+        uint64_t before;
+        uint64_t after;
+        int limit;
+
+        static spot_bills_req_t construct(uint64_t coinId, _group_type groupType = _group_type::_deposit, _biz_type bizType = _biz_type::_deposit, uint64_t before = 0, uint64_t after = 0, int limit = 100);
+        friend std::ostream &operator<<(std::ostream &os, const spot_bills_req_t &f);
+    };
+
+    struct spot_bills_t {
+        struct spot_bill_t {
+            time_t cTime;
             
-            static coin_t construct(simdjson::ondemand::object &obj);
-            friend std::ostream &operator<<(std::ostream &os, const coin_t &f);
+
+            static spot_bill_t construct(simdjson::ondemand::object &obj);
+            friend std::ostream &operator<<(std::ostream &os, const spot_bill_t &f);
         };
-        std::vector<coin_t> coins;
+        std::vector<spot_bill_t> bills;
 
-        static spot_account_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const spot_account_t &f);
-    };
-
-    struct bills_t {
-        struct bill_t {
-            std::size_t cTime;
-            std::size_t coinId;
-            std::string_view coinName;
-            _group_type groupType;
-            _biz_type bizType;
-            double_type quantity;
-            double_type balance;
-            double_type fees;
-            std::size_t billId;
-
-            static bill_t construct(simdjson::ondemand::object &obj);
-            friend std::ostream &operator<<(std::ostream &os, const bill_t &f);
-        };
-        std::vector<bill_t> bills;
-
-        static bills_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const bills_t &f);
-    };
-
-    struct transfers_t {
-        struct transfer_t {
-            std::string_view coinName;
-            std::string_view status;
-            std::string_view toType;
-            std::string_view toSymbol;
-            std::string_view fromType;
-            std::string_view fromSymbol;
-            double_type amount;
-            std::size_t tradeTime;
-
-            static transfer_t construct(simdjson::ondemand::object &obj);
-            friend std::ostream &operator<<(std::ostream &os, const transfer_t &f);
-        };
-        std::vector<transfer_t> transfers;
-
-        static transfers_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const transfers_t &f);
-    };
-
-    struct spot_order_res_t {
-        std::string_view orderId;
-        std::string_view clientOrderId;
-        std::string_view errorMsg;
-
-        static spot_order_res_t construct(simdjson::ondemand::document &doc);
-        static spot_order_res_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const spot_order_res_t &f);
-    };
-
-    struct spot_orders_res_t {
-        std::vector<spot_order_res_t> success;
-        std::vector<spot_order_res_t> fail;
-
-        static spot_orders_res_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const spot_orders_res_t &f);
-    };
-
-    struct spot_cancel_res_t {
-        std::vector<std::string_view> orderId;
-
-        static spot_cancel_res_t construct(simdjson::ondemand::document &doc);
-        static spot_cancel_res_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const spot_cancel_res_t &f);
-    };
-
-    struct spot_order_t {
-        std::size_t accountId;
-        std::string_view symbol;
-        std::string_view orderId;
-        std::string_view clientOrderId;
-        double_type price;
-        double_type quantity;
-        _order_type orderType;
-        _side side;
-        _status status;
-        double_type fillPrice;
-        double_type fillQuantity;
-        double_type fillTotalAmount;
-        std::size_t cTime;
-
-        static spot_order_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const spot_order_t &f);
-    };
-    
-    struct spot_orders_t {
-        std::vector<spot_order_t> spot_orders;
-
-        static spot_orders_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const spot_orders_t &f);
-    };
-
-    struct transaction_t {
-        std::size_t accountId;
-        std::string_view symbol;
-        std::string_view orderId;
-        std::string_view fillId;
-        _order_type orderType;
-        _side side;
-        double_type fillPrice;
-        double_type fillQuantity;
-        double_type fillTotalAmount;
-        std::size_t cTime;
-        std::string_view feeCcy;
-        double_type fees;
-
-        static transaction_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const transaction_t &f);
-    };
-
-    struct transactions_t {
-        std::vector<transaction_t> transactions;
-
-        static transactions_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const transactions_t &f);
-    };
-
-    struct spot_plan_order_res_t {
-        std::string_view orderId;
-        std::string_view clientOrderId;
-
-        static spot_plan_order_res_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const spot_plan_order_res_t &f);
-    };
-
-    struct cancel_spot_plan_order_res_t {
-        std::string_view orderId;
-
-        static cancel_spot_plan_order_res_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const cancel_spot_plan_order_res_t &f);
-    };
-
-    struct spot_plan_order_t {
-        std::string_view orderId;
-        std::string_view symbol;
-        double_type size;
-        double_type executePrice;
-        double_type triggerPrice;
-        _plan_status status;
-        _order_type orderType;
-        _side side;
-        _trigger_type triggerType;
-        std::size_t cTime;
-
-        static spot_plan_order_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const spot_plan_order_t &f);
-    };
-
-    struct spot_plan_orders_t {
-        std::vector<spot_plan_order_t> orders;
-
-        static spot_plan_orders_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const spot_plan_orders_t &f);
-    };
-
-//------------------------------------------------------------------------------
-
-    // Futures endpoints
-
-    struct contract_t {
-        std::string_view baseCoin;
-        std::string_view quoteCoin;
-        std::string_view symbol;
-        double_type buyLimitPriceRatio;
-        double_type sellLimitPriceRatio;
-        double_type feeRateUpRatio;
-        double_type openCostUpRatio;
-        double_type sizeMultiplier;
-        double_type makerFeeRate;
-        double_type takerFeeRate;
-        double_type minTradeNum;
-        std::size_t priceEndStep;
-        std::size_t pricePlace;
-        std::size_t volumePlace;
-        std::string_view symbolType;
-        std::vector<std::string> supportMarginCoins;
-
-        static contract_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const contract_t &f);
-    };
-
-    struct contracts_t {
-        std::vector<contract_t> contracts;
-
-        static contracts_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const contracts_t &f);
-    };
-
-    struct futures_ticker_t {
-        std::string_view symbol;
-        double_type last;
-        double_type bestAsk;
-        double_type bestBid;
-        double_type bidSz;
-        double_type askSz;
-        double_type high24h;
-        double_type low24h;
-        std::size_t timestamp;
-        double_type priceChangePercent;
-        double_type baseVolume;
-        double_type quoteVolume;
-        double_type usdtVolume;
-        double_type openUtc;
-        double_type chgUtc;
-
-        static futures_ticker_t construct(simdjson::ondemand::document &doc);
-        static futures_ticker_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const futures_ticker_t &f);
-    };
-
-    struct futures_tickers_t {
-        std::vector<futures_ticker_t> tickers;
-
-        static futures_tickers_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const futures_tickers_t &f);
-    };
-
-    struct fills_t {
-        struct fill_t {
-            std::string_view tradeId;
-            double_type price;
-            double_type size;
-            _side side;
-            std::size_t timestamp;
-            std::string_view symbol;
-
-            static fill_t construct(simdjson::ondemand::object &obj);
-            friend std::ostream &operator<<(std::ostream &os, const fill_t &f);
-        };
-        std::vector<fill_t> fills;
-
-        static fills_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const fills_t &f);
-    };
-
-    struct index_t {
-        std::string_view symbol;
-        double_type index;
-        std::size_t timestamp;
-
-        static index_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const index_t &f);
-    };
-
-    struct funding_t {
-        std::string_view symbol;
-        std::size_t fundingTime;
-        double_type fundingRate;
-
-        static funding_t construct(simdjson::ondemand::document &doc);
-        static funding_t construct(simdjson::ondemand::object &obj);
-        friend std::ostream &operator<<(std::ostream &os, const funding_t &f);
-    };
-
-    struct fundings_t {
-        std::vector<funding_t> fundings;
-
-        static fundings_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const fundings_t &f);
-    };
-
-    struct open_interest_t {
-        std::string_view symbol;
-        double_type amount;
-        std::size_t timestamp;
-
-        static open_interest_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const open_interest_t &f);
-    };
-
-    struct mark_price_t {
-        std::string_view symbol;
-        double_type markPrice;
-        std::size_t timestamp;
-
-        static mark_price_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const mark_price_t &f);
-    };
-
-    struct leverage_t {
-        std::string_view symbol;
-        std::size_t minLeverage;
-        std::size_t maxLeverage;
-
-        static leverage_t construct(simdjson::ondemand::document &doc);
-        friend std::ostream &operator<<(std::ostream &os, const leverage_t &f);
-    };
-
-    struct futures_account_t {
-        std::string_view marginCoin;
-        double_type locked;
-        double_type available;
-        double_type crossMaxAvailable;
-        double_type fixedMaxAvailable;
-        double_type maxTransferOut;
-        double_type equity;
-        double_type usdtEquity;
-        double_type btcEquity;
-        double_type crossRiskRate;
-        std::size_t crossMarginLeverage;
-        std::size_t fixedLongLeverage;
-        std::size_t fixedShortLeverage;
-        _margin_mode marginMode;
-        _hold_mode holdMode;
-
-        static futures_account_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_account_t &f);
-    };
-
-    struct futures_accounts_t {
-        std::string_view marginCoin;
-        double_type locked;
-        double_type available;
-        double_type crossMaxAvailable;
-        double_type fixedMaxAvailable;
-        double_type maxTransferOut;
-        double_type equity;
-        double_type usdtEquity;
-        double_type btcEquity;
-
-        static futures_accounts_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_accounts_t &f);
-    };
-
-    struct position_t {
-        std::string_view marginCoin;
-        std::string_view symbol;
-        _hold_side holdSide;
-        double_type openDelegateCount;
-        double_type margin;
-        double_type available;
-        double_type locked;
-        double_type total;
-        std::size_t leverage;
-        double_type achievedProfits;
-        double_type averageOpenPrice;
-        _margin_mode marginMode;
-        _hold_mode holdMode;
-        double_type unrealizedPL;
-        double_type keepMarginRate;
-        double_type marketPrice;
-        std::size_t cTime;
-
-        static position_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const position_t &f);
-    };
-
-    struct futures_bill_t {
-        std::string_view id;
-        std::string_view symbol;
-        std::string_view marginCoin;
-        double_type amount;
-        double_type fee;
-        double_type feeByCoupon;
-        std::string_view feeCoin;
-        _business business;
-        std::size_t cTime;
-
-        static futures_bill_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_bill_t &f);
-    };
-
-    struct coin_leverage_t {
-        std::string_view symbol;
-        std::string_view marginCoin;
-        std::size_t longLeverage;
-        std::size_t shortLeverage;
-        _margin_mode marginMode;
-
-        static coin_leverage_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const coin_leverage_t &f);
-    };
-
-    struct futures_open_order_t {
-        std::string_view symbol;
-        double_type size;
-        std::string_view orderId;
-        std::string_view clientOid;
-        double_type filledQty;
-        double_type fee;
-        double_type price;
-        _status state;
-        _trade_side side;
-        _force timeInForce;
-        double_type totalProfits;
-        _hold_side posSide;
-        std::string_view marginCoin;
-        _order_type orderType;
-        std::size_t cTime;
-
-        static futures_open_order_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_open_order_t &f);
-    };
-
-    struct futures_history_order_t {
-        std::string_view symbol;
-        double_type size;
-        std::string_view orderId;
-        std::string_view clientOid;
-        double_type filledQty;
-        double_type fee;
-        double_type price;
-        double_type priceAvg;
-        _status state;
-        _trade_side side;
-        _force timeInForce;
-        double_type totalProfits;
-        _hold_side posSide;
-        std::string_view marginCoin;
-        double_type filledAmount;
-        _order_type orderType;
-        std::size_t leverage;
-        _margin_mode marginMode;
-        std::size_t cTime;
-        std::size_t uTime;
-
-        static futures_history_order_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_history_order_t &f);
-    };
-
-    struct futures_product_type_history_t {
-        std::string_view symbol;
-        double_type size;
-        std::string_view orderId;
-        std::string_view clientOid;
-        double_type filledQty;
-        double_type fee;
-        double_type price;
-        _status state;
-        _trade_side side;
-        _force timeInForce;
-        double_type totalProfits;
-        _hold_side posSide;
-        std::string_view marginCoin;
-        std::size_t leverage;
-        _margin_mode marginMode;
-        _order_type orderType;
-        std::size_t cTime;
-
-        static futures_product_type_history_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_product_type_history_t &f);
-    };
-
-    struct futures_order_details_t {
-        std::string_view symbol;
-        double_type size;
-        std::string_view orderId;
-        std::string_view clientOid;
-        double_type filledQty;
-        double_type fee;
-        double_type price;
-        _status state;
-        _trade_side side;
-        _force timeInForce;
-        double_type totalProfits;
-        _hold_side posSide;
-        std::string_view marginCoin;
-        double_type presetTakeProfitPrice;
-        double_type presetStopLossPrice;
-        double_type filledAmount;
-        _order_type orderType;
-        std::size_t cTime;
-        std::size_t uTime;
-
-        static futures_order_details_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_order_details_t &f);
-    };
-
-    struct futures_plan_order_t {
-        std::string_view orderId;
-        std::string_view symbol;
-        std::string_view marginCoin;
-        double_type size;
-        double_type executePrice;
-        double_type triggerPrice;
-        _plan_status status;
-        _order_type orderType;
-        _plan_type planType;
-        _trade_side side;
-        _trigger_type triggerType;
-        double_type presetTakeProfitPrice;
-        double_type presetStopLossPrice;
-        std::size_t cTime;
-
-        static futures_plan_order_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_plan_order_t &f);
-    };
-
-    struct futures_history_plan_order_t {
-        std::string_view orderId;
-        std::string_view executeOrderId;
-        std::string_view symbol;
-        std::string_view marginCoin;
-        double_type size;
-        double_type executePrice;
-        double_type triggerPrice;
-        _plan_status status;
-        _order_type orderType;
-        _plan_type planType;
-        _trade_side side;
-        _trigger_type triggerType;
-        double_type presetTakeProfitPrice;
-        double_type presetStopLossPrice;
-        std::size_t cTime;
-
-        static futures_history_plan_order_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_history_plan_order_t &f);
-    };
-
-    struct futures_fill_t {
-        std::string_view tradeId;
-        std::string_view symbol;
-        std::string_view orderId;
-        double_type price;
-        double_type sizeQty;
-        double_type fee;
-        _trade_side side;
-        std::size_t cTime;
-
-        static futures_fill_t construct(const simdjson::padded_string json);
-        friend std::ostream &operator<<(std::ostream &os, const futures_fill_t &f);
+        static spot_bills_t construct(simdjson::ondemand::document &doc);
+        friend std::ostream &operator<<(std::ostream &os, const spot_bills_t &f);
     };
 
 //------------------------------------------------------------------------------

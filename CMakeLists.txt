@@ -3,13 +3,6 @@ project(bg_api)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Run genLUTs.py
-find_package(PythonInterp 3.9 REQUIRED)
-execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} genLUTs.py
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/include/bg_api
-)
-
 #set(Boost_DEBUG 1)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address /O2")
 
@@ -31,7 +24,6 @@ set(BG_API_HEADERS
     include/bg_api/message.hpp
     include/bg_api/types.hpp
     include/bg_api/websocket.hpp
-    include/bg_api/LUTs.hpp
     include/bg_api/simdjson.h
 )
 
@@ -41,7 +33,6 @@ set(BG_API_SOURCES
     src/errors.cpp
     src/types.cpp
     src/websocket.cpp
-    include/bg_api/LUTs.cpp
     include/bg_api/simdjson.cpp
 )
 
