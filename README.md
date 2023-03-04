@@ -1,5 +1,5 @@
 # bg_api
-Bitget API implemented in C++ for both synchronous and asynchronous way. Based on niXman's Binance C++ API.
+Bitget API implemented in C++ for both synchronous and asynchronous way. Based on niXman's [Binance C++ API](https://github.com/niXman/binapi).
 
 Note: This project is currently a work in progress. The expected date of completion is the end of May 2023.
 
