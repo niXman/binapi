@@ -250,6 +250,16 @@ struct exchange_info_t {
                 friend std::ostream &operator<<(std::ostream &os, const trailing_delta_t &f);
             };
 
+            struct notional_t {
+                double_type minNotional;
+                bool applyMinToMarket;
+                double_type maxNotional;
+                bool applyMaxToMarket;
+                std::size_t avgPriceMins;
+
+                friend std::ostream &operator<<(std::ostream &os, const notional_t &f);
+            };
+
             std::string filterType;
             boost::variant<
                  price_t
@@ -263,6 +273,7 @@ struct exchange_info_t {
                 ,max_num_algo_orders_t
                 ,max_position_t
                 ,trailing_delta_t
+                ,notional_t
             > filter;
 
             friend std::ostream &operator<<(std::ostream &os, const filter_t &f);
@@ -287,6 +298,8 @@ struct exchange_info_t {
         { return get_filter<filter_t::percent_price_t>(); }
         const filter_t::percent_price_by_side_t& get_filter_percent_price_by_side() const
         { return get_filter<filter_t::percent_price_by_side_t>(); }
+        const filter_t::notional_t& get_filter_notional() const
+        { return get_filter<filter_t::notional_t>(); }
         const filter_t::lot_size_t& get_filter_lot_size() const
         { return get_filter<filter_t::lot_size_t>(); }
         const filter_t::market_lot_size_t& get_filter_market_lot_size() const
