@@ -426,10 +426,12 @@ websockets::handle websockets::diff_depth(const char *pair, e_freq freq, on_diff
 
 /*************************************************************************************************/
 
-websockets::handle websockets::klines(const char *pair, const char *period, on_kline_received_cb cb) {
-    static const auto switch_ = [](const char *period) -> const char * {
-        const auto hash = fnv1a(period);
+websockets::handle websockets::klines(const char *pair, const char *interval, on_kline_received_cb cb) {
+    static const auto switch_ = [](const char *interval) -> const char * {
+        const auto hash = fnv1a(interval);
         switch ( hash ) {
+            // secs
+            case fnv1a("1s"): return "kline_1s";
             // mins
             case fnv1a("1m"): return "kline_1m";
             case fnv1a("3m"): return "kline_3m";
@@ -454,7 +456,7 @@ websockets::handle websockets::klines(const char *pair, const char *period, on_k
         }
     };
 
-    const char *p = switch_(period);
+    const char *p = switch_(interval);
     assert(p != nullptr);
 
     return pimpl->start_channel(pair, p, std::move(cb));

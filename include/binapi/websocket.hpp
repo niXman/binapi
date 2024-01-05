@@ -75,8 +75,8 @@ struct websockets {
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams
     using on_kline_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, kline_t msg)>;
-    // period - 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
-    handle klines(const char *pair, const char *period, on_kline_received_cb cb);
+    // interval - 1s, 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
+    handle klines(const char *pair, const char *interval, on_kline_received_cb cb);
 
     // https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#trade-streams
     using on_trade_received_cb = std::function<bool(const char *fl, int ec, std::string errmsg, trade_t msg)>;

@@ -26,6 +26,20 @@ int main() {
         ,"9443"
     };
 
+    ws.klines("BTCUSDT", "1s",
+        [](const char *fl, int ec, std::string emsg, auto klines){
+            if ( ec ) {
+                std::cerr << "subscribe klines error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+
+                return false;
+            }
+
+            std::cout << "klines: " << klines << std::endl;
+
+            return true;
+        }
+    );
+
     ws.part_depth("BTCUSDT", binapi::e_levels::_5, binapi::e_freq::_100ms,
         [](const char *fl, int ec, std::string emsg, auto depths) {
             if ( ec ) {
