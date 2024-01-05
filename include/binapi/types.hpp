@@ -176,6 +176,10 @@ struct exchange_info_t {
         std::size_t quotePrecision;
         std::vector<std::string> orderTypes;
         bool icebergAllowed;
+        bool ocoAllowed;
+        bool quoteOrderQtyMarketAllowed;
+        bool allowTrailingStop;
+        bool cancelReplaceAllowed;
 
         struct filter_t {
             struct price_t {
@@ -321,6 +325,7 @@ struct exchange_info_t {
     };
 
     std::map<std::string, symbol_t> symbols;
+    std::size_t permissions;
 
     bool is_valid_symbol(const std::string &sym) const
         { return is_valid_symbol(sym.c_str()); }

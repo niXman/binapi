@@ -88,6 +88,22 @@ const char* e_trade_resp_type_to_string(e_trade_resp_type resp);
 
 /*************************************************************************************************/
 
+enum class e_permissions: std::size_t {
+     NONE        = 1u << 0
+    ,SPOT        = 1u << 1
+    ,MARGIN      = 1u << 2
+    ,LEVERAGED   = 1u << 3
+    ,TRD_GRP_002 = 1u << 4
+    ,TRD_GRP_003 = 1u << 5
+    ,TRD_GRP_004 = 1u << 6
+    ,TRD_GRP_005 = 1u << 7
+};
+
+e_permissions e_permissions_from_string(const char *str);
+const char* e_permissions_to_string(e_permissions resp);
+
+/*************************************************************************************************/
+
 } // ns binapi
 
 #endif // __binapi__enums_hpp

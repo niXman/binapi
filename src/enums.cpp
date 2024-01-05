@@ -128,4 +128,39 @@ const char* e_trade_resp_type_to_string(e_trade_resp_type resp) {
 
 /*************************************************************************************************/
 
+e_permissions e_permissions_from_string(const char *str) {
+    const auto hash = fnv1a(str);
+    switch ( hash ) {
+        case fnv1a("NONE"): return e_permissions::NONE;
+        case fnv1a("SPOT"): return e_permissions::SPOT;
+        case fnv1a("MARGIN"): return e_permissions::MARGIN;
+        case fnv1a("LEVERAGED"): return e_permissions::LEVERAGED;
+        case fnv1a("TRD_GRP_002"): return e_permissions::TRD_GRP_002;
+        case fnv1a("TRD_GRP_003"): return e_permissions::TRD_GRP_003;
+        case fnv1a("TRD_GRP_004"): return e_permissions::TRD_GRP_004;
+        case fnv1a("TRD_GRP_005"): return e_permissions::TRD_GRP_005;
+    }
+
+    assert(!"unreachable");
+}
+
+const char* e_permissions_to_string(e_permissions resp) {
+    switch ( resp ) {
+        case e_permissions::NONE: return "NONE";
+        case e_permissions::SPOT: return "SPOT";
+        case e_permissions::MARGIN: return "MARGIN";
+        case e_permissions::LEVERAGED: return "LEVERAGED";
+        case e_permissions::TRD_GRP_002: return "TRD_GRP_002";
+        case e_permissions::TRD_GRP_003: return "TRD_GRP_003";
+        case e_permissions::TRD_GRP_004: return "TRD_GRP_004";
+        case e_permissions::TRD_GRP_005: return "TRD_GRP_005";
+    }
+
+    assert(!"unreachable");
+
+    return nullptr;
+}
+
+/*************************************************************************************************/
+
 } // ns binapi
