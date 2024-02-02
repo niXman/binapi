@@ -914,8 +914,8 @@ api::new_order(
         : e_time_to_string(time)
     ;
 
-    const char *responce_type = e_trade_resp_type_to_string(resp);
-    assert(responce_type);
+    const char *response_type = e_trade_resp_type_to_string(resp);
+    assert(response_type);
 
     const impl::init_list_type map = {
          {"symbol", symbol}
@@ -927,7 +927,7 @@ api::new_order(
         ,{"newClientOrderId", client_order_id}
         ,{"stopPrice", stop_price}
         ,{"icebergQty", iceberg_amount}
-        ,{"newOrderRespType", responce_type}
+        ,{"newOrderRespType", response_type}
     };
 
     return pimpl->post(true, "/api/v3/order", boost::beast::http::verb::post, map, std::move(cb));
@@ -957,8 +957,8 @@ api::new_test_order(
 
     const char *time_str = type == e_type::market ? nullptr : e_time_to_string(time);
 
-    const char *responce_type = e_trade_resp_type_to_string(resp);
-    assert(responce_type);
+    const char *response_type = e_trade_resp_type_to_string(resp);
+    assert(response_type);
 
     const impl::init_list_type map = {
          {"symbol", symbol}
@@ -970,7 +970,7 @@ api::new_test_order(
         ,{"newClientOrderId", client_order_id}
         ,{"stopPrice", stop_price}
         ,{"icebergQty", iceberg_amount}
-        ,{"newOrderRespType", responce_type}
+        ,{"newOrderRespType", response_type}
     };
 
     return pimpl->post(true, "/api/v3/order/test", boost::beast::http::verb::post, map, std::move(cb));

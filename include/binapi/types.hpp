@@ -538,7 +538,7 @@ struct new_order_resp_type
     >::variant;
 
     std::pair<e_trade_resp_type, const void *>
-    get_responce_type() const {
+    get_response_type() const {
         if ( const auto *p = boost::get<new_order_info_ack_t>(this) ) {
             return {e_trade_resp_type::ACK, p};
         } else if ( const auto *p = boost::get<new_order_info_result_t>(this) ) {
@@ -552,39 +552,39 @@ struct new_order_resp_type
         return {e_trade_resp_type::UNKNOWN, nullptr};
     }
 
-    bool is_valid_responce_type()  const { const auto r =  get_responce_type(); return r.first != e_trade_resp_type::UNKNOWN; }
-    bool is_ack_responce_type()    const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::ACK; }
-    bool is_result_responce_type() const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::RESULT; }
-    bool is_full_responce_type()   const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::FULL; }
-    bool is_test_responce_type()   const { const auto r =  get_responce_type(); return r.first == e_trade_resp_type::TEST; }
+    bool is_valid_response_type()  const { const auto r =  get_response_type(); return r.first != e_trade_resp_type::UNKNOWN; }
+    bool is_ack_response_type()    const { const auto r =  get_response_type(); return r.first == e_trade_resp_type::ACK; }
+    bool is_result_response_type() const { const auto r =  get_response_type(); return r.first == e_trade_resp_type::RESULT; }
+    bool is_full_response_type()   const { const auto r =  get_response_type(); return r.first == e_trade_resp_type::FULL; }
+    bool is_test_response_type()   const { const auto r =  get_response_type(); return r.first == e_trade_resp_type::TEST; }
 
-    const new_order_info_ack_t& get_responce_ack() const {
-        const auto r =  get_responce_type();
+    const new_order_info_ack_t& get_response_ack() const {
+        const auto r =  get_response_type();
         assert(r.first == e_trade_resp_type::ACK);
 
         return *static_cast<const new_order_info_ack_t *>(r.second);
     }
-    const new_order_info_result_t& get_responce_result() const {
-        const auto r =  get_responce_type();
+    const new_order_info_result_t& get_response_result() const {
+        const auto r =  get_response_type();
         assert(r.first == e_trade_resp_type::RESULT);
 
         return *static_cast<const new_order_info_result_t *>(r.second);
     }
-    const new_order_info_full_t& get_responce_full() const {
-        const auto r =  get_responce_type();
+    const new_order_info_full_t& get_response_full() const {
+        const auto r =  get_response_type();
         assert(r.first == e_trade_resp_type::FULL);
 
         return *static_cast<const new_order_info_full_t *>(r.second);
     }
-    const new_test_order_info_t& get_responce_test() const {
-        const auto r =  get_responce_type();
+    const new_test_order_info_t& get_response_test() const {
+        const auto r =  get_response_type();
         assert(r.first == e_trade_resp_type::TEST);
 
         return *static_cast<const new_test_order_info_t *>(r.second);
     }
 
     std::size_t get_order_id() const {
-        const auto r =  get_responce_type();
+        const auto r =  get_response_type();
         assert(
             r.first == e_trade_resp_type::ACK ||
             r.first == e_trade_resp_type::RESULT ||
