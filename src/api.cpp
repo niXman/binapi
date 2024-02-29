@@ -128,6 +128,7 @@ std::string hmac_sha256(const char *key, std::size_t klen, const char *data, std
     return b2a_hex(digest, dilen);
 }
 
+// unused for now
 bool verify_signature(const unsigned char* sig, std::size_t slen, const char* data, std::size_t dlen)
 {
     bool result = true;
@@ -157,7 +158,8 @@ bool verify_signature(const unsigned char* sig, std::size_t slen, const char* da
     return result;
 }
 
-static std::string rsa_sha256(const char* privkeyfile, std::size_t pklen, const char *data, std::size_t dlen )
+// unused for now
+std::string rsa_sha256(const char* privkeyfile, std::size_t /*pklen*/, const char *data, std::size_t dlen )
 {
     static EVP_PKEY *pkey = nullptr;
     if ( !pkey ) {
