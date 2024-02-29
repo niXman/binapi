@@ -62,13 +62,32 @@ struct websocket: std::enable_shared_from_this<websocket> {
     virtual ~websocket()
     {}
 
-    using on_message_received_cb = std::function<
-        bool(const char *fl, int ec, std::string errmsg, const char *ptr, std::size_t size)
-    >; // when 'false' returned the stop will called
-
     using holder_type = std::shared_ptr<websocket>;
-    void start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder)
-    { return async_start(host, port, target, std::move(cb), std::move(holder)); }
+
+    template<typename CB>
+    void async_start(
+         const std::string &host
+        ,const std::string &port
+        ,const std::string &target
+        ,CB cb
+        ,holder_type holder
+    ) {
+        m_host = host;
+        m_target = target;
+
+        m_resolver.async_resolve(
+             m_host
+            ,port
+            ,[this, cb=std::move(cb), holder=std::move(holder)]
+             (boost::system::error_code ec, boost::asio::ip::tcp::resolver::results_type res) mutable {
+                if ( ec ) {
+                    if ( !m_stop_requested ) { __BINAPI_CB_ON_ERROR(cb, ec); }
+                } else {
+                    async_connect(std::move(res), std::move(cb), std::move(holder));
+                }
+            }
+        );
+    }
 
     void stop() {
         m_stop_requested = true;
@@ -92,24 +111,8 @@ struct websocket: std::enable_shared_from_this<websocket> {
     }
 
 private:
-    void async_start(const std::string &host, const std::string &port, const std::string &target, on_message_received_cb cb, holder_type holder) {
-        m_host = host;
-        m_target = target;
-
-        m_resolver.async_resolve(
-             m_host
-            ,port
-            ,[this, cb=std::move(cb), holder=std::move(holder)]
-             (boost::system::error_code ec, boost::asio::ip::tcp::resolver::results_type res) mutable {
-                if ( ec ) {
-                    if ( !m_stop_requested ) { __BINAPI_CB_ON_ERROR(cb, ec); }
-                } else {
-                    async_connect(std::move(res), std::move(cb), std::move(holder));
-                }
-            }
-        );
-    }
-    void async_connect(boost::asio::ip::tcp::resolver::results_type res, on_message_received_cb cb, holder_type holder) {
+    template<typename CB>
+    void async_connect(boost::asio::ip::tcp::resolver::results_type res, CB cb, holder_type holder) {
         if( !SSL_set_tlsext_host_name(m_ws.next_layer().native_handle() ,m_host.c_str())) {
             auto error_code = boost::beast::error_code(
                  static_cast<int>(::ERR_get_error())
@@ -135,7 +138,8 @@ private:
             }
         );
     }
-    void on_connected(on_message_received_cb cb, holder_type holder) {
+    template<typename CB>
+    void on_connected(CB cb, holder_type holder) {
         m_ws.control_callback(
             [this]
             (boost::beast::websocket::frame_type kind, boost::beast::string_view payload) mutable {
@@ -161,7 +165,8 @@ private:
             }
         );
     }
-    void on_async_ssl_handshake(on_message_received_cb cb, holder_type holder) {
+    template<typename CB>
+    void on_async_ssl_handshake(CB cb, holder_type holder) {
         m_ws.async_handshake(
              m_host
             ,m_target
@@ -170,8 +175,8 @@ private:
              { start_read(ec, std::move(cb), std::move(holder)); }
         );
     }
-
-    void start_read(boost::system::error_code ec, on_message_received_cb cb, holder_type holder) {
+    template<typename CB>
+    void start_read(boost::system::error_code ec, CB cb, holder_type holder) {
         if ( ec ) {
             if ( !m_stop_requested ) {
                 __BINAPI_CB_ON_ERROR(cb, ec);
@@ -189,7 +194,8 @@ private:
              { on_read(ec, rd, std::move(cb), std::move(holder)); }
         );
     }
-    void on_read(boost::system::error_code ec, std::size_t rd, on_message_received_cb cb, holder_type holder) {
+    template<typename CB>
+    void on_read(boost::system::error_code ec, std::size_t rd, CB cb, holder_type holder) {
         if ( ec ) {
             if ( !m_stop_requested ) {
                 __BINAPI_CB_ON_ERROR(cb, ec);
@@ -240,11 +246,20 @@ struct websocket_id_getter {
 /*************************************************************************************************/
 
 struct websockets::impl {
-    impl(boost::asio::io_context &ioctx, std::string host, std::string port, on_message_received_cb cb)
+    impl(
+         boost::asio::io_context &ioctx
+        ,std::string host
+        ,std::string port
+        ,on_message_received_cb msg_cb
+        ,on_network_stat_cb stat_cb
+        ,std::size_t stat_interval
+    )
         :m_ioctx{ioctx}
         ,m_host{std::move(host)}
         ,m_port{std::move(port)}
-        ,m_on_message{std::move(cb)}
+        ,m_on_message{std::move(msg_cb)}
+        ,m_on_stat{std::move(stat_cb)}
+        ,m_stat_interval{stat_interval}
         ,m_set{}
     {}
     ~impl() {
@@ -321,7 +336,7 @@ struct websockets::impl {
 
             try {
                 message_type message = message_type::construct(json);
-                return cb(fl, ec, std::move(errmsg), std::move(message));
+                return cb(nullptr, 0, std::string{}, std::move(message));
             } catch (const std::exception &ex) {
                 std::fprintf(stderr, "%s: %s\n", __MAKE_FILELINE, ex.what());
                 std::fflush(stderr);
@@ -330,8 +345,8 @@ struct websockets::impl {
             return false;
         };
 
-        auto *ptr = ws.get();
-        ptr->start(
+        auto *ws_ptr = ws.get();
+        ws_ptr->async_start(
              m_host
             ,m_port
             ,schannel
@@ -339,9 +354,9 @@ struct websockets::impl {
             ,std::move(ws)
         );
 
-        m_set.insert(*ptr);
+        m_set.insert(*ws_ptr);
 
-        return ptr;
+        return ws_ptr;
     }
 
     template<typename F>
@@ -382,6 +397,8 @@ struct websockets::impl {
     std::string m_host;
     std::string m_port;
     on_message_received_cb m_on_message;
+    on_network_stat_cb m_on_stat;
+    std::size_t m_stat_interval;
     boost::intrusive::set<
          websocket
         ,boost::intrusive::key_of_value<websocket_id_getter>
@@ -399,9 +416,18 @@ websockets::websockets(
      boost::asio::io_context &ioctx
     ,std::string host
     ,std::string port
-    ,on_message_received_cb cb
+    ,on_message_received_cb msg_cb
+    ,on_network_stat_cb stat_cb
+    ,std::size_t stat_interval
 )
-    :pimpl{std::make_unique<impl>(ioctx, std::move(host), std::move(port), std::move(cb))}
+    :pimpl{std::make_unique<impl>(
+         ioctx
+        ,std::move(host)
+        ,std::move(port)
+        ,std::move(msg_cb)
+        ,std::move(stat_cb)
+        ,stat_interval
+    )}
 {}
 
 websockets::~websockets()
@@ -492,9 +518,6 @@ websockets::handle websockets::markets(on_markets_received_cb cb)
 
 websockets::handle websockets::book(const char *pair, on_book_received_cb cb)
 { return pimpl->start_channel(pair, "bookTicker", std::move(cb)); }
-
-websockets::handle websockets::books(on_books_received_cb cb)
-{ return pimpl->start_channel(nullptr, "!bookTicker", std::move(cb)); }
 
 /*************************************************************************************************/
 

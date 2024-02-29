@@ -15,6 +15,8 @@
 
 #include <type_traits>
 
+#include <boost/utility/string_view.hpp>
+
 //#include <iostream> // TODO: comment out
 
 namespace binapi {
@@ -37,7 +39,8 @@ __get_json(T &v, const char *member, const flatjson::fjson &j) {
 template<typename T>
 typename std::enable_if<std::is_same<T, double_type>::value>::type
 __get_json(T &v, const char *member, const flatjson::fjson &j) {
-    v.assign(j.at(member).to_string());
+    const auto s = j.at(member).to_string();
+    v.assign(s);
 }
 
 #define __BINAPI_GET2(obj, member, json) \
