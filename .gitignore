@@ -1,0 +1,13 @@
+cmake-build-debug
+.idea
+*.so
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+asynchronous
+asynchronous-user_data
+synchronous
+synchronous-user_data
+websockets
