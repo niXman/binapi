@@ -9,9 +9,10 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/api.hpp>
-#include <binapi/invoker.hpp>
-#include <binapi/errors.hpp>
+#include <chrono>
+#include <queue>
+#include <type_traits>
+#include <iostream>
 
 #include <boost/preprocessor.hpp>
 #include <boost/callable_traits.hpp>
@@ -25,14 +26,14 @@
 #include <boost/asio/ssl/error.hpp>
 #include <boost/asio/ssl/stream.hpp>
 
-#include <chrono>
-#include <queue>
-#include <type_traits>
-#include <iostream>
-
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
+
 #include <binapi/flatjson.hpp>
+#include <binapi/api.hpp>
+#include <binapi/invoker.hpp>
+#include <binapi/errors.hpp>
+
 
 namespace binapi {
 namespace rest {

@@ -12,11 +12,11 @@
 #ifndef __binapi__api_hpp
 #define __binapi__api_hpp
 
-#include "types.hpp"
-#include "enums.hpp"
-
 #include <memory>
 #include <functional>
+
+#include <binapi/types.hpp>
+#include <binapi/enums.hpp>
 
 namespace boost {
 namespace asio {

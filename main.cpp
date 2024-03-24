@@ -9,18 +9,18 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include "binapi/websocket.hpp"
-#include "binapi/api.hpp"
-#include "binapi/pairslist.hpp"
-#include "binapi/reports.hpp"
-#include "binapi/flatjson.hpp"
+#include <iostream>
+#include <fstream>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/steady_timer.hpp>
 
-#include <iostream>
-#include <fstream>
 #include <binapi/errors.hpp>
+#include <binapi/websocket.hpp>
+#include <binapi/api.hpp>
+#include <binapi/pairslist.hpp>
+#include <binapi/reports.hpp>
+#include <binapi/flatjson.hpp>
 
 /*************************************************************************************************/
 
