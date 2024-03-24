@@ -12,10 +12,10 @@
 #ifndef __binapi__websocket_hpp
 #define __binapi__websocket_hpp
 
-#include "enums.hpp"
-
 #include <memory>
 #include <functional>
+
+#include <binapi/enums.hpp>
 
 namespace boost {
 namespace asio {

@@ -12,10 +12,10 @@
 #ifndef __binapi__tools_hpp
 #define __binapi__tools_hpp
 
-#include "double_type.hpp"
-
 #include <string>
 #include <vector>
+
+#include <binapi/double_type.hpp>
 
 namespace binapi {
 

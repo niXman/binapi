@@ -7,6 +7,7 @@ find_package(Threads REQUIRED)
 
 add_library(binapi SHARED
         src/api.cpp
+        src/dtf.cpp
         src/enums.cpp
         src/errors.cpp
         src/pairslist.cpp
@@ -22,11 +23,10 @@ target_compile_options(binapi PUBLIC
         $<$<CONFIG:DEBUG>:-g3 -Og -fno-inline -fstack-protector-all -fsanitize=address>
         $<$<CONFIG:RELEASE>:-O3 -s>)
 
-target_compile_definitions(binapi PRIVATE -DDTF_HEADER_ONLY)
+target_link_options(binapi PUBLIC
+        $<$<CONFIG:DEBUG>:-fsanitize=address>)
 
-target_link_libraries(binapi ${BOOST_LIBRARIES})
-
-target_link_libraries(binapi PUBLIC z crypto ssl ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(binapi PUBLIC z crypto ssl ${CMAKE_THREAD_LIBS_INIT} ${BOOST_LIBRARIES})
 
 target_include_directories(binapi PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

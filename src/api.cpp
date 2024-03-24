@@ -9,6 +9,8 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
+#include "binapi/api.hpp"
+
 #include <chrono>
 #include <queue>
 #include <type_traits>
@@ -30,7 +32,6 @@
 #include <openssl/sha.h>
 
 #include <binapi/flatjson.hpp>
-#include <binapi/api.hpp>
 #include <binapi/invoker.hpp>
 #include <binapi/errors.hpp>
 
