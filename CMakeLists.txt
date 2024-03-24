@@ -4,6 +4,8 @@ project(binapi)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(Threads REQUIRED)
+find_package(OpenSSL REQUIRED SSL Crypto)
+find_package(ZLIB REQUIRED)
 
 add_library(binapi SHARED
         src/api.cpp
@@ -26,7 +28,11 @@ target_compile_options(binapi PUBLIC
 target_link_options(binapi PUBLIC
         $<$<CONFIG:DEBUG>:-fsanitize=address>)
 
-target_link_libraries(binapi PUBLIC z crypto ssl ${CMAKE_THREAD_LIBS_INIT} ${BOOST_LIBRARIES})
+target_link_libraries(binapi PUBLIC
+        ZLIB::ZLIB
+        OpenSSL::Crypto OpenSSL::SSL
+        ${BOOST_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT})
 
 target_include_directories(binapi PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
