@@ -1,71 +1,46 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.22)
 project(binapi)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fsanitize=address")
+find_package(Threads REQUIRED)
 
-add_definitions(
-    -UNDEBUG
-    -DDTF_HEADER_ONLY
-)
+add_library(binapi SHARED
+        src/api.cpp
+        src/enums.cpp
+        src/errors.cpp
+        src/pairslist.cpp
+        src/reports.cpp
+        src/tools.cpp
+        src/types.cpp
+        src/websocket.cpp)
 
-include_directories(
-    ./include
-)
+target_include_directories(binapi PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-if (DEFINED ${BOOST_INCLUDE_DIR})
-    include_directories(
-        ${BOOST_INCLUDE_DIR}
-    )
-endif()
+target_compile_options(binapi PUBLIC
+        -pipe -Wall -Wextra
+        $<$<CONFIG:DEBUG>:-g3 -Og -fno-inline -fstack-protector-all -fsanitize=address>
+        $<$<CONFIG:RELEASE>:-O3 -s>)
 
-set(BINAPI_HEADERS
-    binapi/api.hpp
-    binapi/flatjson.hpp
-    binapi/dtf.hpp
-    binapi/double_type.hpp
-    binapi/enums.hpp
-    binapi/errors.hpp
-    binapi/invoker.hpp
-    binapi/message.hpp
-    binapi/pairslist.hpp
-    binapi/reports.hpp
-    binapi/tools.hpp
-    binapi/types.hpp
-    binapi/websocket.hpp
-)
+target_compile_definitions(binapi PRIVATE -DDTF_HEADER_ONLY)
 
-set(BINAPI_SOURCES
-    src/api.cpp
-    src/enums.cpp
-    src/errors.cpp
-    src/pairslist.cpp
-    src/reports.cpp
-    src/tools.cpp
-    src/types.cpp
-    src/websocket.cpp
-)
+target_link_libraries(binapi ${BOOST_LIBRARIES})
 
-add_executable(
-    ${PROJECT_NAME}
-    #
-    main.cpp
-    #
-    ${BINAPI_SOURCES}
-)
+target_link_libraries(binapi PUBLIC z crypto ssl ${CMAKE_THREAD_LIBS_INIT})
 
-if (DEFINED ${BOOST_LIB_DIR})
-    target_link_libraries(
-        ${PROJECT_NAME}
-        -L${BOOST_LIB_DIR}
-    )
-endif()
+target_include_directories(binapi PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(
-    ${PROJECT_NAME}
-    z
-    crypto
-    ssl
-    pthread
-)
+add_executable(asynchronous examples/asynchronous/main.cpp)
+target_link_libraries(asynchronous binapi)
+
+add_executable(asynchronous-user_data examples/asynchronous-user_data/main.cpp)
+target_link_libraries(asynchronous-user_data binapi)
+
+add_executable(synchronous examples/synchronous/main.cpp)
+target_link_libraries(synchronous binapi)
+
+add_executable(synchronous-user_data examples/synchronous-user_data/main.cpp)
+target_link_libraries(synchronous-user_data binapi)
+
+add_executable(websockets examples/websockets/main.cpp)
+target_link_libraries(websockets binapi)
