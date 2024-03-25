@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.2)
 project(binapi)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -36,17 +36,20 @@ target_link_libraries(binapi PUBLIC
 
 target_include_directories(binapi PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(asynchronous examples/asynchronous/main.cpp)
-target_link_libraries(asynchronous binapi)
+add_executable(example_asynchronous examples/asynchronous/main.cpp)
+target_link_libraries(example_asynchronous binapi)
 
-add_executable(asynchronous-user_data examples/asynchronous-user_data/main.cpp)
-target_link_libraries(asynchronous-user_data binapi)
+add_executable(example_asynchronous-user_data examples/asynchronous-user_data/main.cpp)
+target_link_libraries(example_asynchronous-user_data binapi)
 
-add_executable(synchronous examples/synchronous/main.cpp)
-target_link_libraries(synchronous binapi)
+add_executable(example_synchronous examples/synchronous/main.cpp)
+target_link_libraries(example_synchronous binapi)
 
-add_executable(synchronous-user_data examples/synchronous-user_data/main.cpp)
-target_link_libraries(synchronous-user_data binapi)
+add_executable(example_synchronous-user_data examples/synchronous-user_data/main.cpp)
+target_link_libraries(example_synchronous-user_data binapi)
 
-add_executable(websockets examples/websockets/main.cpp)
-target_link_libraries(websockets binapi)
+add_executable(example_websockets examples/websockets/main.cpp)
+target_link_libraries(example_websockets binapi)
+
+add_executable(example_api main.cpp)
+target_link_libraries(example_api binapi)
