@@ -17,9 +17,9 @@
 #include <cstring>
 #include <cstdio>
 
-#include "message.hpp"
-#include "flatjson.hpp"
-#include "errors.hpp"
+#include <binapi/message.hpp>
+#include <binapi/flatjson.hpp>
+#include <binapi/errors.hpp>
 
 namespace binapi {
 namespace detail {

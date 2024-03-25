@@ -9,10 +9,11 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/enums.hpp>
-#include <binapi/fnv1a.hpp>
+#include "binapi/enums.hpp"
 
 #include <cassert>
+
+#include <binapi/fnv1a.hpp>
 
 namespace binapi {
 

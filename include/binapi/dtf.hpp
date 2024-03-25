@@ -95,8 +95,4 @@ std::size_t dt_str_flags(const char *buf, std::size_t n);
 
 } // ns dtf
 
-#ifdef DTF_HEADER_ONLY
-#   include "dtf.cpp"
-#endif // DTF_HEADER_ONLY
-
 #endif // __dtf__dtf_hpp

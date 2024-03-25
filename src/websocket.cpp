@@ -9,12 +9,12 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/websocket.hpp>
-#include <binapi/types.hpp>
-#include <binapi/message.hpp>
-#include <binapi/fnv1a.hpp>
-#include <binapi/flatjson.hpp>
-#include <binapi/errors.hpp>
+#include "binapi/websocket.hpp"
+
+#include <map>
+#include <set>
+#include <cstring>
+//#include <iostream> // TODO: comment out
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/connect.hpp>
@@ -30,11 +30,12 @@
 
 #include <boost/intrusive/set.hpp>
 
-#include <map>
-#include <set>
-#include <cstring>
+#include <binapi/types.hpp>
+#include <binapi/message.hpp>
+#include <binapi/fnv1a.hpp>
+#include <binapi/flatjson.hpp>
+#include <binapi/errors.hpp>
 
-//#include <iostream> // TODO: comment out
 
 #define __BINAPI_CB_ON_ERROR(cb, ec) \
     cb(__FILE__ "(" BOOST_PP_STRINGIZE(__LINE__) ")", ec.value(), ec.message(), nullptr, 0);
