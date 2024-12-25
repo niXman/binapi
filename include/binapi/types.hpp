@@ -714,8 +714,6 @@ struct trade_t {
     std::size_t t; // Trade ID
     double_type p; // Price
     double_type q; // Quantity
-    std::size_t b; // Buyer order ID
-    std::size_t a; // Seller order ID
     std::size_t T; // Trade time
     bool m; // Is the buyer the market maker?
     bool M; // Ignore
