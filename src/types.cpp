@@ -526,7 +526,7 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     << "\"applyMinToMarket\":\"" << o.applyMinToMarket << "\","
     << "\"maxNotional\":\"" << o.maxNotional << "\","
     << "\"applyMaxToMarket\":\"" << o.applyMaxToMarket << "\","
-    << "\"avgPriceMins\":\"" << o.avgPriceMins << "\","
+    << "\"avgPriceMins\":\"" << o.avgPriceMins << "\""
     << "}";
 
     return os;
