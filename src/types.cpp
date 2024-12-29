@@ -526,7 +526,7 @@ std::ostream &operator<<(std::ostream &os, const exchange_info_t::symbol_t::filt
     << "\"applyMinToMarket\":\"" << o.applyMinToMarket << "\","
     << "\"maxNotional\":\"" << o.maxNotional << "\","
     << "\"applyMaxToMarket\":\"" << o.applyMaxToMarket << "\","
-    << "\"avgPriceMins\":\"" << o.avgPriceMins << "\","
+    << "\"avgPriceMins\":\"" << o.avgPriceMins << "\""
     << "}";
 
     return os;
@@ -1649,8 +1649,6 @@ trade_t trade_t::construct(const flatjson::fjson &json) {
     __BINAPI_GET(t);
     __BINAPI_GET(p);
     __BINAPI_GET(q);
-    __BINAPI_GET(b);
-    __BINAPI_GET(a);
     __BINAPI_GET(T);
     __BINAPI_GET(m);
     __BINAPI_GET(M);
@@ -1666,8 +1664,6 @@ std::ostream &operator<<(std::ostream &os, const trade_t &o) {
     << "\"t\":" << o.t << ","
     << "\"p\":\"" << o.p << "\","
     << "\"q\":\"" << o.q << "\","
-    << "\"b\":" << o.b << ","
-    << "\"a\":" << o.a << ","
     << "\"T\":" << o.T << ","
     << "\"m\":" << (o.m ? "true" : "false") << ","
     << "\"M\":" << (o.M ? "true" : "false")

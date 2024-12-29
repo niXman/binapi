@@ -398,7 +398,7 @@ struct agg_trades_t {
     friend std::ostream &operator<<(std::ostream &os, const agg_trades_t &s);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-data
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data
 struct klines_t {
     struct kline_t {
         std::size_t start_time;
@@ -714,8 +714,6 @@ struct trade_t {
     std::size_t t; // Trade ID
     double_type p; // Price
     double_type q; // Quantity
-    std::size_t b; // Buyer order ID
-    std::size_t a; // Seller order ID
     std::size_t T; // Trade time
     bool m; // Is the buyer the market maker?
     bool M; // Ignore
