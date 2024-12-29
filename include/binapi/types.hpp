@@ -12,16 +12,16 @@
 #ifndef __binapi__types_hpp
 #define __binapi__types_hpp
 
-#include "double_type.hpp"
-#include "enums.hpp"
-
-#include <boost/variant.hpp>
-
 #include <string>
 #include <vector>
 #include <map>
 #include <cstdint>
 #include <cassert>
+
+#include <boost/variant.hpp>
+
+#include <binapi/double_type.hpp>
+#include <binapi/enums.hpp>
 
 // forward
 namespace flatjson {

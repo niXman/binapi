@@ -9,12 +9,12 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/api.hpp>
-#include <binapi/websocket.hpp>
+#include <iostream>
 
 #include <boost/asio/io_context.hpp>
 
-#include <iostream>
+#include <binapi/api.hpp>
+#include <binapi/websocket.hpp>
 
 int main(int argc, char **argv) {
     assert(argc == 3);

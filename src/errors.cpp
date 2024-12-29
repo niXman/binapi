@@ -9,7 +9,8 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/errors.hpp>
+#include "binapi/errors.hpp"
+
 #include <binapi/flatjson.hpp>
 
 namespace binapi {

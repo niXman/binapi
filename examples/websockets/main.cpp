@@ -9,13 +9,13 @@
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
 // ----------------------------------------------------------------------------
 
-#include <binapi/api.hpp>
-#include <binapi/websocket.hpp>
+#include <iostream>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/steady_timer.hpp>
 
-#include <iostream>
+#include <binapi/api.hpp>
+#include <binapi/websocket.hpp>
 
 int main() {
     boost::asio::io_context ioctx;
