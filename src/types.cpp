@@ -1466,6 +1466,36 @@ std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o) {
 
 /*************************************************************************************************/
 
+cancel_all_open_orders_info_t cancel_all_open_orders_info_t::construct(const flatjson::fjson &json) {
+    assert(json.is_valid());
+
+    cancel_all_open_orders_info_t res{};
+    for ( auto idx = 0u; idx < json.size(); ++idx ) {
+        const auto it = json.at(idx);
+        assert(it.is_object());
+        cancel_order_info_t item = cancel_order_info_t::construct(it);
+        res.orders.push_back(std::move(item));
+    }
+
+    return res;
+}
+
+std::ostream &operator<<(std::ostream &os, const cancel_all_open_orders_info_t &o) {
+    os
+    << "[";
+    for ( auto it = o.orders.begin(); it != o.orders.end(); ++it ) {
+        os << *it;
+        if ( std::next(it) != o.orders.end() ) {
+            os << ",";
+        }
+    }
+    os << "]";
+
+    return os;
+}
+
+/*************************************************************************************************/
+
 my_trades_info_t::my_trade_info_t my_trades_info_t::my_trade_info_t::construct(const flatjson::fjson &json) {
     my_trade_info_t res{};
     __BINAPI_GET(symbol);

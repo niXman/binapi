@@ -626,6 +626,15 @@ struct cancel_order_info_t {
     friend std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o);
 };
 
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#cancel-all-open-orders-on-a-symbol-trade
+struct cancel_all_open_orders_info_t {
+
+    std::vector<cancel_order_info_t> orders;
+
+    static cancel_all_open_orders_info_t construct(const flatjson::fjson &json);
+    friend std::ostream &operator<<(std::ostream &os, const cancel_all_open_orders_info_t &o);
+};
+
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-trade-list-user_data
 struct my_trades_info_t {
     struct my_trade_info_t {

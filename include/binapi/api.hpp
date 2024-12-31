@@ -310,6 +310,11 @@ struct api {
     result<cancel_order_info_t>
     cancel_order(const char *symbol, std::size_t order_id, const char *client_order_id, const char *new_client_order_id, cancel_order_cb cb = {});
 
+    // https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#cancel-all-open-orders-on-a-symbol-trade
+    using cancel_all_open_orders_cb = std::function<bool(const char *fl, int ec, std::string errmsg, cancel_all_open_orders_info_t res)>;
+    result<cancel_all_open_orders_info_t>
+    cancel_all_open_orders(const char *symbol, cancel_all_open_orders_cb cb = {});
+
     // https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#account-trade-list-user_data
     using my_trades_cb = std::function<bool(const char *fl, int ec, std::string errmsg, my_trades_info_t res)>;
     result<my_trades_info_t>
