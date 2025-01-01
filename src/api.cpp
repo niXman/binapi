@@ -999,6 +999,19 @@ api::result<cancel_order_info_t> api::cancel_order(
 
 /*************************************************************************************************/
 
+api::result<cancel_all_open_orders_info_t> api::cancel_all_open_orders(
+     const char *symbol
+    ,cancel_all_open_orders_cb cb
+) {
+    const impl::init_list_type map = {
+         {"symbol", symbol}
+    };
+
+    return pimpl->post(true, "/api/v3/openOrders", boost::beast::http::verb::delete_, map, std::move(cb));
+}
+
+/*************************************************************************************************/
+
 api::result<my_trades_info_t> api::my_trades(
      const char *symbol
     ,std::size_t start_time
